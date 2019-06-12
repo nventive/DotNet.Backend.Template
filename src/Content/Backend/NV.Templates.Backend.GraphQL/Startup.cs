@@ -1,0 +1,102 @@
+﻿using System;
+using FluentValidation;
+using GraphQL;
+using GraphQL.Server;
+using GraphQL.Server.Internal;
+using GraphQL.Server.Ui.GraphiQL;
+using GraphQL.Server.Ui.Voyager;
+using HelpDeskId;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using NV.Templates.Backend.GraphQL.Framework.GraphQL;
+using NV.Templates.Backend.GraphQL.Framework.Middlewares;
+
+namespace NV.Templates.Backend.GraphQL
+{
+    /// <summary>
+    /// ASP.NET Core startup.
+    /// </summary>
+    public class Startup
+    {
+        private readonly IConfiguration _configuration;
+
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        }
+
+        /// <summary>
+        /// Configure Dependency Injection services.
+        /// This method gets called by the runtime. Use this method to add services to the container.
+        /// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940.
+        /// </summary>
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // Register Core assembly services
+            services.AddCore();
+            services
+                .AddValidatorsFromAssemblyContaining<Startup>()
+                .AddSingleton<IHelpDeskIdGenerator, HelpDeskIdGenerator>();
+
+            // Register ASP.NET Core services
+            services
+                .AddHttpContextAccessor()
+                .AddCors()
+                .AddRouting();
+
+            // Register GraphQL services
+            services
+                .AddSingleton<IDependencyResolver, HttpContextAccessorDependencyResolver>()
+                .AddSingleton<GraphQLSchema>()
+                .AddGraphQL(options =>
+                {
+                    _configuration.GetSection(nameof(GraphQLOptions))?.Bind(options);
+                })
+                .AddGraphTypes()
+                .AddDataLoader()
+                .Services
+                .AddTransient(typeof(IGraphQLExecuter<>), typeof(GraphQLExecuter<>));
+        }
+
+        /// <summary>
+        /// Configure the HTTP request pipeline.
+        /// This method gets called by the runtime.
+        /// </summary>
+        public void Configure(IApplicationBuilder app)
+        {
+            app.UseMiddleware<AbortGraphQLWebSocketMiddleware>();
+
+            app.UseHsts()
+               .UseHttpsRedirection();
+
+            app.UseMiddleware<OperationContextMiddleware>();
+
+            app.UseCors();
+
+            app.UseHealthChecks(
+                "/health",
+                new HealthCheckOptions { ResponseWriter = HealthChecksResponseWriter.WriteResponse });
+
+            app.UseAttributions();
+
+            app
+                .UseGraphQL<GraphQLSchema>()
+                .UseGraphiQLServer(new GraphiQLOptions())
+                .UseGraphQLVoyager(new GraphQLVoyagerOptions { Path = "/voyager" });
+
+            // Small helper routes
+            app.UseRouter(router =>
+            {
+                router.MapGet(PathString.Empty, async (request, response, routeData) =>
+                {
+                    response.StatusCode = StatusCodes.Status307TemporaryRedirect;
+                    response.Headers["Location"] = $"{request.Scheme}://{request.Host}/graphiql";
+                });
+            });
+        }
+    }
+}

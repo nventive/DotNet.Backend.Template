@@ -1,0 +1,122 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "nventive",
+  "name": "nventive Backend template",
+  "identity": "NV.Templates.Backend",
+  "groupIdentity": "NV.Templates.Backend",
+  "shortName": "nv-backend",
+  "classifications": ["Backend"],
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "NV.Templates.Backend",
+  "preferNameDirectory": true,
+  "symbols": {
+    "company": {
+      "type": "parameter",
+      "datatype": "string",
+      "defaultValue": "MyCompany",
+      "replaces": "Company",
+      "description": "The name of the company which determines the assembly company and copyright information."
+    },
+    "aspnet": {
+      "type": "parameter",
+      "description": "Adds ASP.NET Core head project",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "functions": {
+      "type": "parameter",
+      "description": "Adds Azure Functions head project",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "console": {
+      "type": "parameter",
+      "description": "Adds Console head project",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "graphql": {
+      "type": "parameter",
+      "description": "Adds GraphQL head project",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "HttpPort": {
+      "type": "parameter",
+      "datatype": "integer",
+      "description": "Port number to use for the HTTP endpoint in launchSettings.json."
+    },
+    "HttpPortGenerated": {
+      "type": "generated",
+      "generator": "port"
+    },
+    "HttpPortReplacer": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "HttpPort",
+        "fallbackVariableName": "HttpPortGenerated"
+      },
+      "replaces": "49370"
+    },
+    "HttpsPort": {
+      "type": "parameter",
+      "datatype": "integer",
+      "description": "Port number to use for the HTTPS endpoint in launchSettings.json."
+    },
+    "HttpsPortGenerated": {
+      "type": "generated",
+      "generator": "port",
+      "parameters": {
+        "low": 44300,
+        "high": 44399
+      }
+    },
+    "HttpsPortReplacer": {
+      "type": "generated",
+      "generator": "coalesce",
+      "parameters": {
+        "sourceVariableName": "HttpsPort",
+        "fallbackVariableName": "HttpsPortGenerated"
+      },
+      "replaces": "44314"
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "exclude": [
+            "**/[Bb]in/**",
+            "**/[Oo]bj/**",
+            ".template.config/**/*",
+            "**/*.filelist",
+            "**/*.user",
+            "**/*.lock.json",
+            ".vs/**",
+            ".git/**"
+          ]
+        },
+        {
+          "condition": "(!aspnet)",
+          "exclude": ["**/*Web*/**"]
+        },
+        {
+          "condition": "(!functions)",
+          "exclude": ["**/*Functions*/**"]
+        },
+        {
+          "condition": "(!graphql)",
+          "exclude": ["**/*GraphQL*/**"]
+        },
+        {
+          "condition": "(!console)",
+          "exclude": ["**/*Console*/**"]
+        }
+      ]
+    }
+  ]
+}

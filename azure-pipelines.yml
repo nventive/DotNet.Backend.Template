@@ -1,0 +1,28 @@
+
+pool:
+  vmImage: 'windows-2019'
+
+variables:
+  buildConfiguration: 'Release'
+  artifactsFeedId: '/36e50407-5798-43e2-b0e2-a0de0e3f46c6'
+
+steps:
+- task: GitVersion@4
+  displayName: Git Version
+  inputs:
+    updateAssemblyInfo: false
+
+- task: NuGetCommand@2
+  displayName: NuGet Pack
+  command: pack
+  packDestination: $(build.artifactStagingDirectory)
+  versioningScheme: byEnvVar
+  versionEnvVar: GitVersion.NuGetVersionV2
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'push'
+    packagesToPush: '$(build.artifactStagingDirectory)/**/*.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: '$(artifactsFeedId)'
+  condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq('true', variables['forcePushNuget'])))
