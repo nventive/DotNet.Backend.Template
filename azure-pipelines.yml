@@ -3,7 +3,6 @@ pool:
   vmImage: 'windows-2019'
 
 variables:
-  buildConfiguration: 'Release'
   artifactsFeedId: '/36e50407-5798-43e2-b0e2-a0de0e3f46c6'
 
 steps:
@@ -12,12 +11,38 @@ steps:
   inputs:
     updateAssemblyInfo: false
 
+- task: DotNetCoreCLI@2
+  displayName: Restore NuGet Packages
+  inputs:
+    command: 'restore'
+    projects: '**/*.sln'
+    feedsToUse: 'select'
+    vstsFeed: $(artifactsFeedId)
+
+- task: DotNetCoreCLI@2
+  displayName: Build Projects
+  inputs:
+    command: build
+    projects: '**/*.sln'
+    arguments: --no-restore
+
+- task: PowerShell@2
+  displayName: Update TemplateVersion props
+  inputs:
+    filePath: 'build/Update-TemplateVersions.ps1'
+
+
 - task: NuGetCommand@2
   displayName: NuGet Pack
-  command: pack
-  packDestination: $(build.artifactStagingDirectory)
-  versioningScheme: byEnvVar
-  versionEnvVar: GitVersion.NuGetVersionV2
+  inputs:
+    command: pack
+    packagesToPack: src/NV.Templates.nuspec
+    packDestination: $(build.artifactStagingDirectory)
+    versioningScheme: byEnvVar
+    versionEnvVar: GitVersion.NuGetVersionV2
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Build Artifacts'
 
 - task: NuGetCommand@2
   inputs:

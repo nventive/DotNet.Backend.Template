@@ -8,7 +8,6 @@
     <description>Project templates from nventive.</description>
     <copyright>Copyright (c) 2019, nventive</copyright>
     <language>en-CA</language>
-    <license type="expression">Apache-2.0</license>
     <packageTypes>
       <packageType name="Template" />
     </packageTypes>
