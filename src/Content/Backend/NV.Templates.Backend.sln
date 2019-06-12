@@ -18,22 +18,30 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Core",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Core.Tests", "NV.Templates.Backend.Core.Tests\NV.Templates.Backend.Core.Tests.csproj", "{362BC68E-772F-46C9-949D-4FB338342A73}"
 EndProject
+//#if (aspnet)
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Web", "NV.Templates.Backend.Web\NV.Templates.Backend.Web.csproj", "{9878DA6B-87BD-4326-B6DB-7382C945233D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Web.Tests", "NV.Templates.Backend.Web.Tests\NV.Templates.Backend.Web.Tests.csproj", "{3376F981-5E0E-496C-9B07-DEBFD3AA354A}"
 EndProject
+//#endif
+//#if (functions)
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Functions", "NV.Templates.Backend.Functions\NV.Templates.Backend.Functions.csproj", "{42DF8B94-4DA5-4906-B42E-CA499C00B587}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Functions.Tests", "NV.Templates.Backend.Functions.Tests\NV.Templates.Backend.Functions.Tests.csproj", "{CA1A659A-00FD-4D28-9333-4A0CA23A3719}"
 EndProject
+//#endif
+//#if (console)
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Console", "NV.Templates.Backend.Console\NV.Templates.Backend.Console.csproj", "{6B9B9A88-1260-40EC-964D-21CE291643F7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Console.Tests", "NV.Templates.Backend.Console.Tests\NV.Templates.Backend.Console.Tests.csproj", "{554FF2FA-D806-442A-9280-F2643DD6840C}"
 EndProject
+//#endif
+//#if (graphql)
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.GraphQL", "NV.Templates.Backend.GraphQL\NV.Templates.Backend.GraphQL.csproj", "{DDE03BBB-E04C-429E-BF0C-5B19B22C50E6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.GraphQL.Tests", "NV.Templates.Backend.GraphQL.Tests\NV.Templates.Backend.GraphQL.Tests.csproj", "{0BCC3845-EB6A-4F4A-99AF-A280CD7E944D}"
 EndProject
+//#endif
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

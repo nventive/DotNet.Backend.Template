@@ -5,26 +5,19 @@ Install [.Net Core SDK](https://dotnet.microsoft.com/download)
 
 ## Install template
 
-- Clone this repository
-- Run `dotnet new -i "<local template directory>\Template\Content"`
+- Run `dotnet new -i NV.Templates
 
-## Create a project
+## Create a backend project
 
-Run `dotnet new backend -n <project root namespace>`
+Run `dotnet new nv-backend -n <project root namespace> -c <company name>`
 
 The default project template only generates the Core project. To add head projects, use the following options:
   - `--aspnet`: Adds ASP.NET project head
+  - `--graphql`: Adds GraphQL project head
   - `--functions`: Adds Azure Functions project head
   - `--console`: Adds Console project head
-  - `--resourceGroup`: Adds Azure ARM Template (Resource Group) project
-  - `--nodoc`: Disable Architecture Documentation generation
 
-## Update the template to the latest version
+## Create a component project
 
-- Git pull the local template repository
-- Run `dotnet new -i "<local template directory>"` again
+Run `dotnet new nv-component -n <project root namespace> -c <company name>`
 
-## Recipes
-
-This projects also contains reference implementations and recipes for various topics.
-Please check the Recipes solution for more.
