@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using NV.Templates.Backend.Core.General;
 
@@ -34,9 +33,8 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
         /// <summary>
         /// Invoked by ASP.NET.
         /// </summary>
-        public Task Invoke(HttpContext context)
+        public Task Invoke(HttpContext context, IOperationContext operationContext)
         {
-            var operationContext = context.RequestServices.GetRequiredService<IOperationContext>();
             operationContext.OperationId = Activity.Current.RootId;
             operationContext.Timestamp = _clock.GetCurrentInstant();
 

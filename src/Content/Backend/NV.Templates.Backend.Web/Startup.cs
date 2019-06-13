@@ -98,9 +98,9 @@ namespace NV.Templates.Backend.Web
             app.UseHsts()
                .UseHttpsRedirection();
 
+            app.UseRequestTracing();
             app.UseExceptionHandler(ExceptionHandler.ConfigureExceptionHandling);
 
-            app.UseRequestTracing();
             app.UseMiddleware<OperationContextMiddleware>();
 
             app.UseResponseCaching();
