@@ -10,10 +10,15 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
 {
     /// <summary>
     /// This middleware is responsible for setting the current <see cref="IOperationContext.OperationId"/>
-    /// from <see cref="Activity.Current.Id"/>
+    /// from <see cref="Activity.Current.Id"/>.
     /// </summary>
     internal class OperationContextMiddleware
     {
+        /// <summary>
+        /// Gets the Response Header for the current <see cref="OperationContext.OperationId"/>.
+        /// </summary>
+        public const string OperationIdHeader = "X-OperationId";
+
         private readonly RequestDelegate _next;
         private readonly IClock _clock;
 
@@ -32,8 +37,10 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
         public Task Invoke(HttpContext context)
         {
             var operationContext = context.RequestServices.GetRequiredService<IOperationContext>();
-            operationContext.OperationId = Activity.Current.Id;
+            operationContext.OperationId = Activity.Current.RootId;
             operationContext.Timestamp = _clock.GetCurrentInstant();
+
+            context.Response.Headers.Add(OperationIdHeader, operationContext.OperationId);
             return _next(context);
         }
     }

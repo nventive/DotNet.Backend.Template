@@ -34,6 +34,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     options.SwaggerDoc(apiVersionDescription.GroupName, info);
                 }
 
+                options.OperationFilter<HeadersOperationFilter>();
                 options.DocumentFilter<HealthChecksDocumentFilter>();
                 options.EnableAnnotations();
                 options.DescribeAllEnumsAsStrings();

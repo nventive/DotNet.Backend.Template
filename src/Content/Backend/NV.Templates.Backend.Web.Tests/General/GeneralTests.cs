@@ -1,7 +1,10 @@
-﻿using System.Net.Http;
+﻿using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using HttpClientUtilities;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NV.Templates.Backend.Web.Framework.Middlewares;
 using NV.Templates.Backend.Web.General;
@@ -34,6 +37,16 @@ namespace NV.Templates.Backend.Web.Tests.General
         }
 
         [Fact]
+        public async Task ItShouldReturnOperationIdHeader()
+        {
+            var client = _factory.CreateClient();
+
+            var response = await client.GetAsync(FluentUriBuilder.ForPath("/info"));
+
+            response.Headers.GetValues(OperationContextMiddleware.OperationIdHeader).FirstOrDefault().Should().NotBeNullOrEmpty();
+        }
+
+        [Fact]
         public async Task ItShouldReturnAttributions()
         {
             var client = _factory.CreateClient();
@@ -56,6 +69,23 @@ namespace NV.Templates.Backend.Web.Tests.General
             response.EnsureSuccessStatusCode();
             var healthReport = await response.Content.ReadAsAsync<HealthReport>();
             healthReport.Status.Should().Be(HealthStatus.Healthy);
+        }
+
+        [Fact]
+        public async Task ItShouldReturnSwaggerDoc()
+        {
+            var client = _factory.CreateClient();
+
+            var apiVersionDescriptionProvider = _factory.Server.Host.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+            foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions.OrderByDescending(x => x.GroupName))
+            {
+                var uri = FluentUriBuilder
+                    .ForPath("/swagger")
+                    .WithSegment(description.GroupName)
+                    .WithSegment("swagger.json");
+                var response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
+            }
         }
     }
 }
