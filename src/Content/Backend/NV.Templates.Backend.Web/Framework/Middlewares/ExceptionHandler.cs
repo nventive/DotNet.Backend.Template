@@ -26,6 +26,16 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
     internal static class ExceptionHandler
     {
         /// <summary>
+        /// The name of the property in <see cref="ProblemDetails"/> that holds the current <see cref="OperationContext.OperationId"/>.
+        /// </summary>
+        public const string OperationIdProperty = "operationId";
+
+        /// <summary>
+        /// The name of the property in <see cref="ProblemDetails"/> that holds the generated <see cref="HelpDeskId"/>.
+        /// </summary>
+        public const string HelpDeskIdProperty = "helpDeskId";
+
+        /// <summary>
         /// Configure Exception Handling.
         /// </summary>
         public static void ConfigureExceptionHandling(IApplicationBuilder app)
@@ -48,14 +58,14 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
         {
             var operationContext = context.RequestServices.GetService<IOperationContext>();
             var helpDeskIdGenerator = context.RequestServices.GetService<IHelpDeskIdGenerator>();
-            var requestId = operationContext?.OperationId ?? Activity.Current?.Id;
+            var operationId = operationContext?.OperationId ?? Activity.Current?.Id;
             var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
             var responseModel = CreateErrorModel(exceptionHandlerFeature?.Error);
-            responseModel.Extensions["requestId"] = requestId;
+            responseModel.Extensions[OperationIdProperty] = operationId;
             var helpDeskId = helpDeskIdGenerator?.GenerateReadableId(CultureInfo.InvariantCulture);
             if (!string.IsNullOrEmpty(helpDeskId))
             {
-                responseModel.Extensions["helpDeskId"] = helpDeskId;
+                responseModel.Extensions[HelpDeskIdProperty] = helpDeskId;
                 logger.LogError("HelpDeskId: {helpDeskId}", helpDeskId);
             }
 

@@ -132,7 +132,8 @@ namespace NV.Templates.Backend.Web.Tests.Framework.Middlewares
             using (var streamReader = new StreamReader(httpContext.Response.Body))
             {
                 var result = JsonConvert.DeserializeObject<ProblemDetails>(streamReader.ReadToEnd());
-                result.Extensions["requestId"].Should().Be(operationId);
+                result.Extensions[ExceptionHandler.OperationIdProperty].Should().Be(operationId);
+                result.Extensions[ExceptionHandler.HelpDeskIdProperty].Should().NotBeNull();
                 assert(exception, result);
             }
         }

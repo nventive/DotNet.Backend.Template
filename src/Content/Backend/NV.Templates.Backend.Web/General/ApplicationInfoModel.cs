@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 using NV.Templates.Backend.Core.General;
 
 namespace NV.Templates.Backend.Web.General
@@ -21,10 +23,16 @@ namespace NV.Templates.Backend.Web.General
         {
         }
 
+        [Required]
+        [Description("The system name")]
         public string Name { get; }
 
+        [Required]
+        [Description("The system version")]
         public string Version { get; }
 
+        [Required]
+        [Description("The name of the environment")]
         public string Environment { get; }
     }
 }

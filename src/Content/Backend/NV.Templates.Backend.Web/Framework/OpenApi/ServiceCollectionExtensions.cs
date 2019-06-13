@@ -1,18 +1,17 @@
-﻿using MicroElements.Swashbuckle.NodaTime;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
 using NV.Templates.Backend.Core.General;
 using NV.Templates.Backend.Web.Framework.Middlewares;
 using NV.Templates.Backend.Web.Framework.OpenApi;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     internal static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Registers Core services.
+        /// Registers Open Api services.
         /// </summary>
         public static IServiceCollection AddOpenApi(this IServiceCollection services)
         {
@@ -21,27 +20,21 @@ namespace Microsoft.Extensions.DependencyInjection
             var apiVersionDescriptionProvider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
             var jsonOptions = initProvider.GetRequiredService<IOptions<MvcJsonOptions>>().Value;
 
-            services.AddSwaggerGen(options =>
+            foreach (var apiVersionDescription in apiVersionDescriptionProvider.ApiVersionDescriptions.OrderByDescending(x => x.GroupName))
             {
-                foreach (var apiVersionDescription in apiVersionDescriptionProvider.ApiVersionDescriptions)
+                services.AddOpenApiDocument(document =>
                 {
-                    var info = new Info
-                    {
-                        Title = $"{applicationInfo.Name} ({applicationInfo.Environment})",
-                        Version = applicationInfo.Version,
-                        Description = $"<i>For 3rd party licenses see <a href='{AttributionsHandler.Path}'>attributions</a>.</i>",
-                    };
-                    options.SwaggerDoc(apiVersionDescription.GroupName, info);
-                }
+                    document.DocumentName = apiVersionDescription.GroupName;
+                    document.Title = $"{applicationInfo.Name} ({applicationInfo.Environment})";
+                    document.Version = applicationInfo.Version;
+                    document.Description = $"<i>For 3rd party licenses see <a href='{AttributionsHandler.Path}'>attributions</a>.</i>";
+                    document.ApiGroupNames = new[] { apiVersionDescription.GroupName };
 
-                options.OperationFilter<HeadersOperationFilter>();
-                options.DocumentFilter<HealthChecksDocumentFilter>();
-                options.EnableAnnotations();
-                options.DescribeAllEnumsAsStrings();
-                options.DescribeStringEnumsInCamelCase();
-                options.AddFluentValidationRules();
-                options.ConfigureForNodaTime(jsonOptions.SerializerSettings);
-            });
+                    document.DocumentProcessors.Add(new HealthChecksDocumentProcessor());
+                    document.OperationProcessors.Add(new CommonHeadersOperationProcessor());
+                    document.OperationProcessors.Add(new CommonErrorsOperationProcessor());
+                });
+            }
 
             return services;
         }

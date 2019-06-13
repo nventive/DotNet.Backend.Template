@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.ComponentModel;
+using Microsoft.AspNetCore.Mvc;
 using NV.Templates.Backend.Core.General;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace NV.Templates.Backend.Web.General
 {
@@ -15,7 +15,7 @@ namespace NV.Templates.Backend.Web.General
         }
 
         [HttpGet("info")]
-        [SwaggerOperation(Summary = "Get application information")]
+        [Description("Get application information")]
         public ActionResult<ApplicationInfoModel> GetInfo()
         {
             return Ok(new ApplicationInfoModel(_applicationInfo));

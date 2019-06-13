@@ -1,9 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
 using NV.Templates.Backend.Core.Framework.Exceptions;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace NV.Templates.Backend.Web.General
 {
@@ -16,16 +17,18 @@ namespace NV.Templates.Backend.Web.General
     {
         [ApiVersion("1")]
         [HttpGet("hello")]
-        [SwaggerOperation(Summary = "Sample Hello world")]
-        public ActionResult<string> GetHello(string name = null)
+        [Description("Sample Hello world")]
+        public ActionResult<string> GetHello([Description("The salutation")] string name = null)
         {
             return Ok($"Hello, {name ?? "world"}");
         }
 
         [ApiVersion("2")]
         [HttpGet("hello")]
-        [SwaggerOperation(Summary = "Sample Hello world")]
-        public ActionResult<HelloWorldResponse> GetHelloV2([FromServices] IClock clock, string name = null)
+        [Description("Sample Hello world")]
+        public ActionResult<HelloWorldResponse> GetHelloV2(
+            [FromServices] IClock clock,
+            [Description("The salutation")] string name = null)
         {
             return Ok(new HelloWorldResponse { Message = $"Hello, {name ?? "world"}", Timestamp = clock.GetCurrentInstant() });
         }
@@ -33,7 +36,7 @@ namespace NV.Templates.Backend.Web.General
         [ApiVersion("1")]
         [ApiVersion("2")]
         [HttpPost("sample")]
-        [SwaggerOperation(Summary = "Sample Post action")]
+        [Description("Sample Post action")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public IActionResult PostSample(bool return404 = false)
@@ -49,8 +52,11 @@ namespace NV.Templates.Backend.Web.General
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Sample code to be deleted.")]
         public class HelloWorldResponse
         {
+            [Required]
+            [Description("The generated message")]
             public string Message { get; set; }
 
+            [Description("The generated timestamp")]
             public Instant Timestamp { get; set; }
         }
     }

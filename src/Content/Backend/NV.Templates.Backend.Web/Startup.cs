@@ -93,10 +93,11 @@ namespace NV.Templates.Backend.Web
         /// Configure the HTTP request pipeline.
         /// This method gets called by the runtime.
         /// </summary>
-        public void Configure(IApplicationBuilder app, IApiVersionDescriptionProvider apiVersionDescriptionProvider)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseHsts()
-               .UseHttpsRedirection();
+               .UseHttpsRedirection()
+               .UseCors();
 
             app.UseRequestTracing();
             app.UseExceptionHandler(ExceptionHandler.ConfigureExceptionHandling);
@@ -113,16 +114,11 @@ namespace NV.Templates.Backend.Web
 
             app.UseMvc();
 
-            app.UseSwagger()
-               .UseSwaggerUI(options =>
-               {
-                   foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions.OrderByDescending(x => x.GroupName))
-                   {
-                       options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
-                   }
-               });
-
-            app.UseCors();
+            app.UseOpenApi();
+            app.UseSwaggerUi3(configure =>
+            {
+                configure.DocExpansion = "list";
+            });
         }
     }
 }
