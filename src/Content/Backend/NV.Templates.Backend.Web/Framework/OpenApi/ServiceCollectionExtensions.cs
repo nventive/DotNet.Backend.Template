@@ -1,7 +1,5 @@
 ﻿using System.Linq;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.Options;
 using NV.Templates.Backend.Core.General;
 using NV.Templates.Backend.Web.Framework.Middlewares;
 using NV.Templates.Backend.Web.Framework.OpenApi;
@@ -18,7 +16,6 @@ namespace Microsoft.Extensions.DependencyInjection
             var initProvider = services.BuildServiceProvider();
             var applicationInfo = initProvider.GetRequiredService<IApplicationInfo>();
             var apiVersionDescriptionProvider = services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
-            var jsonOptions = initProvider.GetRequiredService<IOptions<MvcJsonOptions>>().Value;
 
             foreach (var apiVersionDescription in apiVersionDescriptionProvider.ApiVersionDescriptions.OrderByDescending(x => x.GroupName))
             {

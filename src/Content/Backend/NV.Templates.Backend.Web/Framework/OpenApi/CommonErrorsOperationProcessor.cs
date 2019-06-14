@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NJsonSchema;
 using NSwag;
 using NSwag.Generation.Processors;
