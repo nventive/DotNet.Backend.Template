@@ -18,10 +18,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Core",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Core.Tests", "NV.Templates.Backend.Core.Tests\NV.Templates.Backend.Core.Tests.csproj", "{362BC68E-772F-46C9-949D-4FB338342A73}"
 EndProject
-//#if (aspnet)
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Web", "NV.Templates.Backend.Web\NV.Templates.Backend.Web.csproj", "{9878DA6B-87BD-4326-B6DB-7382C945233D}"
+//#if (restapi)
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.RestApi", "NV.Templates.Backend.RestApi\NV.Templates.Backend.RestApi.csproj", "{9878DA6B-87BD-4326-B6DB-7382C945233D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Web.Tests", "NV.Templates.Backend.Web.Tests\NV.Templates.Backend.Web.Tests.csproj", "{3376F981-5E0E-496C-9B07-DEBFD3AA354A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.RestApi.Tests", "NV.Templates.Backend.RestApi.Tests\NV.Templates.Backend.RestApi.Tests.csproj", "{3376F981-5E0E-496C-9B07-DEBFD3AA354A}"
 EndProject
 //#endif
 //#if (functions)

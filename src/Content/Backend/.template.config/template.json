@@ -20,9 +20,9 @@
       "replaces": "Company",
       "description": "The name of the company which determines the assembly company and copyright information."
     },
-    "aspnet": {
+    "restapi": {
       "type": "parameter",
-      "description": "Adds ASP.NET Core head project",
+      "description": "Adds ASP.NET Core REST API head project",
       "datatype": "bool",
       "defaultValue": "false"
     },
@@ -101,8 +101,8 @@
           ]
         },
         {
-          "condition": "(!aspnet)",
-          "exclude": ["**/*Web*/**"]
+          "condition": "(!restapi)",
+          "exclude": ["**/*RestApi*/**"]
         },
         {
           "condition": "(!functions)",
