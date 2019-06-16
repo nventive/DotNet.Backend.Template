@@ -8,8 +8,7 @@ using NV.Templates.Backend.Core.General;
 namespace NV.Templates.Backend.Web.Framework.Middlewares
 {
     /// <summary>
-    /// This middleware is responsible for setting the current <see cref="IOperationContext.OperationId"/>
-    /// from <see cref="Activity.Current.Id"/>.
+    /// This middleware is responsible for setting the current <see cref="IOperationContext"/> values.
     /// </summary>
     internal class OperationContextMiddleware
     {

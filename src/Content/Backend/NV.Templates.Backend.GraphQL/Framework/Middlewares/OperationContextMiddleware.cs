@@ -2,18 +2,21 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using NV.Templates.Backend.Core.General;
 
 namespace NV.Templates.Backend.GraphQL.Framework.Middlewares
 {
     /// <summary>
-    /// This middleware is responsible for setting the current <see cref="IOperationContext.OperationId"/>
-    /// from <see cref="Activity.Current.Id"/>
+    /// This middleware is responsible for setting the current <see cref="IOperationContext"/> values.
     /// </summary>
     internal class OperationContextMiddleware
     {
+        /// <summary>
+        /// Gets the Response Header for the current <see cref="OperationContext.OperationId"/>.
+        /// </summary>
+        public const string OperationIdHeader = "X-OperationId";
+
         private readonly RequestDelegate _next;
         private readonly IClock _clock;
 
@@ -29,11 +32,12 @@ namespace NV.Templates.Backend.GraphQL.Framework.Middlewares
         /// <summary>
         /// Invoked by ASP.NET.
         /// </summary>
-        public Task Invoke(HttpContext context)
+        public Task Invoke(HttpContext context, IOperationContext operationContext)
         {
-            var operationContext = context.RequestServices.GetRequiredService<IOperationContext>();
-            operationContext.OperationId = Activity.Current.Id;
+            operationContext.OperationId = Activity.Current.RootId;
             operationContext.Timestamp = _clock.GetCurrentInstant();
+
+            context.Response.Headers.Add(OperationIdHeader, operationContext.OperationId);
             return _next(context);
         }
     }
