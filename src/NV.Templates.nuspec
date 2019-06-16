@@ -3,11 +3,10 @@
   <metadata>
     <id>NV.Templates</id>
     <version>1.0.0</version>
-    <title>nventive .NET Core Templates</title>
+    <title>NV.Templates</title>
     <authors>nventive</authors>
-    <description>Project templates from nventive.</description>
+    <description>.NET Core Templates for backend applications and open-source components.</description>
     <copyright>Copyright (c) 2019, nventive</copyright>
-    <language>en-CA</language>
     <packageTypes>
       <packageType name="Template" />
     </packageTypes>
