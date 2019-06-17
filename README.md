@@ -119,6 +119,36 @@ environment, if you need to do it yourself here is what's needed:
   (e.g. by using [`IServiceProvider.CreateScope`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.serviceproviderserviceextensions.createscope?view=aspnetcore-2.2))
 
 
+#### RestApi
+
+When using the `--restapi` option, 2 projects are added to the solution:
+
+- `RestApi`: An ASP.NET Core application setup for exposing the Core library as a Rest API. Contains the following features:
+  - MVC bootstrap code with API-related features only (using [AddMvcCore](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.mvccoreservicecollectionextensions.addmvccore?view=aspnetcore-2.2) instead of [AddMvc](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.mvcservicecollectionextensions.addmvc?view=aspnetcore-2.2))
+  - JSON options configured with sensible default and include `NodaTime` serialization support
+  - [ASP.NET Core API Versioning](https://github.com/microsoft/aspnet-api-versioning) is
+    enabled and setup with support for versioning of the API in the URL (e.g. `/api/v1/...`)
+  - [FluentValidation](https://fluentvalidation.net/) is configured and integrated with
+    the ASP.NET Core MVC pipeline
+  - [Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview) is configured
+  - HTTPS is enforced and [HSTS](https://fr.wikipedia.org/wiki/HTTP_Strict_Transport_Security) is configured
+  - [CORS](https://developer.mozilla.org/fr/docs/Web/HTTP/CORS) is configured
+  - Full request and response tracing is available, courtesy of the `AspNetCoreRequestTracing` component
+  - Generic error handling middleware is already setup (in `Framework.Middleware.ExceptionHandler`)
+    and configured for the exception classes provided in the Core project
+  - HTTP Response caching is configured to return "no-store,no-cache" by default
+  - Swagger/Open API support is configured, courtesy of [NSwag](https://github.com/RicoSuter/NSwag)
+  - `/attributions.txt` handler configured, to expose the `ATTRIBUTIONS.txt` file
+    the includes 3rd-party NuGet licenses
+  - `/info` endpoint that exposes `IApplicationInfo` information
+  - [ASP.NET Core health checks](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-2.2) are configured, with additional tracing options exposed through a `/health` endpoint
+  - all operations return a `X-OperationId` header with the current `IOperationContext.Id` value
+  - errors include an additional Help Desk Id property, courtesy of the `HelpDeskId` component
+
+- `RestApi.Tests`: a [xUnit](https://xunit.net/) [integration tests](https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-2.2) project.
+  Sets up a `TestWebApplicationFactory` and a xUnit collection for tests that 
+  automatically starts an in-memory instance of the ASP.NET Core application.
+
 ### Component
 
 ## Changelog
