@@ -60,6 +60,65 @@ For more details on what's provided, see the [Features / Component](#component) 
 
 ### Backend
 
+#### Core
+
+Regardless of the options provided to the template, there is always 2 projects
+that are generated: `Core` and `Core.Tests`, along with some supporting solution files.
+
+Here is the set of feature provided as part of the Core feature set:
+
+- `Core`: a `netstandard2.0` library where the business logic of the application
+is meant to reside. Contains:
+  - `IApplicationInfo` / `ApplicationInfo` service that represents the execution
+    environment of the application itself
+  - `IOperationContext` / `OperationContext` service that represents a the execution
+    environment of a single operation executed by the library; it is meant to be
+    registered as a *Scoped* service, and the lifetime of it must be managed by the
+    Dependency Injection container
+  - Various interfaces and base classes for Entity-type class (in the `Framework` namespace) 
+  - an `IdGenerator` utility class to generate unique ids as reasonably readable strings
+  - Inclusion of [NodaTime](https://nodatime.org/) as the preferred library to
+    handle Date/Time concerns
+  - Inclusion of [FluentValidation](https://fluentvalidation.net/) as the preferred
+    library for validating entities
+  - Inclusion of helpers and extension methods to handle pagination as Continuation tokens
+    (in `Framework/Continuation`) as the preferred method to handle pagination
+    (as opposed to offset pagination)
+  - A set of standard, application-level `Exception` classes to handle common cases
+    (`ConcurrencyException`, `DependencyException`, `NotFoundException`)
+  - An extension method to help registering all services in the Dependency Injection
+    container (in `ServiceCollectionExtensions`)
+
+- `Core.Tests`: a [xUnit](https://xunit.net/) project for unit-tests. Contains:
+  - `OptionsHelper` to help load [Options](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-2.2) from unit-tests projects configuration
+  - `EntityFactory` to help implement the [Object Mother](https://martinfowler.com/bliki/ObjectMother.html) unit testing pattern
+  - An adapter that adapts a `ILogger` to the standard xUnit output
+
+- Solution Items files: Various solution files that apply to all projects:
+  - an [.editorconfig](https://editorconfig.org/) configuration file
+  - standard configuration for [StyleCop](https://github.com/DotNetAnalyzers/StyleCopAnalyzers) and [FxCop](https://github.com/dotnet/roslyn-analyzers) that applies to all projects in the solution
+  - common set of properties for all projects (in `Directory.Build.props`)
+  - a Powershell script to generate an `ATTRIBUTIONS.txt` file to collect all
+    NuGet packages license information to ensure compliance
+
+*Implementation Get Started*
+
+- Create the relevant service interfaces and implementations
+- Add the registration code for each one in `ServiceCollectionExtensions.AddCore`
+- Create the corresponding unit tests in the `Core.Tests` project
+
+*Using the library*
+
+In order to use the library in the context of an application, it needs to be setup
+in a specific way. While the template options for head projects provide such an
+environment, if you need to do it yourself here is what's needed:
+
+- [Create a .NET Host](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2)
+- Configure the library by adding the library services using the `IServiceCollection.AddCore` extension method
+- Ensure that each operation is executed in a separate scope
+  (e.g. by using [`IServiceProvider.CreateScope`](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.serviceproviderserviceextensions.createscope?view=aspnetcore-2.2))
+
+
 ### Component
 
 ## Changelog
