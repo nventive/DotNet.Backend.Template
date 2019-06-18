@@ -98,6 +98,8 @@ is meant to reside. Contains:
   - an [.editorconfig](https://editorconfig.org/) configuration file
   - standard configuration for [StyleCop](https://github.com/DotNetAnalyzers/StyleCopAnalyzers) and [FxCop](https://github.com/dotnet/roslyn-analyzers) that applies to all projects in the solution
   - common set of properties for all projects (in `Directory.Build.props`)
+  - all projects are marked with a property named `TemplateVersion` that is set
+    to the template version used during project generation
   - a Powershell script to generate an `ATTRIBUTIONS.txt` file to collect all
     NuGet packages license information to ensure compliance
 
@@ -199,6 +201,27 @@ When using the `--console` option, 2 projects are added to the solution:
 - `Console.Tests`: a [xUnit](https://xunit.net/) project for unit testing the commands
 
 ### Component
+
+Provides a base repository, solution and projects to create an open-source component.
+
+Includes:
+
+- an [.editorconfig](https://editorconfig.org/) configuration file
+- 2 projects:
+  - a `netstandard2.0` library for the component
+  - a [xUnit](https://xunit.net/) project for unit testing
+- standard configuration for [StyleCop](https://github.com/DotNetAnalyzers/StyleCopAnalyzers) and [FxCop](https://github.com/dotnet/roslyn-analyzers) that applies to all projects in the solution
+- common set of properties for all projects (in `Directory.Build.props`)
+- all projects are marked with a property named `TemplateVersion` that is set
+  to the template version used during project generation
+- default `azure-pipeline.yml` CI build file, along with an adequate [GitVersion](https://gitversion.readthedocs.io) configuration
+- standard supporting file for GitHub-published components:
+  - a default `README.md` file
+  - a [`CHANGELOG.md`](https://keepachangelog.com) file
+  - default GitHub Issue and Pull Requests templates
+  - an Apache-2.0 `LICENSE` file
+  - a [Contributor Covenant Code of Conduct](https://www.contributor-covenant.org/)
+  - instructions regarding contributions
 
 ## Changelog
 
