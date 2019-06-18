@@ -142,12 +142,61 @@ When using the `--restapi` option, 2 projects are added to the solution:
     the includes 3rd-party NuGet licenses
   - `/info` endpoint that exposes `IApplicationInfo` information
   - [ASP.NET Core health checks](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-2.2) are configured, with additional tracing options exposed through a `/health` endpoint
+  - Models that maps with the Continuation tokens classes defined in `Core`
   - all operations return a `X-OperationId` header with the current `IOperationContext.Id` value
   - errors include an additional Help Desk Id property, courtesy of the `HelpDeskId` component
 
 - `RestApi.Tests`: a [xUnit](https://xunit.net/) [integration tests](https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-2.2) project.
   Sets up a `TestWebApplicationFactory` and a xUnit collection for tests that 
   automatically starts an in-memory instance of the ASP.NET Core application.
+
+#### GraphQL
+
+When using the `--graphql` option, 2 projects are added to the solution:
+
+- `GraphQL`: an ASP.NET Core project (without MVC) that exposes a GraphQL API using [GraphQL.NET](https://graphql-dotnet.github.io/)
+  - [Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview) is configured
+  - HTTPS is enforced and [HSTS](https://fr.wikipedia.org/wiki/HTTP_Strict_Transport_Security) is configured
+  - [CORS](https://developer.mozilla.org/fr/docs/Web/HTTP/CORS) is configured
+  - Full GraphQL Query and response tracing is available
+  - `/attributions.txt` handler configured, to expose the `ATTRIBUTIONS.txt` file
+    the includes 3rd-party NuGet licenses
+  - [ASP.NET Core health checks](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-2.2) are configured, with additional tracing options exposed through a `/health` endpoint
+  - Support for GraphQL Extensions that output `IOperationContext` information
+  - Generic error handling Field Middleware
+  - Support for custom error handling that include an additional Help Desk Id property, courtesy of the `HelpDeskId` component
+  - Built-in [GraphiQL](https://github.com/graphql/graphiql) and [GraphQL Voyager](https://github.com/APIs-guru/graphql-voyager) endpoints
+  - Support for `IDependencyResolver` in GraphQL nodes to resolve dependencies
+  - Custom Models for continuation collections and continuation tokens
+  - Custom Models for exposing a Relay-like Node interface for GraphQL nodes that subclass the `NodeGraphType` class
+  - Custom Models for exposing a Relay-like Mutations for GraphQL nodes that subclass the `MutationPayloadGraphType` class
+
+- `GraphQL.Tests`: a [xUnit](https://xunit.net/) [integration tests](https://docs.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-2.2) project.
+  Sets up a `TestGraphQLApplicationFactory` and a xUnit collection for tests that 
+  automatically starts an in-memory instance of the ASP.NET Core application and
+  configures a `GraphQLClient`.
+
+#### Azure Functions
+
+When using the `--functions` option, 2 projects are added to the solution:
+
+- `Functions`: an Azure Functions project
+  - Azure Functions setup with [integrated Dependency Injection](https://docs.microsoft.com/en-us/azure/azure-functions/functions-dotnet-dependency-injection)
+  - Support for scoped execution is [provided by the Azure Functions SDK](https://docs.microsoft.com/en-us/azure/azure-functions/functions-dotnet-dependency-injection#service-lifetimes)
+
+
+- `Functions.Tests`: a [xUnit](https://xunit.net/) project for unit testing the functions
+
+#### Console app
+
+When using the `--console` option, 2 projects are added to the solution:
+
+- `Console`: a .NET Core console application
+  - Organized around the Command pattern using [`CommandLineUtils`](https://github.com/natemcmaster/CommandLineUtils)
+  - Sets up a Generic Host with integrated Dependency injection
+  - Each command is a separate class, with argument parsing
+
+- `Console.Tests`: a [xUnit](https://xunit.net/) project for unit testing the commands
 
 ### Component
 

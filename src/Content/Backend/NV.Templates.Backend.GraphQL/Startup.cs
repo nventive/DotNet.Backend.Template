@@ -57,6 +57,7 @@ namespace NV.Templates.Backend.GraphQL
                     _configuration.GetSection(nameof(GraphQLOptions))?.Bind(options);
                 })
                 .AddGraphTypes()
+                .AddUserContextBuilder<GraphQLUserContextBuilder>()
                 .AddDataLoader()
                 .Services
                 .AddTransient(typeof(IGraphQLExecuter<>), typeof(GraphQLExecuter<>));
@@ -71,11 +72,10 @@ namespace NV.Templates.Backend.GraphQL
             app.UseMiddleware<AbortGraphQLWebSocketMiddleware>();
 
             app.UseHsts()
-               .UseHttpsRedirection();
+               .UseHttpsRedirection()
+               .UseCors();
 
             app.UseMiddleware<OperationContextMiddleware>();
-
-            app.UseCors();
 
             app.UseHealthChecks(
                 "/health",
