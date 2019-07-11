@@ -9,6 +9,10 @@ namespace NV.Templates.Backend.Core.Framework.Exceptions
     /// </summary>
     public class DependencyException : Exception
     {
+        public DependencyException()
+        {
+        }
+
         public DependencyException(string dependencyName)
         {
             DependencyName = dependencyName;

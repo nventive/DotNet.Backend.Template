@@ -7,6 +7,10 @@ namespace NV.Templates.Backend.Core.Framework.Exceptions
     /// </summary>
     public class ConcurrencyException : Exception
     {
+        public ConcurrencyException()
+        {
+        }
+
         public ConcurrencyException(string target)
         {
             Target = target;

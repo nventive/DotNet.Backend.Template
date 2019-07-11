@@ -7,6 +7,10 @@ namespace NV.Templates.Backend.Core.Framework.Exceptions
     /// </summary>
     public class NotFoundException : Exception
     {
+        public NotFoundException()
+        {
+        }
+
         public NotFoundException(string target)
         {
             Target = target;
