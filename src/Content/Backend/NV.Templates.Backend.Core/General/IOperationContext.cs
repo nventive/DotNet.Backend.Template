@@ -13,7 +13,7 @@ namespace NV.Templates.Backend.Core.General
         string OperationId { get; set; }
 
         /// <summary>
-        /// Gets or sets the operation timestamp
+        /// Gets or sets the operation timestamp.
         /// </summary>
         Instant Timestamp { get; set; }
     }

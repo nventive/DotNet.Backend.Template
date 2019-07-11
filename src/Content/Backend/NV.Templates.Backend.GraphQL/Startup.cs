@@ -6,6 +6,7 @@ using GraphQL.Server.Internal;
 using GraphQL.Server.Ui.GraphiQL;
 using GraphQL.Server.Ui.Voyager;
 using HelpDeskId;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NV.Templates.Backend.GraphQL.Framework.GraphQL;
 using NV.Templates.Backend.GraphQL.Framework.Middlewares;
+using NV.Templates.Backend.GraphQL.Framework.Telemetry;
 
 namespace NV.Templates.Backend.GraphQL
 {
@@ -36,19 +38,24 @@ namespace NV.Templates.Backend.GraphQL
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
-            // Register Core assembly services
+            // Core assembly services
             services.AddCore();
+
+            // Common services
             services
                 .AddValidatorsFromAssemblyContaining<Startup>()
                 .AddSingleton<IHelpDeskIdGenerator, HelpDeskIdGenerator>();
 
-            // Register ASP.NET Core services
+            // ASP.NET Core services
             services
                 .AddHttpContextAccessor()
                 .AddCors()
                 .AddRouting();
 
-            // Register GraphQL services
+            // Telemetry
+            services.AddSingleton<ITelemetryInitializer, HttpContextTelemetryInitializer>();
+
+            // GraphQL services
             services
                 .AddSingleton<IDependencyResolver, HttpContextAccessorDependencyResolver>()
                 .AddSingleton<GraphQLSchema>()

@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Linq;
 using AspNetCoreRequestTracing;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using HelpDeskId;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
@@ -16,6 +15,7 @@ using Newtonsoft.Json.Serialization;
 using NodaTime;
 using NodaTime.Serialization.JsonNet;
 using NV.Templates.Backend.RestApi.Framework.Middlewares;
+using NV.Templates.Backend.RestApi.Framework.Telemetry;
 
 [assembly: ApiController]
 [assembly: ApiConventionType(typeof(DefaultApiConventions))]
@@ -41,14 +41,20 @@ namespace NV.Templates.Backend.RestApi
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
+            // Core assembly services
             services.AddCore();
 
+            // Common services
             services
                 .AddValidatorsFromAssemblyContaining<Startup>()
-                .AddSingleton<IHelpDeskIdGenerator, HelpDeskIdGenerator>()
-                .Configure<RequestTracingMiddlewareOptions>(_configuration.GetSection(nameof(RequestTracingMiddlewareOptions)));
+                .AddSingleton<IHelpDeskIdGenerator, HelpDeskIdGenerator>();
 
+            // Options
+            services.Configure<RequestTracingMiddlewareOptions>(_configuration.GetSection(nameof(RequestTracingMiddlewareOptions)));
+
+            // ASP.NET Core services
             services
+                .AddHttpContextAccessor()
                 .AddResponseCaching()
                 .AddApiVersioning(options =>
                 {
@@ -86,6 +92,10 @@ namespace NV.Templates.Backend.RestApi
                 })
                 .AddFluentValidation();
 
+            // Telemetry
+            services.AddSingleton<ITelemetryInitializer, HttpContextTelemetryInitializer>();
+
+            // Open API
             services.AddOpenApi();
         }
 
