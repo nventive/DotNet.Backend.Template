@@ -9,7 +9,7 @@ namespace NV.Templates.Backend.GraphQL.Framework.Middlewares
     /// The GraphiQL web UI and some GraphQL clients are quite agressive for those connections
     /// and tend to pollute request processing.
     /// </summary>
-    public class AbortGraphQLWebSocketMiddleware
+    internal class AbortGraphQLWebSocketMiddleware
     {
         private readonly RequestDelegate _next;
 

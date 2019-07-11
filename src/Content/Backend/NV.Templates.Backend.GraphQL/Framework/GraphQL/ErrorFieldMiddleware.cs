@@ -16,6 +16,11 @@ namespace NV.Templates.Backend.GraphQL.Framework.GraphQL
     {
         public async Task<object> Resolve(ResolveFieldContext context, FieldMiddlewareDelegate next)
         {
+            if (next == null)
+            {
+                throw new ArgumentNullException(nameof(next));
+            }
+
             try
             {
                 return await next(context);

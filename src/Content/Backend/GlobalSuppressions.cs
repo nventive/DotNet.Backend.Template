@@ -12,8 +12,8 @@
 [assembly: SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1515:Single-line comment must be preceded by blank line", Justification = "Prevents quick edits during development")]
 
 [assembly: SuppressMessage("Design", "CA1032:Implement standard exception constructors", Justification = "Most of the time we want to assert specific parameters on exception constructors.")]
+[assembly: SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "Triggers false positive for log messages.")]
 [assembly: SuppressMessage("Naming", "CA1710:Identifiers should have correct suffix", Justification = "Collision with enumerable / collection rule.")]
 [assembly: SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated via Dependency Injection.")]
 [assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Conflicts with some standard patterns.")]
 [assembly: SuppressMessage("Reliability", "CA2007:Do not directly await a Task", Justification = "Not needed systematically.")]
-[assembly: SuppressMessage("Usage", "CA2234:Pass system uri objects instead of strings", Justification = "String is fine - Uri class is sometime cumbersome.")]

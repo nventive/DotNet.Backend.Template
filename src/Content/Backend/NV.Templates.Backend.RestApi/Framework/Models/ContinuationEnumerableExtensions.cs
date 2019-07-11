@@ -7,7 +7,7 @@ namespace NV.Templates.Backend.RestApi.Framework.Models
     /// <summary>
     /// <see cref="IContinuationEnumerable{T}"/> extension methods.
     /// </summary>
-    public static class ContinuationEnumerableExtensions
+    internal static class ContinuationEnumerableExtensions
     {
         public static ContinuationEnumerableModel<TSource> ToModel<TSource>(this IContinuationEnumerable<TSource> source)
         {

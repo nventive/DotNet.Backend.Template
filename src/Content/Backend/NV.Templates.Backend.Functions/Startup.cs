@@ -13,6 +13,11 @@ namespace NV.Templates.Backend.Functions
         /// <inheritdoc />
         public override void Configure(IFunctionsHostBuilder builder)
         {
+            if (builder == null)
+            {
+                throw new System.ArgumentNullException(nameof(builder));
+            }
+
             builder.Services.AddCore();
         }
     }

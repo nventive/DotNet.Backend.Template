@@ -21,7 +21,7 @@ namespace NV.Templates.Backend.Core.Framework.Exceptions
         }
 
         public DependencyException(string dependencyName, Exception inner)
-            : base(inner.Message, inner)
+            : base(inner?.Message, inner)
         {
             DependencyName = dependencyName;
         }

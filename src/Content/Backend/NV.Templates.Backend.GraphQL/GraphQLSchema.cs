@@ -6,7 +6,7 @@ namespace NV.Templates.Backend.GraphQL
     /// <summary>
     /// Defines the GraphQL Schema.
     /// </summary>
-    public class GraphQLSchema : Schema
+    internal class GraphQLSchema : Schema
     {
         public GraphQLSchema(IDependencyResolver resolver)
             : base(resolver)

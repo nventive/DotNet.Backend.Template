@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		GlobalSuppressions.cs = GlobalSuppressions.cs
 		README.md = README.md
 		stylecop.json = stylecop.json
+		TestsSuppressions.cs = TestsSuppressions.cs
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Core", "NV.Templates.Backend.Core\NV.Templates.Backend.Core.csproj", "{3EF06F88-EA31-4464-9587-66C6B531B915}"

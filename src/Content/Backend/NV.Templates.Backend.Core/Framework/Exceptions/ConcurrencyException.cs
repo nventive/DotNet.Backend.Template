@@ -19,7 +19,7 @@ namespace NV.Templates.Backend.Core.Framework.Exceptions
         }
 
         public ConcurrencyException(string target, Exception inner)
-            : base(inner.Message, inner)
+            : base(inner?.Message, inner)
         {
             Target = target;
         }

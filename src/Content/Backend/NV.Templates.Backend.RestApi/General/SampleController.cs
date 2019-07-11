@@ -30,6 +30,11 @@ namespace NV.Templates.Backend.RestApi.General
             [FromServices] IClock clock,
             [Description("The salutation")] string name = null)
         {
+            if (clock == null)
+            {
+                throw new System.ArgumentNullException(nameof(clock));
+            }
+
             return Ok(new HelloWorldResponse { Message = $"Hello, {name ?? "world"}", Timestamp = clock.GetCurrentInstant() });
         }
 

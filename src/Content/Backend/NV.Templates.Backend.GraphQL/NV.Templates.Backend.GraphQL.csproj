@@ -10,7 +10,7 @@
     <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="3.4.0" />
     <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="3.4.0" />
     <PackageReference Include="HelpDeskId" Version="0.1.3" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.7.0-beta3" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.7.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 

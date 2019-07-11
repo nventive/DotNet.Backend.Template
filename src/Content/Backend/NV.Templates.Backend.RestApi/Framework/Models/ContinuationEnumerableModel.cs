@@ -7,7 +7,8 @@ namespace NV.Templates.Backend.RestApi.Framework.Models
     /// <summary>
     /// Models that reflects <see cref="IContinuationEnumerable{T}"/>.
     /// </summary>
-    public class ContinuationEnumerableModel<T> : IContinuation
+    /// <typeparam name="T">The type of objects to enumerate.</typeparam>
+    internal class ContinuationEnumerableModel<T> : IContinuation
     {
         [JsonConstructor]
         public ContinuationEnumerableModel(IEnumerable<T> items, string continuationToken)

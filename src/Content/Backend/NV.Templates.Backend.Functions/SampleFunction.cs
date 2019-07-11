@@ -34,7 +34,7 @@ namespace NV.Templates.Backend.Functions
                 throw new ArgumentNullException(nameof(request));
             }
 
-            _operationContext.OperationId = executionContext.InvocationId.ToString();
+            _operationContext.OperationId = executionContext?.InvocationId.ToString();
             return new JsonResult(_applicationInfo, SerializerSettings.JsonSerializerSettings) { StatusCode = StatusCodes.Status200OK };
         }
     }

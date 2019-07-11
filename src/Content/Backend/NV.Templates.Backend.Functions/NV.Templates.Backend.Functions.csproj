@@ -7,8 +7,8 @@
   
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.1.0" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.27" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.2.0" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.29" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,4 +29,5 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
+
 </Project>
