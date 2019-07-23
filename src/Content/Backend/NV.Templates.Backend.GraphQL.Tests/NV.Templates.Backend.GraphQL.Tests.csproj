@@ -9,7 +9,7 @@
     <PackageReference Include="Bogus" Version="28.0.2" />
     <PackageReference Include="FluentAssertions" Version="5.7.0" />
     <PackageReference Include="GraphQL.Client" Version="1.0.3" />
-    <PackageReference Include="HttpClientUtilities" Version="0.1.0-beta0014" />
+    <PackageReference Include="HttpClientUtilities" Version="1.0.0" />
     <PackageReference Include="MartinCostello.Logging.XUnit" Version="0.1.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNetCore.App" />

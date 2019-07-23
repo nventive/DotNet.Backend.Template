@@ -35,7 +35,7 @@ namespace NV.Templates.Backend.Functions
             }
 
             _operationContext.OperationId = executionContext?.InvocationId.ToString();
-            return new JsonResult(_applicationInfo, SerializerSettings.JsonSerializerSettings) { StatusCode = StatusCodes.Status200OK };
+            return new JsonResult(_applicationInfo) { StatusCode = StatusCodes.Status200OK };
         }
     }
 }
