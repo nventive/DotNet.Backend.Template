@@ -7,6 +7,10 @@
     <authors>nventive</authors>
     <description>.NET Core Templates for backend applications and open-source components.</description>
     <copyright>Copyright (c) 2019, nventive</copyright>
+    <license type="expression">Apache-2.0</license>
+    <iconUrl>https://nventive-email-assets.s3.amazonaws.com/packages/nv-package-logo%400%2C25x.png</iconUrl>
+    <projectUrl>https://github.com/nventive/NV.Templates</projectUrl>
+    <repository type="git" url="https://github.com/nventive/NV.Templates" />
     <packageTypes>
       <packageType name="Template" />
     </packageTypes>

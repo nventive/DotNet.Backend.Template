@@ -10,6 +10,8 @@ Generated projects can expose a REST API, a GraphQL API, run in Azure Functions 
 as a command-line application.
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Build Status](https://dev.azure.com/nventive-public/nventive/_apis/build/status/nventive.NV.Templates?branchName=master)](https://dev.azure.com/nventive-public/nventive/_build/latest?definitionId=6&branchName=master)
+![Nuget](https://img.shields.io/nuget/v/NV.Templates.svg)
 
 ## Getting Started
 
