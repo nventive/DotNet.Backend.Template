@@ -9,19 +9,10 @@ steps:
     updateAssemblyInfo: false
 
 - task: DotNetCoreCLI@2
-  displayName: Restore NuGet Packages
-  inputs:
-    command: 'restore'
-    projects: '**/*.sln'
-    feedsToUse: 'select'
-    vstsFeed: $(artifactsFeedId)
-
-- task: DotNetCoreCLI@2
   displayName: Build Projects
   inputs:
     command: build
     projects: '**/*.sln'
-    arguments: --no-restore
 
 - task: PowerShell@2
   displayName: Update TemplateVersion props
