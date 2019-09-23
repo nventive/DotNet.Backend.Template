@@ -1,11 +1,13 @@
 ﻿using System;
 using NV.Templates.Backend.Core.Framework;
+using NV.Templates.Backend.Core.Framework.Services;
 
 namespace NV.Templates.Backend.Core.General
 {
     /// <summary>
     /// <see cref="IOperationContext"/> implementation.
     /// </summary>
+    [RegisterScopedService]
     internal class OperationContext : IOperationContext
     {
         /// <inheritdoc />

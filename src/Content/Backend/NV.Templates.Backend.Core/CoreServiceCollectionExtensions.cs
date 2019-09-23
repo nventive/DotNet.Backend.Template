@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Hosting;
+using NV.Templates.Backend.Core.Framework.Services;
 using NV.Templates.Backend.Core.Framework.Validation;
 using NV.Templates.Backend.Core.General;
 
@@ -12,11 +13,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddCore(this IServiceCollection services)
         {
-            services
-                .AddTransient<IValidatorFactory, ServiceProviderValidatorFactory>()
-                .AddValidatorsFromAssemblyContaining<IApplicationInfo>()
-                .AddSingleton<IApplicationInfo>(sp => new ApplicationInfo(sp.GetRequiredService<IHostingEnvironment>())) // We want to force the usage of the right constructor.
-                .AddScoped<IOperationContext, OperationContext>();
+            services.AddValidatorsFromAssemblyContaining<IApplicationInfo>();
+            services.AutoRegisterServicesFromAssembly(typeof(CoreServiceCollectionExtensions).Assembly);
 
             services
                 .AddHealthChecks();

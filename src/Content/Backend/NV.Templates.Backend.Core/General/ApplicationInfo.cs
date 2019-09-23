@@ -1,12 +1,14 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
+using NV.Templates.Backend.Core.Framework.Services;
 
 namespace NV.Templates.Backend.Core.General
 {
     /// <summary>
     /// <see cref="IApplicationInfo"/> implementation.
     /// </summary>
+    [RegisterSingletonService]
     internal class ApplicationInfo : IApplicationInfo
     {
         /// <summary>
