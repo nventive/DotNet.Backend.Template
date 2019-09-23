@@ -19,18 +19,24 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Core",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Core.Tests", "NV.Templates.Backend.Core.Tests\NV.Templates.Backend.Core.Tests.csproj", "{362BC68E-772F-46C9-949D-4FB338342A73}"
 EndProject
+//#if (Functions)
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Functions", "NV.Templates.Backend.Functions\NV.Templates.Backend.Functions.csproj", "{42DF8B94-4DA5-4906-B42E-CA499C00B587}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Functions.Tests", "NV.Templates.Backend.Functions.Tests\NV.Templates.Backend.Functions.Tests.csproj", "{CA1A659A-00FD-4D28-9333-4A0CA23A3719}"
 EndProject
+//#endif
+//#if (Console)
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Console", "NV.Templates.Backend.Console\NV.Templates.Backend.Console.csproj", "{6B9B9A88-1260-40EC-964D-21CE291643F7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Console.Tests", "NV.Templates.Backend.Console.Tests\NV.Templates.Backend.Console.Tests.csproj", "{554FF2FA-D806-442A-9280-F2643DD6840C}"
 EndProject
+//#endif
+//#if (Web)
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NV.Templates.Backend.Web", "NV.Templates.Backend.Web\NV.Templates.Backend.Web.csproj", "{CFFB44CE-FF48-4B03-9AA6-57CF8E96FC24}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NV.Templates.Backend.Web.Tests", "NV.Templates.Backend.Web.Tests\NV.Templates.Backend.Web.Tests.csproj", "{7EB32155-ED8C-4F23-AE05-61FDD46DEFF1}"
 EndProject
+//#endif
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

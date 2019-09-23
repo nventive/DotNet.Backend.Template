@@ -13,36 +13,47 @@
   "sourceName": "NV.Templates.Backend",
   "preferNameDirectory": true,
   "symbols": {
-    "company": {
+    "Company": {
       "type": "parameter",
       "datatype": "string",
       "defaultValue": "MyCompany",
       "replaces": "Company",
       "description": "The name of the company which determines the assembly company and copyright information."
     },
-    "restapi": {
+    "RestApi": {
       "type": "parameter",
-      "description": "Adds ASP.NET Core REST API head project",
+      "description": "Adds Rest API support",
       "datatype": "bool",
       "defaultValue": "false"
     },
-    "functions": {
+    "Functions": {
       "type": "parameter",
-      "description": "Adds Azure Functions head project",
+      "description": "Adds Azure Functions support",
       "datatype": "bool",
       "defaultValue": "false"
     },
-    "console": {
+    "Console": {
       "type": "parameter",
-      "description": "Adds Console head project",
+      "description": "Adds Console support",
       "datatype": "bool",
       "defaultValue": "false"
     },
-    "graphql": {
+    "GraphQL": {
       "type": "parameter",
-      "description": "Adds GraphQL head project",
+      "description": "Adds GraphQL support",
       "datatype": "bool",
       "defaultValue": "false"
+    },
+    "SPA": {
+      "type": "parameter",
+      "description": "Adds Single Page Application support",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
+    "Web": {
+      "type": "computed",
+      "dataType": "bool",
+      "value": "(RestApi || GraphQL || SPA)"
     },
     "HttpPort": {
       "type": "parameter",
@@ -101,20 +112,28 @@
           ]
         },
         {
-          "condition": "(!restapi)",
+          "condition": "(!RestApi)",
           "exclude": ["**/*RestApi*/**"]
         },
         {
-          "condition": "(!functions)",
+          "condition": "(!Functions)",
           "exclude": ["**/*Functions*/**"]
         },
         {
-          "condition": "(!graphql)",
+          "condition": "(!GraphQL)",
           "exclude": ["**/*GraphQL*/**"]
         },
         {
-          "condition": "(!console)",
+          "condition": "(!SPA)",
+          "exclude": ["**/*ClientApp*/**"]
+        },
+        {
+          "condition": "(!Console)",
           "exclude": ["**/*Console*/**"]
+        },
+        {
+          "condition": "(!Web)",
+          "exclude": ["**/*Web*/**"]
         }
       ]
     }

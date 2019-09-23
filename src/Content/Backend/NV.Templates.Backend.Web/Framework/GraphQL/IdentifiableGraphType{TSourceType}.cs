@@ -1,7 +1,7 @@
 ﻿using GraphQL.Types;
 using NV.Templates.Backend.Core.Framework;
 
-namespace Umwelt.Web.Framework.GraphQL
+namespace NV.Templates.Backend.Web.Framework.GraphQL
 {
     internal abstract class IdentifiableGraphType<TSourceType> : ObjectGraphType<TSourceType>
         where TSourceType : IIdentifiable
