@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace NV.Templates.Backend.Core.Framework
+﻿namespace NV.Templates.Backend.Core.Framework
 {
     /// <summary>
     /// Base class for root entities with an Id property.

@@ -1,6 +1,4 @@
-﻿using Bogus;
-
-namespace NV.Templates.Backend.Core.Tests
+﻿namespace NV.Templates.Backend.Core.Tests
 {
     /// <summary>
     /// Creates test entities for unit-testing.
