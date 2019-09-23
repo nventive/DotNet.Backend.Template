@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using NV.Templates.Backend.Web.Framework.Middlewares;
 using NV.Templates.Backend.Web.GraphQLApi;
 
@@ -38,6 +39,11 @@ namespace NV.Templates.Backend.Web
             services.AddGraphQLApi(_configuration);
 
             services.AddOpenApi();
+
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "ClientApp/build";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,6 +77,19 @@ namespace NV.Templates.Backend.Web
             app.UseSwaggerUi3(configure =>
             {
                 configure.DocExpansion = "list";
+            });
+
+            app.UseSpaStaticFiles();
+
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+
+                if (app.ApplicationServices.GetRequiredService<IHostingEnvironment>().IsDevelopment())
+                {
+                    // spa.UseReactDevelopmentServer(npmScript: "start");
+                    // spa.UseAngularCliServer(npmScript: "start");
+                }
             });
         }
     }
