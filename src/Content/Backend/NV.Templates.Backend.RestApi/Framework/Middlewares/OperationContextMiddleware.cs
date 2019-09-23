@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using NodaTime;
 using NV.Templates.Backend.Core.General;
 
 namespace NV.Templates.Backend.RestApi.Framework.Middlewares
@@ -18,15 +17,13 @@ namespace NV.Templates.Backend.RestApi.Framework.Middlewares
         public const string OperationIdHeader = "X-OperationId";
 
         private readonly RequestDelegate _next;
-        private readonly IClock _clock;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OperationContextMiddleware"/> class.
         /// </summary>
-        public OperationContextMiddleware(RequestDelegate next, IClock clock)
+        public OperationContextMiddleware(RequestDelegate next)
         {
             _next = next ?? throw new ArgumentNullException(nameof(next));
-            _clock = clock ?? throw new ArgumentNullException(nameof(clock));
         }
 
         /// <summary>
@@ -35,7 +32,7 @@ namespace NV.Templates.Backend.RestApi.Framework.Middlewares
         public Task Invoke(HttpContext context, IOperationContext operationContext)
         {
             operationContext.OperationId = Activity.Current.RootId;
-            operationContext.Timestamp = _clock.GetCurrentInstant();
+            operationContext.Timestamp = DateTimeOffset.UtcNow;
 
             context.Response.Headers.Add(OperationIdHeader, operationContext.OperationId);
             return _next(context);

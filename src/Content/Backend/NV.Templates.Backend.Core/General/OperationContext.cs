@@ -1,4 +1,4 @@
-﻿using NodaTime;
+﻿using System;
 using NV.Templates.Backend.Core.Framework;
 
 namespace NV.Templates.Backend.Core.General
@@ -12,7 +12,7 @@ namespace NV.Templates.Backend.Core.General
         public string OperationId { get; set; } = IdGenerator.Generate();
 
         /// <inheritdoc />
-        public Instant Timestamp { get; set; } = SystemClock.Instance.GetCurrentInstant();
+        public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;
 
         /// <inheritdoc />
         public override string ToString() => $"{nameof(OperationContext)}: {OperationId} {Timestamp}";

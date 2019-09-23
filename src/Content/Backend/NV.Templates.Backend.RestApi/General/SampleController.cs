@@ -1,9 +1,9 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NodaTime;
 using NV.Templates.Backend.Core.Framework.Exceptions;
 
 namespace NV.Templates.Backend.RestApi.General
@@ -26,16 +26,9 @@ namespace NV.Templates.Backend.RestApi.General
         [ApiVersion("2")]
         [HttpGet("hello")]
         [Description("Sample Hello world")]
-        public ActionResult<HelloWorldResponse> GetHelloV2(
-            [FromServices] IClock clock,
-            [Description("The salutation")] string name = null)
+        public ActionResult<HelloWorldResponse> GetHelloV2([Description("The salutation")] string name = null)
         {
-            if (clock == null)
-            {
-                throw new System.ArgumentNullException(nameof(clock));
-            }
-
-            return Ok(new HelloWorldResponse { Message = $"Hello, {name ?? "world"}", Timestamp = clock.GetCurrentInstant() });
+            return Ok(new HelloWorldResponse { Message = $"Hello, {name ?? "world"}", Timestamp = DateTimeOffset.UtcNow });
         }
 
         [ApiVersion("1")]
@@ -62,7 +55,7 @@ namespace NV.Templates.Backend.RestApi.General
             public string Message { get; set; }
 
             [Description("The generated timestamp")]
-            public Instant Timestamp { get; set; }
+            public DateTimeOffset Timestamp { get; set; }
         }
     }
 }

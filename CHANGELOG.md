@@ -34,6 +34,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Removed
 
+- Removed NodaTime default support - Users will be able to add it if they want to, but it's not longer added by default to reduce OOB complexity.
+
 ### Fixed
 
 ### Security

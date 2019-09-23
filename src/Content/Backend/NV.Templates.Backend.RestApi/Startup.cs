@@ -12,8 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
-using NodaTime;
-using NodaTime.Serialization.JsonNet;
 using NV.Templates.Backend.RestApi.Framework.Middlewares;
 using NV.Templates.Backend.RestApi.Framework.Telemetry;
 
@@ -88,7 +86,6 @@ namespace NV.Templates.Backend.RestApi
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     options.SerializerSettings.Converters.Add(new StringEnumConverter { CamelCaseText = true });
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    options.SerializerSettings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
                 })
                 .AddFluentValidation();
 

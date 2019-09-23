@@ -79,8 +79,6 @@ is meant to reside. Contains:
     Dependency Injection container
   - Various interfaces and base classes for Entity-type class (in the `Framework` namespace) 
   - an `IdGenerator` utility class to generate unique ids as reasonably readable strings
-  - Inclusion of [NodaTime](https://nodatime.org/) as the preferred library to
-    handle Date/Time concerns
   - Inclusion of [FluentValidation](https://fluentvalidation.net/) as the preferred
     library for validating entities
   - Inclusion of helpers and extension methods to handle pagination as Continuation tokens
@@ -129,7 +127,7 @@ When using the `--restapi` option, 2 projects are added to the solution:
 
 - `RestApi`: An ASP.NET Core application setup for exposing the Core library as a Rest API. Contains the following features:
   - MVC bootstrap code with API-related features only (using [AddMvcCore](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.mvccoreservicecollectionextensions.addmvccore?view=aspnetcore-2.2) instead of [AddMvc](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.dependencyinjection.mvcservicecollectionextensions.addmvc?view=aspnetcore-2.2))
-  - JSON options configured with sensible default and include `NodaTime` serialization support
+  - JSON options configured with sensible default
   - [ASP.NET Core API Versioning](https://github.com/microsoft/aspnet-api-versioning) is
     enabled and setup with support for versioning of the API in the URL (e.g. `/api/v1/...`)
   - [FluentValidation](https://fluentvalidation.net/) is configured and integrated with
