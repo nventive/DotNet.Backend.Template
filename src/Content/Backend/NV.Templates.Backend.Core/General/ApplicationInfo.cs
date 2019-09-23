@@ -24,9 +24,9 @@ namespace NV.Templates.Backend.Core.General
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationInfo"/> class.
         /// </summary>
-        /// <param name="name">Application name</param>
-        /// <param name="version">Application version</param>
-        /// <param name="environment">Application environment</param>
+        /// <param name="name">Application name.</param>
+        /// <param name="version">Application version.</param>
+        /// <param name="environment">Application environment.</param>
         [JsonConstructor]
         public ApplicationInfo(string name, string version, string environment)
         {

@@ -1,5 +1,4 @@
-﻿using System;
-using NodaTime;
+﻿using NodaTime;
 using NV.Templates.Backend.Core.Framework;
 
 namespace NV.Templates.Backend.Core.General

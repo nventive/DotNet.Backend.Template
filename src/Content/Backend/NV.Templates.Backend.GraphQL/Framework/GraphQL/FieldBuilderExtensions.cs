@@ -5,7 +5,7 @@ using NV.Templates.Backend.Core.Framework.Continuation;
 namespace NV.Templates.Backend.GraphQL.Framework.GraphQL
 {
     /// <summary>
-    /// Extension methods for <see cref="FieldBuilder"/>
+    /// Extension methods for <see cref="FieldBuilder"/>.
     /// </summary>
     internal static class FieldBuilderExtensions
     {
@@ -16,8 +16,8 @@ namespace NV.Templates.Backend.GraphQL.Framework.GraphQL
         /// Adds <see cref="ContinuationTokenArgumentName"/> and <see cref="LimitArgumentName"/>
         /// as arguments.
         /// </summary>
-        /// <typeparam name="TSourceType">The graph source type</typeparam>
-        /// <typeparam name="TReturnType">The actual returned type</typeparam>
+        /// <typeparam name="TSourceType">The graph source type.</typeparam>
+        /// <typeparam name="TReturnType">The actual returned type.</typeparam>
         public static FieldBuilder<TSourceType, TReturnType> ArgumentContinuationQuery<TSourceType, TReturnType>(this FieldBuilder<TSourceType, TReturnType> fieldBuilder)
         {
             return fieldBuilder

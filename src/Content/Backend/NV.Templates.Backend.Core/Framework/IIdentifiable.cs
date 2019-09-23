@@ -6,7 +6,7 @@
     public interface IIdentifiable
     {
         /// <summary>
-        /// Gets the Id
+        /// Gets the Id.
         /// </summary>
         string Id { get; }
     }
