@@ -38,7 +38,7 @@
       "datatype": "bool",
       "defaultValue": "false"
     },
-    "GraphQL": {
+    "GraphQLApi": {
       "type": "parameter",
       "description": "Adds GraphQL support",
       "datatype": "bool",
@@ -53,7 +53,7 @@
     "Web": {
       "type": "computed",
       "dataType": "bool",
-      "value": "(RestApi || GraphQL || SPA)"
+      "value": "(RestApi || GraphQLApi || SPA)"
     },
     "HttpPort": {
       "type": "parameter",
@@ -113,14 +113,14 @@
         },
         {
           "condition": "(!RestApi)",
-          "exclude": ["**/*RestApi*/**"]
+          "exclude": ["**/*RestApi*/**","**/*OpenApi*/**"]
         },
         {
           "condition": "(!Functions)",
           "exclude": ["**/*Functions*/**"]
         },
         {
-          "condition": "(!GraphQL)",
+          "condition": "(!GraphQLApi)",
           "exclude": ["**/*GraphQL*/**"]
         },
         {

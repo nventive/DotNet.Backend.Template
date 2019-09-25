@@ -9,15 +9,19 @@
   <ItemGroup>
     <PackageReference Include="AspNetCoreRequestTracing" Version="1.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.4.0" />
+    <!--#if (GraphQLApi) -->
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="3.4.0" />
     <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="3.4.0" />
     <PackageReference Include="GraphQL.Server.Ui.Voyager" Version="3.4.0" />
+    <!--#endif -->
     <PackageReference Include="HelpDeskId" Version="1.0.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.7.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <!--#if (RestApi) -->
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Api.Analyzers" Version="2.2.6" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="3.2.1" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.0.6" />
+    <!--#endif -->
   </ItemGroup>
 
   <ItemGroup>
@@ -31,16 +35,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NV.Templates.Backend.Core\NV.Templates.Backend.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Framework\Middlewares\" />
-    <Folder Include="Framework\Models\" />
-    <Folder Include="Framework\GraphQL\" />
-    <Folder Include="Framework\Telemetry\" />
-    <Folder Include="Framework\OpenApi\" />
-    <Folder Include="GraphQLApi\" />
-    <Folder Include="ClientApp\" />
   </ItemGroup>
 
 </Project>

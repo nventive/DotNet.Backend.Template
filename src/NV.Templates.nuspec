@@ -5,7 +5,7 @@
     <version>1.0.0</version>
     <title>NV.Templates</title>
     <authors>nventive</authors>
-    <description>.NET Core Templates for backend applications and open-source components.</description>
+    <description>.NET Core Templates for applications and open-source components.</description>
     <copyright>Copyright (c) 2019, nventive</copyright>
     <license type="expression">Apache-2.0</license>
     <iconUrl>https://nventive-email-assets.s3.amazonaws.com/packages/nv-package-logo%400%2C25x.png</iconUrl>

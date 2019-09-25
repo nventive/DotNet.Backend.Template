@@ -1,10 +1,10 @@
 {
   "$schema": "http://json.schemastore.org/template",
   "author": "nventive",
-  "name": "nventive Component Template",
+  "name": "nventive NetStandard Component Template",
   "identity": "NV.Templates.Component",
   "groupIdentity": "NV.Templates.Component",
-  "shortName": "nv-component",
+  "shortName": "nv-netstandard-component",
   "classifications": ["Component"],
   "tags": {
     "language": "C#",

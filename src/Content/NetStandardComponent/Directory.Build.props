@@ -12,6 +12,8 @@
     <NoWarn>1701;1702;1998</NoWarn>
     <TemplateVersion>1.0.0</TemplateVersion>
     <Deterministic>true</Deterministic>
+    <PackageIconUrl>https://www.nuget.org/Content/gallery/img/default-package-icon.svg</PackageIconUrl>
+    <PackageProjectUrl>https://github.com</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,7 +1,6 @@
-﻿#pragma warning disable SA1119
-using System;
+﻿using System;
 using AspNetCoreRequestTracing;
-#if (GraphQL)
+#if GraphQLApi
 using GraphQL.Server;
 using GraphQL.Server.Ui.GraphiQL;
 using GraphQL.Server.Ui.Voyager;
@@ -13,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NV.Templates.Backend.Web.Framework.Middlewares;
-#if (GraphQL)
+#if GraphQLApi
 using NV.Templates.Backend.Web.GraphQLApi;
 #endif
 
@@ -38,14 +37,14 @@ namespace NV.Templates.Backend.Web
             services.AddCore();
 
             services.AddWeb();
-#if (RestApi)
+#if RestApi
             services.AddRestApi();
             services.AddOpenApi();
 #endif
-#if (GraphQL)
+#if GraphQLApi
             services.AddGraphQLApi(_configuration);
 #endif
-#if (SPA)
+#if SPA
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/build";
@@ -65,20 +64,19 @@ namespace NV.Templates.Backend.Web
 
             app.UseMiddleware<OperationContextMiddleware>();
 
-            app.UseResponseCaching();
-
             app.UseHealthChecks(
                 "/api/health",
                 new HealthCheckOptions { ResponseWriter = HealthChecksResponseWriter.WriteResponse });
 
             app.UseAttributions();
-#if (GraphQL)
+#if GraphQLApi
             app
                 .UseGraphQL<GraphQLSchema>()
                 .UseGraphiQLServer(new GraphiQLOptions())
                 .UseGraphQLVoyager(new GraphQLVoyagerOptions { Path = "/graphql-voyager" });
 #endif
-#if (RestApi)
+#if RestApi
+            app.UseResponseCaching();
             app.UseMvc();
 
             app.UseOpenApi();
@@ -87,7 +85,7 @@ namespace NV.Templates.Backend.Web
                 configure.DocExpansion = "list";
             });
 #endif
-#if (SPA)
+#if SPA
             app.UseSpaStaticFiles();
 
             app.UseSpa(spa =>
