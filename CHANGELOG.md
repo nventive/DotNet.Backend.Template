@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Merged RestApi & GraphQLApi into a single Web project
 - Updated NuGet dependencies (to the exclusion of anything .Net Core 3-related)
+- Renamed nv-component template to nv-netstandard-component
 
 ### Deprecated
 
