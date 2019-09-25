@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using NV.Templates.Backend.Core.Tests.Framework.Continuation;
 
 namespace NV.Templates.Backend.Core.Tests
 {
@@ -28,6 +29,7 @@ namespace NV.Templates.Backend.Core.Tests
             => new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
+                .AddUserSecrets<ContinuationTokenTests>()
                 .Build();
     }
 }

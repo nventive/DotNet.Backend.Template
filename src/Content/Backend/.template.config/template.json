@@ -94,6 +94,14 @@
         "fallbackVariableName": "HttpsPortGenerated"
       },
       "replaces": "44314"
+    },
+    "UserSecretsId": {
+      "type": "generated",
+      "generator": "guid",
+      "replaces": "20403522-635f-44fd-ab82-8a754fe59c64",
+      "parameters": {
+        "format":"D"
+      }
     }
   },
   "sources": [
