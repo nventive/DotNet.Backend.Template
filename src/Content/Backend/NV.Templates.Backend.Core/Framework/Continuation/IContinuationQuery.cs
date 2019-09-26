@@ -11,7 +11,7 @@
         string ContinuationToken { get; set; }
 
         /// <summary>
-        /// Gets or sets the number of items to fetch
+        /// Gets or sets the number of items to fetch.
         /// </summary>
         int Limit { get; set; }
     }

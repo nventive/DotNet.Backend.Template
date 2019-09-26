@@ -6,12 +6,12 @@
     public interface IApplicationInfo
     {
         /// <summary>
-        /// Gets the application name
+        /// Gets the application name.
         /// </summary>
         string Name { get; }
 
         /// <summary>
-        /// Gets the application version
+        /// Gets the application version.
         /// </summary>
         string Version { get; }
 
