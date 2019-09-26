@@ -26,7 +26,7 @@ namespace NV.Templates.Backend.Core.General
 
 #if Auth
         /// <inheritdoc />
-        public override string ToString() => $"{nameof(OperationContext)}: {OperationId} {Timestamp} {(UserIdentity != null && UserIdentity.IsAuthenticated ? UserIdentity.Name : "Anonymous")}";
+        public override string ToString() => $"{nameof(OperationContext)}: {OperationId} {Timestamp} {UserIdentity.GetUserName()}";
 #else
         /// <inheritdoc />
         public override string ToString() => $"{nameof(OperationContext)}: {OperationId} {Timestamp}";

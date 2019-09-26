@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading;
 using System.Threading.Tasks;
 using GraphQL;
@@ -67,6 +68,9 @@ namespace NV.Templates.Backend.Web.Framework.GraphQL
             {
                 operationId = _operationContext.OperationId,
                 timestamp = _operationContext.Timestamp.ToUnixTimeMilliseconds(),
+#if Auth
+                identity = _operationContext.UserIdentity.GetUserName(),
+#endif
             };
 
             LogResult(result);
