@@ -11,7 +11,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using NSwag.AspNetCore;
+using NV.Templates.Backend.Core.General;
 using NV.Templates.Backend.Web.Framework.Middlewares;
+#if Auth
+using NV.Templates.Backend.Web.Framework.Security;
+#endif
 #if GraphQLApi
 using NV.Templates.Backend.Web.GraphQLApi;
 #endif
@@ -37,6 +43,10 @@ namespace NV.Templates.Backend.Web
             services.AddCore();
 
             services.AddWeb();
+#if Auth
+            services.AddAuthenticationSetup(_configuration);
+#endif
+
 #if RestApi
             services.AddRestApi();
             services.AddOpenApi();
@@ -61,6 +71,9 @@ namespace NV.Templates.Backend.Web
 
             app.UseRequestTracing();
             app.UseExceptionHandler(ExceptionHandler.ConfigureExceptionHandling);
+#if Auth
+            app.UseAuthentication();
+#endif
 
             app.UseMiddleware<OperationContextMiddleware>();
 
@@ -83,6 +96,18 @@ namespace NV.Templates.Backend.Web
             app.UseSwaggerUi3(configure =>
             {
                 configure.DocExpansion = "list";
+#if Auth
+                var authenticationOptions = app.ApplicationServices.GetRequiredService<IOptions<AuthenticationOptions>>();
+                var appInfo = app.ApplicationServices.GetRequiredService<IApplicationInfo>();
+                if (!string.IsNullOrEmpty(authenticationOptions.Value.ClientClientId))
+                {
+                    configure.OAuth2Client = new OAuth2ClientSettings
+                    {
+                        AppName = appInfo.Name,
+                        ClientId = authenticationOptions.Value.ClientClientId,
+                    };
+                }
+#endif
             });
 #endif
 #if SPA

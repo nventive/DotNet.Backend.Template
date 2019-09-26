@@ -1,4 +1,7 @@
 ﻿using System;
+#if Auth
+using System.Security.Principal;
+#endif
 
 namespace NV.Templates.Backend.Core.General
 {
@@ -16,5 +19,12 @@ namespace NV.Templates.Backend.Core.General
         /// Gets or sets the operation timestamp in UTC.
         /// </summary>
         DateTimeOffset Timestamp { get; set; }
+
+#if Auth
+        /// <summary>
+        /// Gets or sets the authenticated user identity, if any.
+        /// </summary>
+        IIdentity UserIdentity { get; set; }
+#endif
     }
 }

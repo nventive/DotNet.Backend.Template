@@ -1,4 +1,7 @@
 ﻿using System;
+#if Auth
+using System.Security.Principal;
+#endif
 using NV.Templates.Backend.Core.Framework;
 using NV.Templates.Backend.Core.Framework.Services;
 
@@ -16,7 +19,17 @@ namespace NV.Templates.Backend.Core.General
         /// <inheritdoc />
         public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;
 
+#if Auth
+        /// <inheritdoc />
+        public IIdentity UserIdentity { get; set; }
+#endif
+
+#if Auth
+        /// <inheritdoc />
+        public override string ToString() => $"{nameof(OperationContext)}: {OperationId} {Timestamp} {(UserIdentity != null && UserIdentity.IsAuthenticated ? UserIdentity.Name : "Anonymous")}";
+#else
         /// <inheritdoc />
         public override string ToString() => $"{nameof(OperationContext)}: {OperationId} {Timestamp}";
+#endif
     }
 }

@@ -1,5 +1,11 @@
 ﻿using FluentValidation.AspNetCore;
+#if Auth
+using Microsoft.AspNetCore.Authorization;
+#endif
 using Microsoft.AspNetCore.Mvc;
+#if Auth
+using Microsoft.AspNetCore.Mvc.Authorization;
+#endif
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -32,6 +38,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddMvcCore(options =>
                 {
                     options.Filters.Add(new ResponseCacheAttribute { Location = ResponseCacheLocation.None, NoStore = true });
+#if Auth
+                    options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
+#endif
                 })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddAuthorization()
