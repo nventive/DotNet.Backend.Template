@@ -12,7 +12,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+#if RestApi
 using NSwag.AspNetCore;
+#endif
 using NV.Templates.Backend.Core.General;
 using NV.Templates.Backend.Web.Framework.Middlewares;
 #if Auth
