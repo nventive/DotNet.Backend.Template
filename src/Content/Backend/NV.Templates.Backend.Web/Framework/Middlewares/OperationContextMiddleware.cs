@@ -33,6 +33,9 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
         {
             operationContext.OperationId = Activity.Current.RootId;
             operationContext.Timestamp = DateTimeOffset.UtcNow;
+#if Auth
+            operationContext.UserIdentity = context.User.Identity;
+#endif
 
             context.Response.Headers.Add(OperationIdHeader, operationContext.OperationId);
             return _next(context);

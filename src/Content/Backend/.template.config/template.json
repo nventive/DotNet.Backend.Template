@@ -50,6 +50,12 @@
       "datatype": "bool",
       "defaultValue": "false"
     },
+    "Auth": {
+      "type": "parameter",
+      "description": "Add Authentication support",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
     "Web": {
       "type": "computed",
       "dataType": "bool",
@@ -142,6 +148,10 @@
         {
           "condition": "(!Web)",
           "exclude": ["**/*Web*/**"]
+        },
+        {
+          "condition": "(!Auth)",
+          "exclude": ["**/*Security*/**"]
         }
       ]
     }

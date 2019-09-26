@@ -4,15 +4,18 @@ using GraphQL.Server.Internal;
 using Microsoft.Extensions.Configuration;
 using NV.Templates.Backend.Web.Framework.GraphQL;
 using NV.Templates.Backend.Web.GraphQLApi;
+#if Auth
+using NV.Templates.Backend.Web.GraphQLApi.Security;
+#endif
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    internal static class GraphQLServiceCollectionExtensions
+    public static class GraphQLServiceCollectionExtensions
     {
         /// <summary>
         /// Adds GraphQL services.
         /// </summary>
-        internal static IServiceCollection AddGraphQLApi(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddGraphQLApi(this IServiceCollection services, IConfiguration configuration)
         {
             services
                 .AddSingleton<IDependencyResolver, HttpContextAccessorDependencyResolver>()
@@ -26,6 +29,18 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddDataLoader()
                 .Services
                 .AddTransient(typeof(IGraphQLExecuter<>), typeof(GraphQLExecuter<>));
+
+#if Auth
+            services
+                .AddSingleton<GraphQL.Authorization.IAuthorizationEvaluator, GraphQL.Authorization.AuthorizationEvaluator>()
+                .AddTransient<GraphQL.Validation.IValidationRule, GraphQL.Authorization.AuthorizationValidationRule>()
+                .AddSingleton(x =>
+                {
+                    var authorizationSettings = new GraphQL.Authorization.AuthorizationSettings();
+                    authorizationSettings.AddPolicy(AuthorizationPolicyNames.RequireUser, y => y.AddRequirement(new RequireUserAuthorizationRequirement()));
+                    return authorizationSettings;
+                });
+#endif
 
             return services;
         }

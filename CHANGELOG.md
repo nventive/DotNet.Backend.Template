@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Added LimitOffsetContinuationToken (ContinuationToken implementation using Limit & Offset pagination information)
 - Added Auto-registration for services
 - Added ClientApp SPA support
+- Added Authentication support via JWT
 - Added UserSecrets default configuration and support in `OptionsHelper`
 
 ### Changed

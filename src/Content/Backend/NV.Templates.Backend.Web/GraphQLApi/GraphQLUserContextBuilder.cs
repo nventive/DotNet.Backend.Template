@@ -9,7 +9,12 @@ namespace NV.Templates.Backend.Web.GraphQLApi
     /// </summary>
     public class GraphQLUserContextBuilder : IUserContextBuilder
     {
+#if Auth
+        public Task<object> BuildUserContext(HttpContext httpContext)
+            => Task.FromResult<object>(new GraphQLUserContext { User = httpContext?.User });
+#else
         public Task<object> BuildUserContext(HttpContext httpContext)
             => Task.FromResult<object>(new GraphQLUserContext());
+#endif
     }
 }

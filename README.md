@@ -41,10 +41,11 @@ To generate suitable hosts to run and expose it, use the following options:
 | --SPA       | Generates an ASP.NET Core project suitable for hosting SPAs           |
 | --Functions | Generates an Azure Functions project                                  |
 | --Console   | Generates a Console (command-line) project                            |
+| --Auth      | Add authentication (JWT-based) support in Web projects                |
 
 Options can be combined, e.g.
 ```shell
-dotnet new nv-backend -n <project name> -c <company name> --RestApi --SPA --Functions --Console
+dotnet new nv-backend -n <project name> -c <company name> --RestApi --SPA --Functions --Console --Auth
 ```
 
 For more details on each project type, see the [Features / Backend](#backend) section.
@@ -178,6 +179,21 @@ When using the `--SPA` option, the `Web` project is augmented with the following
 - Creates a `ClientApp` folder that should host the content of the SPA; it is voluntarily left empty
 
 Once the solution has been generated, go to the `Web\ClientApp` folder and generate the SPA client app here using the SPA tooling of your choice (e.g. [Create React App](https://create-react-app.dev/) or [Angular CLI](https://cli.angular.io/)).
+
+#### Auth
+
+When using the `--Auth` option, the `Web` project is augmented with the following features:
+
+- Adds support for validating JWT tokens
+- Configuration is achieved via `AuthenticationOptions`; an example is given in `appsettings.Development.json`
+- Integration with RestApi and GraphQLApi
+- Integration with the `IOperationContext`
+- Integration with the Application Insights Telemetry
+- Adds support for OAuth2 login in Open API
+
+Covering the entire scope of authentication and authorization is too large for this documentation.
+This option is only there to provide a starting point.
+Please refer to the [ASP.NET Core documentation](https://docs.microsoft.com/en-us/aspnet/core/security/?view=aspnetcore-2.2) for more info.
 
 #### Azure Functions
 
