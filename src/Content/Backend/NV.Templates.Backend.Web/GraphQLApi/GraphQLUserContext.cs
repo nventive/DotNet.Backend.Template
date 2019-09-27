@@ -11,10 +11,15 @@ namespace NV.Templates.Backend.Web.GraphQLApi
     /// </summary>
     public class GraphQLUserContext : IProvideClaimsPrincipal
     {
+        public GraphQLUserContext(ClaimsPrincipal user)
+        {
+            User = user;
+        }
+
         /// <summary>
-        /// Gets or sets the authenticated <see cref="ClaimsPrincipal"/>.
+        /// Gets the authenticated <see cref="ClaimsPrincipal"/>.
         /// </summary>
-        public ClaimsPrincipal User { get; set; }
+        public ClaimsPrincipal User { get; }
     }
 #else
     /// <summary>

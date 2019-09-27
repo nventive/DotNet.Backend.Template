@@ -26,7 +26,8 @@ namespace NV.Templates.Backend.Core.Framework.Continuation
         /// <typeparam name="T">The continuation token decoded type.</typeparam>
         /// <param name="continuationToken">The encoded continuation token.</param>
         /// <returns>The decoded continuation token, or default if no continuation token,.</returns>
-        public static T FromContinuationToken<T>(string continuationToken)
+        public static T? FromContinuationToken<T>(string? continuationToken)
+            where T : class
         {
             try
             {

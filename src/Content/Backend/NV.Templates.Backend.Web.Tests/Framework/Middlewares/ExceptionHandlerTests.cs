@@ -27,10 +27,10 @@ namespace NV.Templates.Backend.Web.Tests.Framework.Middlewares
 {
     public class ExceptionHandlerTests
     {
-        public static IEnumerable<object[]> GenerateDataForItShouldHandleExceptions()
+        public static IEnumerable<object?[]> GenerateDataForItShouldHandleExceptions()
         {
             var faker = new Faker();
-            yield return new object[]
+            yield return new object?[]
             {
                 null,
                 new Action<Exception, ProblemDetails>((ex, result) =>
@@ -100,7 +100,7 @@ namespace NV.Templates.Backend.Web.Tests.Framework.Middlewares
                     result.Status.Should().Be(StatusCodes.Status400BadRequest);
                     var validationFailure = ((FluentValidation.ValidationException)ex).Errors.First();
                     var errors = result.Extensions["errors"] as JObject;
-                    errors[validationFailure.PropertyName].First().ToString().Should().Be(validationFailure.ErrorMessage);
+                    errors?[validationFailure.PropertyName]?.First()?.ToString().Should().Be(validationFailure.ErrorMessage);
                 }),
             };
         }

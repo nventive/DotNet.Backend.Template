@@ -5,7 +5,7 @@
     <Copyright>Copyright (c) 2019, Company</Copyright>
     <Product>NV.Templates.Backend</Product>
     <LangVersion>8.0</LangVersion>
-    <Nullable>disable</Nullable>
+    <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
     <NoWarn>1701;1702;1998</NoWarn>

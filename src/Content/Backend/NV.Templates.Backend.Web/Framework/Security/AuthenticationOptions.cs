@@ -13,30 +13,30 @@ namespace NV.Templates.Backend.Web.Framework.Security
         /// Gets or sets the required JWT token Audience to check.
         /// </summary>
         [Required]
-        public string JwtAudience { get; set; }
+        public string? JwtAudience { get; set; }
 
         /// <summary>
         /// Gets or sets the required JWT token Authority to check.
         /// </summary>
         [Required]
-        public string JwtAuthority { get; set; }
+        public string? JwtAuthority { get; set; }
 
         /// <summary>
         /// Gets or sets the OAuth2 authorization url to use.
         /// This is used for OpenApi OAuth 2 support.
         /// </summary>
-        public Uri AuthorizationUrl { get; set; }
+        public Uri? AuthorizationUrl { get; set; }
 
         /// <summary>
         /// Gets or sets the Scopes to use for User authentication.
         /// This is used for OpenApi OAuth 2 support.
         /// </summary>
-        public IEnumerable<string> UserAuthenticationScopes { get; set; }
+        public IEnumerable<string>? UserAuthenticationScopes { get; set; }
 
         /// <summary>
         /// Gets or sets the client id of the client application.
         /// This is used for OpenApi OAuth 2 support.
         /// </summary>
-        public string ClientClientId { get; set; }
+        public string? ClientClientId { get; set; }
     }
 }

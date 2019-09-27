@@ -8,7 +8,7 @@
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <inheritdoc />
         public override string ToString() => $"{base.ToString()} name: {Name}";

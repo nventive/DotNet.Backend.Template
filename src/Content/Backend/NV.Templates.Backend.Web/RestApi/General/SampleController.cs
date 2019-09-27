@@ -18,7 +18,7 @@ namespace NV.Templates.Backend.Web.RestApi.General
         [ApiVersion("1")]
         [HttpGet("hello")]
         [Description("Sample Hello world")]
-        public ActionResult<string> GetHello([Description("The salutation")] string name = null)
+        public ActionResult<string> GetHello([Description("The salutation")] string? name = null)
         {
             return Ok($"Hello, {name ?? "world"}");
         }
@@ -26,9 +26,9 @@ namespace NV.Templates.Backend.Web.RestApi.General
         [ApiVersion("2")]
         [HttpGet("hello")]
         [Description("Sample Hello world")]
-        public ActionResult<HelloWorldResponse> GetHelloV2([Description("The salutation")] string name = null)
+        public ActionResult<HelloWorldResponse> GetHelloV2([Description("The salutation")] string? name = null)
         {
-            return Ok(new HelloWorldResponse { Message = $"Hello, {name ?? "world"}", Timestamp = DateTimeOffset.UtcNow });
+            return Ok(new HelloWorldResponse($"Hello, {name ?? "world"}", DateTimeOffset.UtcNow));
         }
 
         [ApiVersion("1")]
@@ -50,12 +50,18 @@ namespace NV.Templates.Backend.Web.RestApi.General
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Sample code to be deleted.")]
         public class HelloWorldResponse
         {
+            public HelloWorldResponse(string message, DateTimeOffset timestamp)
+            {
+                Message = message;
+                Timestamp = timestamp;
+            }
+
             [Required]
             [Description("The generated message")]
-            public string Message { get; set; }
+            public string Message { get; }
 
             [Description("The generated timestamp")]
-            public DateTimeOffset Timestamp { get; set; }
+            public DateTimeOffset Timestamp { get; }
         }
     }
 }

@@ -24,7 +24,7 @@ namespace NV.Templates.Backend.Core.General
         /// <summary>
         /// Gets or sets the authenticated user identity, if any.
         /// </summary>
-        IIdentity UserIdentity { get; set; }
+        IIdentity? UserIdentity { get; set; }
 #else
         /// <summary>
         /// Gets or sets the operation timestamp in UTC.

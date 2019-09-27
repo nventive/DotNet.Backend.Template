@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Http;
 
@@ -11,7 +12,14 @@ namespace NV.Templates.Backend.Web.GraphQLApi
     {
 #if Auth
         public Task<object> BuildUserContext(HttpContext httpContext)
-            => Task.FromResult<object>(new GraphQLUserContext { User = httpContext?.User });
+        {
+            if (httpContext is null)
+            {
+                throw new ArgumentNullException(nameof(httpContext));
+            }
+
+            return Task.FromResult<object>(new GraphQLUserContext(httpContext.User));
+        }
 #else
         public Task<object> BuildUserContext(HttpContext httpContext)
             => Task.FromResult<object>(new GraphQLUserContext());

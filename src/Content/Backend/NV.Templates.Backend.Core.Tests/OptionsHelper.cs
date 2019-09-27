@@ -13,7 +13,7 @@ namespace NV.Templates.Backend.Core.Tests
         /// </summary>
         /// <typeparam name="T">The options type.</typeparam>
         /// <param name="key">The section name. Defaults to typeof(T).Name.</param>
-        public static T GetOptionsFromConfig<T>(string key = null)
+        public static T GetOptionsFromConfig<T>(string? key = null)
             where T : class, new()
         {
             var configuration = GetConfiguration();

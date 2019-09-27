@@ -51,7 +51,7 @@ namespace Microsoft.Extensions.DependencyInjection
                                 Implicit = new OpenApiOAuthFlow
                                 {
                                     Scopes = (authenticationOptions.UserAuthenticationScopes ?? Enumerable.Empty<string>()).ToDictionary(x => x, x => x),
-                                    AuthorizationUrl = authenticationOptions.AuthorizationUrl.ToString(),
+                                    AuthorizationUrl = authenticationOptions.AuthorizationUrl?.ToString(),
                                 },
                             },
                         });

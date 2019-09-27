@@ -6,9 +6,9 @@
     public abstract class Entity : IIdentifiable
     {
         /// <inheritdoc />
-        public string Id { get; set; }
+        public string Id { get; set; } = IdGenerator.Generate();
 
         /// <inheritdoc />
-        public override string ToString() => $"[{GetType().Name}] ({Id ?? "<new>"})";
+        public override string ToString() => $"[{GetType().Name}] ({Id})";
     }
 }

@@ -5,6 +5,6 @@
     /// </summary>
     public static class IdentityExtensions
     {
-        public static string GetUserName(this IIdentity identity) => identity != null && identity.IsAuthenticated ? identity.Name : "Anonymous";
+        public static string GetUserName(this IIdentity? identity) => identity != null && identity.IsAuthenticated ? identity.Name : "Anonymous";
     }
 }

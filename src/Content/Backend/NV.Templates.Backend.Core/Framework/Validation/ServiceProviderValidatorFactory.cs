@@ -18,7 +18,7 @@ namespace NV.Templates.Backend.Core.Framework.Validation
             _serviceProvider = serviceProvider;
         }
 
-        public override IValidator CreateInstance(Type validatorType)
+        public override IValidator? CreateInstance(Type validatorType)
         {
             return _serviceProvider.GetService(validatorType) as IValidator;
         }

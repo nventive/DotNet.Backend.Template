@@ -37,6 +37,6 @@ namespace NV.Templates.Backend.Core.Framework.Exceptions
         /// <summary>
         /// Gets information about the expected target (such as id).
         /// </summary>
-        public string Target { get; }
+        public string? Target { get; }
     }
 }

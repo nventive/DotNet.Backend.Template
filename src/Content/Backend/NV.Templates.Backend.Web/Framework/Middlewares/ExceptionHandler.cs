@@ -81,7 +81,7 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
             await context.Response.WriteAsync(JsonSerializer.Serialize(responseModel, jsonOptions.JsonSerializerOptions), Encoding.UTF8);
         }
 
-        private static ProblemDetails CreateErrorModel(Exception exception)
+        private static ProblemDetails CreateErrorModel(Exception? exception)
         {
             switch (exception)
             {

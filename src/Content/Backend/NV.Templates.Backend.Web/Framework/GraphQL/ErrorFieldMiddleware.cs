@@ -14,7 +14,7 @@ namespace NV.Templates.Backend.Web.Framework.GraphQL
     /// </summary>
     public class ErrorFieldMiddleware
     {
-        public async Task<object> Resolve(ResolveFieldContext context, FieldMiddlewareDelegate next)
+        public async Task<object?> Resolve(ResolveFieldContext context, FieldMiddlewareDelegate next)
         {
             if (next is null)
             {

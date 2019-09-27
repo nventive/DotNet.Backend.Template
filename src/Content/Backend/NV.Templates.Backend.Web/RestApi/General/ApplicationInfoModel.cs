@@ -19,7 +19,7 @@ namespace NV.Templates.Backend.Web.RestApi.General
         }
 
         public ApplicationInfoModel(IApplicationInfo appInfo)
-            : this(appInfo?.Name, appInfo?.Version, appInfo?.Environment)
+            : this(appInfo?.Name ?? string.Empty, appInfo?.Version ?? string.Empty, appInfo?.Environment ?? string.Empty)
         {
         }
 

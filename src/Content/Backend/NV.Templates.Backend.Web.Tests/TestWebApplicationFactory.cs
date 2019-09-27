@@ -18,7 +18,7 @@ namespace NV.Templates.Backend.Web.Tests
     {
         public MediaTypeFormatter MediaTypeFormatter { get; } = CreateMediaTypeFormatter();
 
-        public ITestOutputHelper OutputHelper { get; set; }
+        public ITestOutputHelper? OutputHelper { get; set; }
 
         /// <summary>
         /// Creates a connected <see cref="GraphQLClient"/>.

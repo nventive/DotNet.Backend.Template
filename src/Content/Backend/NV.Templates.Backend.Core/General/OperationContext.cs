@@ -21,7 +21,7 @@ namespace NV.Templates.Backend.Core.General
 
 #if Auth
         /// <inheritdoc />
-        public IIdentity UserIdentity { get; set; }
+        public IIdentity? UserIdentity { get; set; }
 
         /// <inheritdoc />
         public override string ToString() => $"{nameof(OperationContext)}: {OperationId} {Timestamp} {UserIdentity.GetUserName()}";

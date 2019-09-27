@@ -17,14 +17,14 @@ namespace NV.Templates.Backend.Core.Framework.Continuation
         /// </summary>
         /// <param name="inner">The original <see cref="IEnumerable{T}"/>.</param>
         /// <param name="continuationToken">The continuation token if any.</param>
-        public ContinuationEnumerableDecorator(IEnumerable<T> inner, string continuationToken = null)
+        public ContinuationEnumerableDecorator(IEnumerable<T> inner, string? continuationToken = null)
         {
             _inner = inner ?? Enumerable.Empty<T>();
             ContinuationToken = continuationToken;
         }
 
         /// <inheritdoc/>
-        public string ContinuationToken { get; }
+        public string? ContinuationToken { get; }
 
         /// <inheritdoc />
         public IEnumerator<T> GetEnumerator() => _inner.GetEnumerator();

@@ -11,7 +11,7 @@ namespace NV.Templates.Backend.Web.Framework.Models
     internal class ContinuationEnumerableModel<T> : IContinuation
     {
         [JsonConstructor]
-        public ContinuationEnumerableModel(IEnumerable<T> items, string continuationToken)
+        public ContinuationEnumerableModel(IEnumerable<T> items, string? continuationToken)
         {
             Items = items;
             ContinuationToken = continuationToken;
@@ -24,6 +24,6 @@ namespace NV.Templates.Backend.Web.Framework.Models
 
         public IEnumerable<T> Items { get; }
 
-        public string ContinuationToken { get; }
+        public string? ContinuationToken { get; }
     }
 }
