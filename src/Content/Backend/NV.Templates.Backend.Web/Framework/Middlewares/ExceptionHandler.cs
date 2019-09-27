@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -15,9 +16,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using NV.Templates.Backend.Core.Framework.Exceptions;
 using NV.Templates.Backend.Core.General;
 
@@ -40,11 +41,11 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
         /// </summary>
         public static void ConfigureExceptionHandling(IApplicationBuilder app)
         {
-            var env = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
-            var mvcJsonOptions = app.ApplicationServices.GetRequiredService<IOptions<MvcJsonOptions>>();
+            var env = app.ApplicationServices.GetRequiredService<IHostEnvironment>();
+            var jsonOptions = app.ApplicationServices.GetRequiredService<IOptions<JsonOptions>>();
             var loggerFactory = app.ApplicationServices.GetRequiredService<ILoggerFactory>();
 
-            app.Run(httpContext => HandleException(httpContext, mvcJsonOptions.Value, env, loggerFactory.CreateLogger(nameof(ExceptionHandler))));
+            app.Run(httpContext => HandleException(httpContext, jsonOptions.Value, env, loggerFactory.CreateLogger(nameof(ExceptionHandler))));
         }
 
         /// <summary>
@@ -52,8 +53,8 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
         /// </summary>
         public static async Task HandleException(
             HttpContext context,
-            MvcJsonOptions jsonOptions,
-            IHostingEnvironment env,
+            JsonOptions jsonOptions,
+            IHostEnvironment env,
             ILogger logger)
         {
             var operationContext = context.RequestServices.GetService<IOperationContext>();
@@ -77,7 +78,7 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
 
             context.Response.ContentType = "application/problem+json";
             context.Response.StatusCode = responseModel.Status ?? StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(responseModel, jsonOptions.SerializerSettings), Encoding.UTF8);
+            await context.Response.WriteAsync(JsonSerializer.Serialize(responseModel, jsonOptions.JsonSerializerOptions), Encoding.UTF8);
         }
 
         private static ProblemDetails CreateErrorModel(Exception exception)

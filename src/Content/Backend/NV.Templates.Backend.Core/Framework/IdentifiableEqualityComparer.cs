@@ -26,6 +26,6 @@ namespace NV.Templates.Backend.Core.Framework
             return string.Equals(x.Id, y.Id, StringComparison.Ordinal);
         }
 
-        public int GetHashCode(T obj) => (obj.Id.GetHashCode() ^ typeof(T).GetHashCode()).GetHashCode();
+        public int GetHashCode(T obj) => (obj.Id.GetHashCode(StringComparison.Ordinal) ^ typeof(T).GetHashCode()).GetHashCode();
     }
 }

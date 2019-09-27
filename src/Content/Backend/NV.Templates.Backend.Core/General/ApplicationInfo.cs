@@ -13,13 +13,13 @@ namespace NV.Templates.Backend.Core.General
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationInfo"/> class using current
-        /// <see cref="AssemblyInformationalVersionAttribute"/> and the <paramref name="hostingEnvironment"/>.
+        /// <see cref="AssemblyInformationalVersionAttribute"/> and the <paramref name="hostEnvironment"/>.
         /// </summary>
-        public ApplicationInfo(IHostingEnvironment hostingEnvironment)
+        public ApplicationInfo(IHostEnvironment hostEnvironment)
             : this(
-                  hostingEnvironment?.ApplicationName ?? typeof(ApplicationInfo).Assembly.GetName().Name,
+                  hostEnvironment?.ApplicationName ?? typeof(ApplicationInfo).Assembly.GetName().Name,
                   typeof(ApplicationInfo).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion,
-                  hostingEnvironment?.EnvironmentName ?? EnvironmentName.Production)
+                  hostEnvironment?.EnvironmentName ?? Environments.Production)
         {
         }
 

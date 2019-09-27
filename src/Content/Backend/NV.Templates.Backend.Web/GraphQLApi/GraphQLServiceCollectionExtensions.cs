@@ -1,6 +1,8 @@
 ﻿using GraphQL;
 using GraphQL.Server;
 using GraphQL.Server.Internal;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using NV.Templates.Backend.Web.Framework.GraphQL;
 using NV.Templates.Backend.Web.GraphQLApi;
@@ -17,6 +19,16 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddGraphQLApi(this IServiceCollection services, IConfiguration configuration)
         {
+            // This is a fix until this is resolve in GraphQL.
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+            services.Configure<IISServerOptions>(options =>
+            {
+                options.AllowSynchronousIO = true;
+            });
+
             services
                 .AddSingleton<IDependencyResolver, HttpContextAccessorDependencyResolver>()
                 .AddSingleton<GraphQLSchema>()

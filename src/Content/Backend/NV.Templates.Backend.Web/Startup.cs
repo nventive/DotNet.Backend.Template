@@ -69,21 +69,31 @@ namespace NV.Templates.Backend.Web
         {
             app.UseHsts()
                .UseHttpsRedirection()
+               .UseRouting()
                .UseCors();
 
-            app.UseRequestTracing();
+            // app.UseRequestTracing();
             app.UseExceptionHandler(ExceptionHandler.ConfigureExceptionHandling);
 #if Auth
-            app.UseAuthentication();
+            app.UseAuthentication()
+               .UseAuthorization();
 #endif
 
+            app.UseResponseCaching();
             app.UseMiddleware<OperationContextMiddleware>();
 
-            app.UseHealthChecks(
-                "/api/health",
-                new HealthCheckOptions { ResponseWriter = HealthChecksResponseWriter.WriteResponse });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapAttributions();
+                endpoints.MapHealthChecks(
+                    "/api/health",
+                    new HealthCheckOptions { ResponseWriter = HealthChecksResponseWriter.WriteResponse });
 
-            app.UseAttributions();
+#if RestApi
+                endpoints.MapControllers();
+#endif
+            });
+
 #if GraphQLApi
             app
                 .UseGraphQL<GraphQLSchema>()
@@ -91,9 +101,6 @@ namespace NV.Templates.Backend.Web
                 .UseGraphQLVoyager(new GraphQLVoyagerOptions { Path = "/graphql-voyager" });
 #endif
 #if RestApi
-            app.UseResponseCaching();
-            app.UseMvc();
-
             app.UseOpenApi();
             app.UseSwaggerUi3(configure =>
             {
@@ -119,7 +126,7 @@ namespace NV.Templates.Backend.Web
             {
                 spa.Options.SourcePath = "ClientApp";
 
-                if (app.ApplicationServices.GetRequiredService<IHostingEnvironment>().IsDevelopment())
+                if (app.ApplicationServices.GetRequiredService<IHostEnvironment>().IsDevelopment())
                 {
                     // spa.UseReactDevelopmentServer(npmScript: "start");
                     // spa.UseAngularCliServer(npmScript: "start");

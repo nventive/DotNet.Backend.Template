@@ -12,8 +12,8 @@ namespace NV.Templates.Backend.Core.Framework
         /// </summary>
         public static string Generate() =>
             Convert.ToBase64String(Guid.NewGuid().ToByteArray())
-                .Replace("/", "_")
-                .Replace("+", "-")
+                .Replace("/", "_", StringComparison.Ordinal)
+                .Replace("+", "-", StringComparison.Ordinal)
                 .Substring(0, 22);
     }
 }

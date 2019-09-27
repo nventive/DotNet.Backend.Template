@@ -1,10 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text.Json;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 
 namespace NV.Templates.Backend.Web.Framework.Middlewares
 {
@@ -16,8 +16,8 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
         public static Task WriteResponse(HttpContext httpContext, HealthReport result)
         {
             httpContext.Response.ContentType = "application/json";
-            var mvcJsonOptions = httpContext.RequestServices.GetRequiredService<IOptions<MvcJsonOptions>>();
-            return httpContext.Response.WriteAsync(JsonConvert.SerializeObject(result, Formatting.Indented, mvcJsonOptions.Value.SerializerSettings));
+            var jsonOptions = httpContext.RequestServices.GetRequiredService<IOptions<JsonOptions>>().Value;
+            return httpContext.Response.WriteAsync(JsonSerializer.Serialize(result, jsonOptions.JsonSerializerOptions));
         }
     }
 }

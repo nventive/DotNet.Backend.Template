@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Bogus;
 using FluentAssertions;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
@@ -113,8 +115,8 @@ namespace NV.Templates.Backend.Web.Tests.Framework.Middlewares
                 RequestServices = serviceProviderMock.Object,
             };
             httpContext.Response.Body = new MemoryStream();
-            var mvcJsonOptions = new MvcJsonOptions();
-            var environmentMock = new Mock<IHostingEnvironment>();
+            var jsonOptions = new JsonOptions();
+            var environmentMock = new Mock<IHostEnvironment>();
 
             var operationId = IdGenerator.Generate();
             var operationContextMock = new Mock<IOperationContext>();
@@ -126,7 +128,7 @@ namespace NV.Templates.Backend.Web.Tests.Framework.Middlewares
             exceptionHandlerFeatureMock.SetupGet(x => x.Error).Returns(exception);
             httpContext.Features.Set(exceptionHandlerFeatureMock.Object);
 
-            await ExceptionHandler.HandleException(httpContext, mvcJsonOptions, environmentMock.Object, NullLogger.Instance);
+            await ExceptionHandler.HandleException(httpContext, jsonOptions, environmentMock.Object, NullLogger.Instance);
 
             httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
             using (var streamReader = new StreamReader(httpContext.Response.Body))

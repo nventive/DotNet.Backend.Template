@@ -6,10 +6,10 @@ using NV.Templates.Backend.Core.Framework.Continuation;
 namespace NV.Templates.Backend.Web.Framework.GraphQL
 {
     /// <summary>
-    /// Maps <see cref="IContinuationEnumerable{T}"/> to an <see cref="ObjectGraphType"/>
+    /// Maps <see cref="IContinuationEnumerable{T}"/> to an <see cref="ObjectGraphType"/>.
     /// </summary>
-    /// <typeparam name="TSourceType">The Type parameter of the enumeration</typeparam>
-    /// <typeparam name="TGraphType">The target <see cref="ObjectGraphType"/></typeparam>
+    /// <typeparam name="TSourceType">The Type parameter of the enumeration.</typeparam>
+    /// <typeparam name="TGraphType">The target <see cref="ObjectGraphType"/>.</typeparam>
     internal abstract class ContinuationEnumerableGraphType<TSourceType, TGraphType> : ObjectGraphType<IContinuationEnumerable<TSourceType>>
         where TGraphType : GraphType
     {

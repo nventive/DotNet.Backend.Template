@@ -1,4 +1,5 @@
-﻿using FluentValidation.AspNetCore;
+﻿using System.Text.Json.Serialization;
+using FluentValidation.AspNetCore;
 #if Auth
 using Microsoft.AspNetCore.Authorization;
 #endif
@@ -6,9 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 #if Auth
 using Microsoft.AspNetCore.Mvc.Authorization;
 #endif
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -35,28 +33,18 @@ namespace Microsoft.Extensions.DependencyInjection
                     options.LowercaseUrls = true;
                     options.LowercaseQueryStrings = true;
                 })
-                .AddMvcCore(options =>
+                .AddControllers(options =>
                 {
                     options.Filters.Add(new ResponseCacheAttribute { Location = ResponseCacheLocation.None, NoStore = true });
 #if Auth
                     options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build()));
 #endif
                 })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddAuthorization()
-                .AddFormatterMappings()
-                .AddDataAnnotations()
-                .AddJsonFormatters()
                 .AddJsonOptions(options =>
                 {
-                    options.SerializerSettings.ContractResolver = new DefaultContractResolver
-                    {
-                        NamingStrategy = new CamelCaseNamingStrategy(),
-                    };
-                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                    options.SerializerSettings.Converters.Add(new StringEnumConverter { CamelCaseText = true });
-                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddFluentValidation();
 
             return services;
