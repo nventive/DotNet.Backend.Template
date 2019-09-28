@@ -44,7 +44,7 @@ namespace NV.Templates.Backend.Web
         {
             services.AddCore();
 
-            services.AddWeb();
+            services.AddWeb(_configuration);
 #if Auth
             services.AddAuthenticationSetup(_configuration);
 #endif
