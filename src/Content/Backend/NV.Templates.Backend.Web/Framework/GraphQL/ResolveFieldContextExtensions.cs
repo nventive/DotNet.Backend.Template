@@ -13,9 +13,9 @@ namespace NV.Templates.Backend.Web.Framework.GraphQL
     {
         /// <summary>
         /// Fills <paramref name="query"/> with GraphQL arguments previously setup with
-        /// <see cref="FieldBuilderExtensions.ArgumentContinuationQuery{TSourceType, TReturnType}(GraphQL.Builders.FieldBuilder{TSourceType, TReturnType})"/>
+        /// <see cref="FieldBuilderExtensions.ArgumentContinuationQuery{TSourceType, TReturnType}(GraphQL.Builders.FieldBuilder{TSourceType, TReturnType})"/>.
         /// </summary>
-        /// <typeparam name="TSource">The source type</typeparam>
+        /// <typeparam name="TSource">The source type.</typeparam>
         public static ResolveFieldContext<TSource> FillContinuationQuery<TSource>(this ResolveFieldContext<TSource> context, IContinuationQuery query)
         {
             query = query ?? throw new ArgumentNullException(nameof(query));

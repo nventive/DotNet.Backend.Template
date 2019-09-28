@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+- Support for alternative authentication in Integration Tests when using `--Auth` option.
+
 ### Changed
 
 - Default JWT Auth configuration uses `DefaultScheme` instead of `DefaultAuthenticateScheme`

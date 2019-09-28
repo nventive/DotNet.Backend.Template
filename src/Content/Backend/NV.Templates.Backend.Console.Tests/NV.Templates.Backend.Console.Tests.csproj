@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NV.Templates.Backend.Core.Tests\NV.Templates.Backend.Core.Tests.csproj" />
     <ProjectReference Include="..\NV.Templates.Backend.Core\NV.Templates.Backend.Core.csproj" />
     <ProjectReference Include="..\NV.Templates.Backend.Console\NV.Templates.Backend.Console.csproj" />
   </ItemGroup>
