@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 2.1.0
+
+### Added
+
 - Support for alternative authentication in Integration Tests when using `--Auth` option.
 
 ### Changed
