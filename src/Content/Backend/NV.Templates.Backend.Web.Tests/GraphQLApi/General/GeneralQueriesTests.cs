@@ -16,6 +16,7 @@ namespace NV.Templates.Backend.Web.Tests.GraphQLApi.General
             _factory.OutputHelper = testOutputHelper;
         }
 
+#if GraphQLApi
         [Fact]
         public async Task ItShouldReturnInfo()
         {
@@ -51,5 +52,6 @@ namespace NV.Templates.Backend.Web.Tests.GraphQLApi.General
 
             response.Errors.Should().BeNullOrEmpty();
         }
+#endif
     }
 }
