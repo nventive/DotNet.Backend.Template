@@ -19,6 +19,7 @@ namespace NV.Templates.Backend.Web.Tests.GraphQLApi.General
         [Fact]
         public async Task ItShouldReturnInfo()
         {
+            _factory.Server.AllowSynchronousIO = true;
             var client = _factory.CreateGraphQLClient();
             var response = await client.PostQueryAsync(@"
                 {

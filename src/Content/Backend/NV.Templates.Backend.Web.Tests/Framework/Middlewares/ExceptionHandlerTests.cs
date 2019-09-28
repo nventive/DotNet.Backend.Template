@@ -9,14 +9,11 @@ using FluentAssertions;
 using FluentValidation.Results;
 using HelpDeskId;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NV.Templates.Backend.Core.Framework;
 using NV.Templates.Backend.Core.Framework.Exceptions;
 using NV.Templates.Backend.Core.General;
@@ -33,18 +30,18 @@ namespace NV.Templates.Backend.Web.Tests.Framework.Middlewares
             yield return new object?[]
             {
                 null,
-                new Action<Exception, ProblemDetails>((ex, result) =>
+                new Action<Exception, ProblemDetails, HttpResponse>((ex, result, response) =>
                 {
-                    result.Status.Should().Be(StatusCodes.Status500InternalServerError);
+                    response.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
                 }),
             };
 
             yield return new object[]
             {
                 new Exception(faker.Random.Words()),
-                new Action<Exception, ProblemDetails>((ex, result) =>
+                new Action<Exception, ProblemDetails, HttpResponse>((ex, result, response) =>
                 {
-                    result.Status.Should().Be(StatusCodes.Status500InternalServerError);
+                    response.StatusCode.Should().Be(StatusCodes.Status500InternalServerError);
                     result.Detail.Should().Be(ex.Message);
                 }),
             };
@@ -52,9 +49,9 @@ namespace NV.Templates.Backend.Web.Tests.Framework.Middlewares
             yield return new object[]
             {
                 new DependencyException(faker.Random.Words(), faker.Random.Words()),
-                new Action<Exception, ProblemDetails>((ex, result) =>
+                new Action<Exception, ProblemDetails, HttpResponse>((ex, result, response) =>
                 {
-                    result.Status.Should().Be(StatusCodes.Status502BadGateway);
+                    response.StatusCode.Should().Be(StatusCodes.Status502BadGateway);
                     result.Detail.Should().Be(ex.Message);
                     result.Instance.Should().Be(((DependencyException)ex).DependencyName);
                 }),
@@ -63,9 +60,9 @@ namespace NV.Templates.Backend.Web.Tests.Framework.Middlewares
             yield return new object[]
             {
                 new NotFoundException(faker.Random.Words(), faker.Random.Words()),
-                new Action<Exception, ProblemDetails>((ex, result) =>
+                new Action<Exception, ProblemDetails, HttpResponse>((ex, result, response) =>
                 {
-                    result.Status.Should().Be(StatusCodes.Status404NotFound);
+                    response.StatusCode.Should().Be(StatusCodes.Status404NotFound);
                     result.Detail.Should().Be(ex.Message);
                     result.Instance.Should().Be(((NotFoundException)ex).Target);
                 }),
@@ -74,9 +71,9 @@ namespace NV.Templates.Backend.Web.Tests.Framework.Middlewares
             yield return new object[]
             {
                 new ConcurrencyException(faker.Random.Words(), faker.Random.Words()),
-                new Action<Exception, ProblemDetails>((ex, result) =>
+                new Action<Exception, ProblemDetails, HttpResponse>((ex, result, response) =>
                 {
-                    result.Status.Should().Be(StatusCodes.Status409Conflict);
+                    response.StatusCode.Should().Be(StatusCodes.Status409Conflict);
                     result.Detail.Should().Be(ex.Message);
                     result.Instance.Should().Be(((ConcurrencyException)ex).Target);
                 }),
@@ -85,9 +82,9 @@ namespace NV.Templates.Backend.Web.Tests.Framework.Middlewares
             yield return new object[]
             {
                 new FluentValidation.ValidationException(faker.Random.Words()),
-                new Action<Exception, ProblemDetails>((ex, result) =>
+                new Action<Exception, ProblemDetails, HttpResponse>((ex, result, response) =>
                 {
-                    result.Status.Should().Be(StatusCodes.Status400BadRequest);
+                    response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
                     result.Detail.Should().Be(ex.Message);
                 }),
             };
@@ -95,19 +92,18 @@ namespace NV.Templates.Backend.Web.Tests.Framework.Middlewares
             yield return new object[]
             {
                 new FluentValidation.ValidationException(new[] { new ValidationFailure(faker.Random.Word(), faker.Random.Words()) }),
-                new Action<Exception, ProblemDetails>((ex, result) =>
+                new Action<Exception, ProblemDetails, HttpResponse>((ex, result, response) =>
                 {
-                    result.Status.Should().Be(StatusCodes.Status400BadRequest);
+                    response.StatusCode.Should().Be(StatusCodes.Status400BadRequest);
                     var validationFailure = ((FluentValidation.ValidationException)ex).Errors.First();
-                    var errors = result.Extensions["errors"] as JObject;
-                    errors?[validationFailure.PropertyName]?.First()?.ToString().Should().Be(validationFailure.ErrorMessage);
+                    result.Detail.Should().Contain(validationFailure.ErrorMessage);
                 }),
             };
         }
 
         [Theory]
         [MemberData(nameof(GenerateDataForItShouldHandleExceptions))]
-        public async Task ItShouldHandleExceptions(Exception exception, Action<Exception, ProblemDetails> assert)
+        public async Task ItShouldHandleExceptions(Exception exception, Action<Exception, ProblemDetails, HttpResponse> assert)
         {
             var serviceProviderMock = new Mock<IServiceProvider>();
             var httpContext = new DefaultHttpContext
@@ -131,13 +127,12 @@ namespace NV.Templates.Backend.Web.Tests.Framework.Middlewares
             await ExceptionHandler.HandleException(httpContext, jsonOptions, environmentMock.Object, NullLogger.Instance);
 
             httpContext.Response.Body.Seek(0, SeekOrigin.Begin);
-            using (var streamReader = new StreamReader(httpContext.Response.Body))
-            {
-                var result = JsonConvert.DeserializeObject<ProblemDetails>(streamReader.ReadToEnd());
-                result.Extensions[ExceptionHandler.OperationIdProperty].Should().Be(operationId);
-                result.Extensions[ExceptionHandler.HelpDeskIdProperty].Should().NotBeNull();
-                assert(exception, result);
-            }
+            using var streamReader = new StreamReader(httpContext.Response.Body);
+
+            var result = JsonSerializer.Deserialize<ProblemDetails>(streamReader.ReadToEnd());
+            ((JsonElement)result.Extensions[ExceptionHandler.OperationIdProperty]).GetString().Should().Be(operationId);
+            ((JsonElement)result.Extensions[ExceptionHandler.HelpDeskIdProperty]).GetString().Should().NotBeNull();
+            assert(exception, result, httpContext.Response);
         }
     }
 }

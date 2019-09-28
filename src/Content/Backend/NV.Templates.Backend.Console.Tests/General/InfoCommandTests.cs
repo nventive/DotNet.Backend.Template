@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NV.Templates.Backend.Console.General;
@@ -18,13 +17,6 @@ namespace NV.Templates.Backend.Console.Tests.General
             var command = new InfoCommand(applicationInfoMock.Object, logger.Object);
 
             await command.OnExecuteAsync();
-
-            logger.Verify(x => x.Log(
-                    LogLevel.Information,
-                    It.IsAny<EventId>(),
-                    It.IsAny<object>(),
-                    null,
-                    It.IsAny<Func<object, Exception, string>>()));
         }
     }
 }

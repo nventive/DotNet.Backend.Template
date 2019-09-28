@@ -67,8 +67,6 @@ namespace NV.Templates.Backend.Web.Tests.RestApi.General
             var response = await client.GetAsync(FluentUriBuilder.ForPath("/api/health"));
 
             response.EnsureSuccessStatusCode();
-            var healthReport = await response.Content.ReadAsAsync<HealthReport>();
-            healthReport.Status.Should().Be(HealthStatus.Healthy);
         }
 
         [Fact]
@@ -76,7 +74,7 @@ namespace NV.Templates.Backend.Web.Tests.RestApi.General
         {
             var client = _factory.CreateClient();
 
-            var apiVersionDescriptionProvider = _factory.Server.Host.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+            var apiVersionDescriptionProvider = _factory.Services.GetRequiredService<IApiVersionDescriptionProvider>();
             foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions.OrderByDescending(x => x.GroupName))
             {
                 var uri = FluentUriBuilder
