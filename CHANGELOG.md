@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+- Default JWT Auth configuration uses `DefaultScheme` instead of `DefaultAuthenticateScheme`
+
 ### Deprecated
 
 ### Removed
