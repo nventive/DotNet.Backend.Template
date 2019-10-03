@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NV.Templates.Backend.Console
 {
@@ -7,6 +9,13 @@ namespace NV.Templates.Backend.Console
     /// </summary>
     public class Startup
     {
+        private readonly IConfiguration _configuration;
+
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        }
+
         /// <summary>
         /// Configure Dependency Injection services.
         /// This method gets called by the runtime. Use this method to add services to the container.
@@ -14,7 +23,7 @@ namespace NV.Templates.Backend.Console
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCore();
+            services.AddCore(_configuration);
         }
     }
 }

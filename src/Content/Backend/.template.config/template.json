@@ -56,6 +56,12 @@
       "datatype": "bool",
       "defaultValue": "false"
     },
+    "EFCore": {
+      "type": "parameter",
+      "description": "Add Entity Framework support",
+      "datatype": "bool",
+      "defaultValue": "false"
+    },
     "Web": {
       "type": "computed",
       "dataType": "bool",
@@ -152,6 +158,10 @@
         {
           "condition": "(!Auth)",
           "exclude": ["**/*Security*/**"]
+        },
+        {
+          "condition": "(!EFCore)",
+          "exclude": ["**/**/CoreDbContext*", "**/*EF*/**"]
         }
       ]
     }
