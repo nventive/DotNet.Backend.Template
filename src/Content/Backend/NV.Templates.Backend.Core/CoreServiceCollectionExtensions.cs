@@ -29,14 +29,17 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddDbContext<CoreDbContext>(options =>
                 {
                     options.UseSqlServer(
-                        configuration.GetConnectionString(nameof(CoreDbContext)),
+                        configuration.GetConnectionString(nameof(CoreDbContext)) ?? throw new ArgumentNullException($"Missing connection string for {nameof(CoreDbContext)}"),
                         sqlServerOptions => sqlServerOptions.EnableRetryOnFailure());
                 });
 
-#endif
+            services
+                .AddHealthChecks()
+                .AddDbContextCheck<CoreDbContext>();
+#else
             services
                 .AddHealthChecks();
-
+#endif
             return services;
         }
     }

@@ -211,6 +211,13 @@ In order to use the EF Core tooling, you must specify a `--startup-project` when
 dotnet ef database update --project <Core project> --startup-project <Web project>
 ```
 
+Additionaly, the project adds a ``docker-compose.yml` that allows you to:
+
+- Start a docker container with MS SQL Server running locally on linux with a new database created
+- Easily restore any additional database on container start by dropping the backups into the `.docker/mssql/to-restore` folder
+
+The `Web` and `Functions` projects are configured to use this database in development. Just run `docker-compose up` and you're good to go.
+
 #### Azure Functions
 
 When using the `--Functions` option, 2 projects are added to the solution:

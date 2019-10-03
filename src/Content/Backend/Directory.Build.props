@@ -9,7 +9,6 @@
     <WarningsAsErrors />
     <NoWarn>1701;1702;1998</NoWarn>
     <TemplateVersion>1.0.0</TemplateVersion>
-    <DefineConstants>EFCore</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
