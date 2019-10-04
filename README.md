@@ -204,7 +204,7 @@ When using the `--EFCore` option, the `Core` and `Core.Tests` projects are augme
 - Adds some `IQueryable` extension methods to support `NotFoundException` and `ContinuationTokenEnumerable`
 - Adds a `CoreDbContextHelper` that helps with SQLite in-memory unit tests support
 
-The `CoreDbContext` class is intentionnaly marked as `internal` so as it does not blead to peripheral head projects.
+The `CoreDbContext` class is intentionnaly marked as `internal` so as it does not get unintentionally used in peripheral head projects.
 In order to use the EF Core tooling, you must specify a `--startup-project` when running the commands, e.g.:
 
 ```shell
