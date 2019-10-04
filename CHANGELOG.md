@@ -8,7 +8,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Support for EF Core
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## 2.2.0
+
+### Added
+
+- Support for EF Core & MS SQL Docker
 
 ### Changed
 
