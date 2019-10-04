@@ -42,7 +42,7 @@ namespace NV.Templates.Backend.Web
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCore();
+            services.AddCore(_configuration);
 
             services.AddWeb(_configuration);
 #if Auth

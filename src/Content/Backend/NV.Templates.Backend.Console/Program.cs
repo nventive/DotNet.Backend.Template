@@ -33,7 +33,7 @@ namespace NV.Templates.Backend.Console
                 .ConfigureServices((services) =>
                 {
                     services.AddOptions();
-                    new Startup().ConfigureServices(services);
+                    new Startup(services.BuildServiceProvider().GetRequiredService<IConfiguration>()).ConfigureServices(services);
                 })
                 .RunCommandLineApplicationAsync<Program>(args);
 

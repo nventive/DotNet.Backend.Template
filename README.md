@@ -42,6 +42,7 @@ To generate suitable hosts to run and expose it, use the following options:
 | --Functions | Generates an Azure Functions project                                  |
 | --Console   | Generates a Console (command-line) project                            |
 | --Auth      | Add authentication (JWT-based) support in Web projects                |
+| --EFCore    | Add EF Core support                                                   |
 
 Options can be combined, e.g.
 ```shell
@@ -194,6 +195,28 @@ When using the `--Auth` option, the `Web` project is augmented with the followin
 Covering the entire scope of authentication and authorization is too large for this documentation.
 This option is only there to provide a starting point.
 Please refer to the [ASP.NET Core documentation](https://docs.microsoft.com/en-us/aspnet/core/security/?view=aspnetcore-2.2) for more info.
+
+#### EF Core
+
+When using the `--EFCore` option, the `Core` and `Core.Tests` projects are augmented with the following features:
+
+- Adds a baseline `CoreDbContext` with client evaluation disabled and configuration via `IEntityTypeConfiguration` enabled
+- Adds some `IQueryable` extension methods to support `NotFoundException` and `ContinuationTokenEnumerable`
+- Adds a `CoreDbContextHelper` that helps with SQLite in-memory unit tests support
+
+The `CoreDbContext` class is intentionnaly marked as `internal` so as it does not blead to peripheral head projects.
+In order to use the EF Core tooling, you must specify a `--startup-project` when running the commands, e.g.:
+
+```shell
+dotnet ef database update --project <Core project> --startup-project <Web project>
+```
+
+Additionaly, the project adds a ``docker-compose.yml` that allows you to:
+
+- Start a docker container with MS SQL Server running locally on linux with a new database created
+- Easily restore any additional database on container start by dropping the backups into the `.docker/mssql/to-restore` folder
+
+The `Web` and `Functions` projects are configured to use this database in development. Just run `docker-compose up` and you're good to go.
 
 #### Azure Functions
 
