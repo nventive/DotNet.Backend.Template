@@ -5,6 +5,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NSwag;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
+using NV.Templates.Backend.Web.Framework.Middlewares;
 
 namespace NV.Templates.Backend.Web.Framework.OpenApi
 {
@@ -35,7 +36,7 @@ namespace NV.Templates.Backend.Web.Framework.OpenApi
                 { "GET", getHealthOperation },
             };
 
-            context.Document.Paths.Add("/api/health", healthPathItem);
+            context.Document.Paths.Add(HealthChecksResponseWriter.HealthChecksEndpoint, healthPathItem);
         }
     }
 }

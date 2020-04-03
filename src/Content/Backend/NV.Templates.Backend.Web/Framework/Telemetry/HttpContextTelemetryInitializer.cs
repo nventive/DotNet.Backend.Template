@@ -50,13 +50,13 @@ namespace NV.Templates.Backend.Web.Framework.Telemetry
                     telemetry.Context.User.UserAgent = userAgentHeader;
                 }
 
-                var sessionIdHeader = httpContext.Request?.Headers["X-SessionId"];
+                var sessionIdHeader = httpContext.Request?.Headers[SessionIdHeader];
                 if (!string.IsNullOrEmpty(sessionIdHeader))
                 {
                     telemetry.Context.Session.Id = sessionIdHeader;
                 }
 
-                var deviceIdHeader = httpContext.Request?.Headers["X-DeviceId"];
+                var deviceIdHeader = httpContext.Request?.Headers[DeviceIdHeader];
                 if (!string.IsNullOrEmpty(deviceIdHeader))
                 {
                     telemetry.Context.Device.Id = deviceIdHeader;

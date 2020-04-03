@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
-using NV.Templates.Backend.Core.Framework.Services;
+using NV.Templates.Backend.Core.Framework.DependencyInjection;
 
 namespace NV.Templates.Backend.Core.General
 {
@@ -13,28 +12,13 @@ namespace NV.Templates.Backend.Core.General
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationInfo"/> class using current
-        /// <see cref="AssemblyInformationalVersionAttribute"/> and the <paramref name="hostingEnvironment"/>.
+        /// <see cref="AssemblyInformationalVersionAttribute"/> and the <paramref name="hostEnvironment"/>.
         /// </summary>
-        public ApplicationInfo(IHostingEnvironment hostingEnvironment)
-            : this(
-                  hostingEnvironment?.ApplicationName ?? typeof(ApplicationInfo).Assembly.GetName().Name,
-                  typeof(ApplicationInfo).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion,
-                  hostingEnvironment?.EnvironmentName ?? EnvironmentName.Production)
+        public ApplicationInfo(IHostEnvironment hostEnvironment)
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ApplicationInfo"/> class.
-        /// </summary>
-        /// <param name="name">Application name.</param>
-        /// <param name="version">Application version.</param>
-        /// <param name="environment">Application environment.</param>
-        [JsonConstructor]
-        public ApplicationInfo(string name, string version, string environment)
-        {
-            Name = name;
-            Version = version;
-            Environment = environment;
+            Name = hostEnvironment?.ApplicationName ?? typeof(ApplicationInfo).Assembly.GetName().Name;
+            Version = typeof(ApplicationInfo).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+            Environment = hostEnvironment?.EnvironmentName ?? Environments.Production;
         }
 
         /// <inheritdoc />

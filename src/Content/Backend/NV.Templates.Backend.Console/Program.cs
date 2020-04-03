@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,28 +15,31 @@ namespace NV.Templates.Backend.Console
     public class Program
     {
         public static Task<int> Main(string[] args) => new HostBuilder()
-                .ConfigureAppConfiguration((hostBuilderContext, config) =>
-                {
-                    config.AddJsonFile("appsettings.json", optional: true);
-                    config.AddEnvironmentVariables();
-                    if (args != null)
-                    {
-                        config.AddCommandLine(args);
-                    }
+            .ConfigureAppConfiguration((hostBuilderContext, config) =>
+            {
+                var rootProjectPath = Path.GetFullPath(Path.Combine("..", "..", "..", ".."));
+                config
+                    .AddLocalSettings(rootProjectPath)
+                    .AddEnvironmentVariables()
+                    .AddUserSecrets<Program>();
 
-                    hostBuilderContext.HostingEnvironment.ApplicationName = typeof(Program).Assembly.GetName().Name;
-                    hostBuilderContext.HostingEnvironment.EnvironmentName = "Console";
-                })
-                .ConfigureLogging((_, builder) =>
+                if (args != null)
                 {
-                    builder.AddConsole();
-                })
-                .ConfigureServices((services) =>
-                {
-                    services.AddOptions();
-                    new Startup(services.BuildServiceProvider().GetRequiredService<IConfiguration>()).ConfigureServices(services);
-                })
-                .RunCommandLineApplicationAsync<Program>(args);
+                    config.AddCommandLine(args);
+                }
+
+                hostBuilderContext.HostingEnvironment.ApplicationName = typeof(Program).Assembly.GetName().Name;
+            })
+            .ConfigureLogging((_, builder) =>
+            {
+                builder.AddConsole();
+            })
+            .ConfigureServices((context, services) =>
+            {
+                services.AddOptions();
+                new Startup(context.Configuration).ConfigureServices(services);
+            })
+            .RunCommandLineApplicationAsync<Program>(args);
 
         private int OnExecute(CommandLineApplication app, IConsole console)
         {

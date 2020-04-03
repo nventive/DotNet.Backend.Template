@@ -10,9 +10,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+- Added support for .Net Core 3.1 & C# 8
+- Removed appsettings.json files in favor of a unified `LocalSettings.Development.json` file outside the projects.
+
 ### Deprecated
 
 ### Removed
+
+- Base Entity & IIdentifiable implementations
+- GraphQL support - waiting for .Net Core 3 overall from graphql-dotnet
+- EF Core Support
+- FluentValidation
 
 ### Fixed
 

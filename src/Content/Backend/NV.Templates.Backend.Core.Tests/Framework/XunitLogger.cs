@@ -19,7 +19,7 @@ namespace NV.Templates.Backend.Core.Tests.Framework
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            _output.WriteLine(state.ToString());
+            _output.WriteLine(state?.ToString());
         }
 
         public bool IsEnabled(LogLevel logLevel)

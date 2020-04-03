@@ -12,7 +12,7 @@ namespace NV.Templates.Backend.Web.Framework.OpenApi
     /// <summary>
     /// <see cref="IOperationProcessor"/> implementation that Adds common headers to all operations.
     /// </summary>
-    internal class CommonHeadersOperationProcessor : IOperationProcessor
+    public class CommonHeadersOperationProcessor : IOperationProcessor
     {
         /// <inheritdoc />
         public bool Process(OperationProcessorContext context)

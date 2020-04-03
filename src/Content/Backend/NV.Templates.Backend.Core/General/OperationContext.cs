@@ -1,9 +1,7 @@
 ﻿using System;
-#if Auth
 using System.Security.Principal;
-#endif
-using NV.Templates.Backend.Core.Framework;
-using NV.Templates.Backend.Core.Framework.Services;
+using NV.Templates.Backend.Core.Framework.DependencyInjection;
+using NV.Templates.Backend.Core.Framework.Entities;
 
 namespace NV.Templates.Backend.Core.General
 {
@@ -13,21 +11,16 @@ namespace NV.Templates.Backend.Core.General
     [RegisterScopedService]
     internal class OperationContext : IOperationContext
     {
-        /// <inheritdoc />
-        public string OperationId { get; set; } = IdGenerator.Generate();
+        /// <inheritdoc/>
+        public string Id { get; set; } = IdGenerator.Generate();
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;
 
-#if Auth
         /// <inheritdoc />
-        public IIdentity UserIdentity { get; set; }
+        public IPrincipal? User { get; set; } = Framework.Auth.SystemPrincipal.Instance;
 
         /// <inheritdoc />
-        public override string ToString() => $"{nameof(OperationContext)}: {OperationId} {Timestamp} {UserIdentity.GetUserName()}";
-#else
-        /// <inheritdoc />
-        public override string ToString() => $"{nameof(OperationContext)}: {OperationId} {Timestamp}";
-#endif
+        public override string ToString() => $"{nameof(OperationContext)}: {Id} {Timestamp} {User?.Identity?.Name}";
     }
 }

@@ -39,6 +39,6 @@ namespace NV.Templates.Backend.Core.Framework.Exceptions
         /// <summary>
         /// Gets the name of the dependency.
         /// </summary>
-        public string DependencyName { get; }
+        public string? DependencyName { get; }
     }
 }

@@ -6,7 +6,10 @@ using NV.Templates.Backend.Core.General;
 
 namespace NV.Templates.Backend.Console.General
 {
-    [Command(Name = "info", Description = "Get application information", ThrowOnUnexpectedArgument = false)]
+    [Command(
+        Name = "info",
+        Description = "Get application information",
+        UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.CollectAndContinue)]
     public class InfoCommand
     {
         private readonly IApplicationInfo _applicationInfo;
@@ -22,7 +25,7 @@ namespace NV.Templates.Backend.Console.General
 
         public async Task<int> OnExecuteAsync()
         {
-            _logger.LogInformation($"{_applicationInfo.Name} ({_applicationInfo.Version})");
+            _logger.LogInformation($"{_applicationInfo.Name} ({_applicationInfo.Version}) in {_applicationInfo.Environment}");
 
             return 0;
         }

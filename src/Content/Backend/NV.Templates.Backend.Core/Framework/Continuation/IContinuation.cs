@@ -8,6 +8,6 @@
         /// <summary>
         /// Gets the continuation token.
         /// </summary>
-        string ContinuationToken { get; }
+        string? ContinuationToken { get; }
     }
 }

@@ -14,6 +14,6 @@
         public int Limit { get; set; } = DefaultLimit;
 
         /// <inheritdoc />
-        public string ContinuationToken { get; set; }
+        public string? ContinuationToken { get; set; }
     }
 }

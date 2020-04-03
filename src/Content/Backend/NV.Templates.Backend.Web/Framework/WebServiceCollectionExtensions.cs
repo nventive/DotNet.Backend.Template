@@ -1,14 +1,13 @@
-﻿using AspNetCoreRequestTracing;
-using FluentValidation;
+﻿using System;
+using AspNetCoreRequestTracing;
 using HelpDeskId;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
-using NV.Templates.Backend.Web;
 using NV.Templates.Backend.Web.Framework.Telemetry;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class WebServiceCollectionExtensions
+    internal static class WebServiceCollectionExtensions
     {
         /// <summary>
         /// Registers Web project services.
@@ -17,19 +16,25 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             if (configuration is null)
             {
-                throw new System.ArgumentNullException(nameof(configuration));
+                throw new ArgumentNullException(nameof(configuration));
             }
 
-            services.Configure<RequestTracingMiddlewareOptions>(configuration.GetSection(nameof(RequestTracingMiddlewareOptions)));
-            services.AddApplicationInsightsTelemetry();
-            services.AddSingleton<ITelemetryInitializer, HttpContextTelemetryInitializer>();
-            services.AddValidatorsFromAssemblyContaining<Startup>();
+            services.BindOptionsToConfigurationAndValidate<RequestTracingMiddlewareOptions>(configuration);
+
+            services
+                .AddApplicationInsightsTelemetry()
+                .AddSingleton<ITelemetryInitializer, HttpContextTelemetryInitializer>();
+
             services.AddSingleton<IHelpDeskIdGenerator, HelpDeskIdGenerator>();
 
             services
-                .AddHttpContextAccessor()
                 .AddCors()
-                .AddRouting();
+                .AddResponseCaching()
+                .AddRouting(options =>
+                {
+                    options.LowercaseUrls = true;
+                    options.LowercaseQueryStrings = true;
+                });
 
             return services;
         }

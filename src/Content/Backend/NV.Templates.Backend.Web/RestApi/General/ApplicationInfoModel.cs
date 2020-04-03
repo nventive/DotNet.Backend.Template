@@ -1,38 +1,32 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
 using NV.Templates.Backend.Core.General;
 
 namespace NV.Templates.Backend.Web.RestApi.General
 {
     public class ApplicationInfoModel
     {
-        [JsonConstructor]
-        public ApplicationInfoModel(
-            string name,
-            string version,
-            string environment)
+        public ApplicationInfoModel()
         {
-            Name = name;
-            Version = version;
-            Environment = environment;
         }
 
         public ApplicationInfoModel(IApplicationInfo appInfo)
-            : this(appInfo?.Name, appInfo?.Version, appInfo?.Environment)
         {
+            Name = appInfo.Name;
+            Version = appInfo.Version;
+            Environment = appInfo.Environment;
         }
 
         [Required]
         [Description("The system name")]
-        public string Name { get; }
+        public string? Name { get; set; }
 
         [Required]
         [Description("The system version")]
-        public string Version { get; }
+        public string? Version { get; set; }
 
         [Required]
         [Description("The name of the environment")]
-        public string Environment { get; }
+        public string? Environment { get; set; }
     }
 }

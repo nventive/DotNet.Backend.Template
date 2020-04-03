@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "NV.Templates.Backend.Console": {
+      "commandName": "Project",
+      "commandLineArgs": "info",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

@@ -1,4 +1,7 @@
-﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+﻿using System;
+using System.IO;
+using System.Linq;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,10 +19,22 @@ namespace NV.Templates.Backend.Functions
         {
             if (builder == null)
             {
-                throw new System.ArgumentNullException(nameof(builder));
+                throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Services.AddCore(builder.Services.BuildServiceProvider().GetRequiredService<IConfiguration>());
+            var rootProjectPath = Path.GetFullPath(Path.Combine("..", "..", "..", ".."));
+
+            var configuration = new ConfigurationBuilder()
+                .AddLocalSettings(rootProjectPath)
+                .AddEnvironmentVariables()
+                .AddUserSecrets<Startup>()
+                .Build();
+
+            builder.Services.AddSingleton<IConfiguration>(configuration);
+            builder.Services.AddCore(configuration);
+
+            // TODO: This is a patch for this: https://github.com/dotnet/extensions/issues/2846
+            builder.Services.Remove(builder.Services.Single(s => s.ImplementationType?.Name == "HealthCheckPublisherHostedService"));
         }
     }
 }
