@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.ComponentModel;
+using System.Linq;
 using NV.Templates.Backend.Core.Framework.Continuation;
 
 namespace NV.Templates.Backend.Web.Framework.Models
@@ -8,22 +9,28 @@ namespace NV.Templates.Backend.Web.Framework.Models
     /// Models that reflects <see cref="IContinuationEnumerable{T}"/>.
     /// </summary>
     /// <typeparam name="T">The type of objects to enumerate.</typeparam>
-    internal class ContinuationEnumerableModel<T> : IContinuation
+    public class ContinuationEnumerableModel<T> : IContinuation
     {
-        [JsonConstructor]
-        public ContinuationEnumerableModel(IEnumerable<T> items, string continuationToken)
+        public ContinuationEnumerableModel()
+        {
+        }
+
+        public ContinuationEnumerableModel(IContinuationEnumerable<T> continuationEnumerable)
+        {
+            Items = continuationEnumerable;
+            ContinuationToken = continuationEnumerable.ContinuationToken;
+        }
+
+        public ContinuationEnumerableModel(IEnumerable<T> items, string? continuationToken)
         {
             Items = items;
             ContinuationToken = continuationToken;
         }
 
-        public ContinuationEnumerableModel(IContinuationEnumerable<T> continuationEnumerable)
-            : this(continuationEnumerable, continuationEnumerable.ContinuationToken)
-        {
-        }
+        [Description("The items in the collection.")]
+        public IEnumerable<T> Items { get; set; } = Enumerable.Empty<T>();
 
-        public IEnumerable<T> Items { get; }
-
-        public string ContinuationToken { get; }
+        [Description("The continuation token, if any. Pass it back to get the rest of the results.")]
+        public string? ContinuationToken { get; set; }
     }
 }

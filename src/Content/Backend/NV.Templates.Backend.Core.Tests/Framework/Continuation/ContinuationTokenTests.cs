@@ -25,7 +25,7 @@ namespace NV.Templates.Backend.Core.Tests.Framework.Continuation
             var malformedToken = new Faker().Random.Hash();
             Action act = () => ContinuationToken.FromContinuationToken<DeserializedToken>(malformedToken);
 
-            act.Should().Throw<FormatException>().WithMessage($"*{malformedToken}*");
+            act.Should().Throw<System.ComponentModel.DataAnnotations.ValidationException>().WithMessage($"*{malformedToken}*");
         }
 
         private class DeserializedToken

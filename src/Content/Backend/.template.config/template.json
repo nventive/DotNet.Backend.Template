@@ -17,7 +17,7 @@
       "type": "parameter",
       "datatype": "string",
       "defaultValue": "MyCompany",
-      "replaces": "Company",
+      "replaces": "CompanyName",
       "description": "The name of the company which determines the assembly company and copyright information."
     },
     "RestApi": {
@@ -38,12 +38,6 @@
       "datatype": "bool",
       "defaultValue": "false"
     },
-    "GraphQLApi": {
-      "type": "parameter",
-      "description": "Adds GraphQL support",
-      "datatype": "bool",
-      "defaultValue": "false"
-    },
     "SPA": {
       "type": "parameter",
       "description": "Adds Single Page Application support",
@@ -56,37 +50,10 @@
       "datatype": "bool",
       "defaultValue": "false"
     },
-    "EFCore": {
-      "type": "parameter",
-      "description": "Add Entity Framework support",
-      "datatype": "bool",
-      "defaultValue": "false"
-    },
     "Web": {
       "type": "computed",
       "dataType": "bool",
-      "value": "(RestApi || GraphQLApi || SPA)"
-    },
-    "Docker": {
-      "type": "computed",
-      "dataType": "bool",
-      "value": "(EFCore)"
-    },
-    "SA_PASSWORD": {
-      "type": "generated",
-      "generator": "guid",
-      "replaces": "92ddb1f9fa9b448b9c542bffa3da3289",
-      "parameters": {
-        "format": "N"
-      }
-    },
-    "DATABASE_PASS": {
-      "type": "generated",
-      "generator": "guid",
-      "replaces": "3b775abcd15540e299ee77a1df62ef31",
-      "parameters": {
-        "format": "N"
-      }
+      "value": "(RestApi || SPA)"
     },
     "HttpPort": {
       "type": "parameter",
@@ -133,7 +100,7 @@
       "generator": "guid",
       "replaces": "20403522-635f-44fd-ab82-8a754fe59c64",
       "parameters": {
-        "format": "D"
+        "format":"D"
       }
     }
   },
@@ -148,21 +115,18 @@
             "**/*.filelist",
             "**/*.user",
             "**/*.lock.json",
+            "**/package-lock.json",
             ".vs/**",
             ".git/**"
           ]
         },
         {
           "condition": "(!RestApi)",
-          "exclude": ["**/*RestApi*/**", "**/*OpenApi*/**"]
+          "exclude": ["**/*RestApi*/**","**/*OpenApi*/**"]
         },
         {
           "condition": "(!Functions)",
           "exclude": ["**/*Functions*/**"]
-        },
-        {
-          "condition": "(!GraphQLApi)",
-          "exclude": ["**/*GraphQL*/**"]
         },
         {
           "condition": "(!SPA)",
@@ -175,18 +139,6 @@
         {
           "condition": "(!Web)",
           "exclude": ["**/*Web*/**"]
-        },
-        {
-          "condition": "(!Auth)",
-          "exclude": ["**/*Security*/**"]
-        },
-        {
-          "condition": "(!EFCore)",
-          "exclude": ["**/**/CoreDbContext*", "**/*EF*/**"]
-        },
-        {
-          "condition": "(!Docker)",
-          "exclude": ["**/docker-compose.yml", "**/.docker/**"]
         }
       ]
     }

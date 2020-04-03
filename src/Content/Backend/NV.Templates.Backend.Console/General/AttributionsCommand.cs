@@ -7,7 +7,10 @@ using Microsoft.Extensions.Logging;
 
 namespace NV.Templates.Backend.Console.General
 {
-    [Command(Name = "attributions", Description = "Outputs 3rd party licenses information", ThrowOnUnexpectedArgument = false)]
+    [Command(
+        Name = "attributions",
+        Description = "Outputs 3rd party licenses information",
+        UnrecognizedArgumentHandling = UnrecognizedArgumentHandling.CollectAndContinue)]
     public class AttributionsCommand
     {
         private readonly ILogger<AttributionsCommand> _logger;

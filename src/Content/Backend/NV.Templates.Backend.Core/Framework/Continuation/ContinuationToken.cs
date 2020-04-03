@@ -1,6 +1,7 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace NV.Templates.Backend.Core.Framework.Continuation
 {
@@ -17,7 +18,7 @@ namespace NV.Templates.Backend.Core.Framework.Continuation
         /// <returns>The encoded continuation token.</returns>
         public static string ToContinuationToken(object value)
         {
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(value)));
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(value)));
         }
 
         /// <summary>
@@ -26,7 +27,8 @@ namespace NV.Templates.Backend.Core.Framework.Continuation
         /// <typeparam name="T">The continuation token decoded type.</typeparam>
         /// <param name="continuationToken">The encoded continuation token.</param>
         /// <returns>The decoded continuation token, or default if no continuation token,.</returns>
-        public static T FromContinuationToken<T>(string continuationToken)
+        public static T? FromContinuationToken<T>(string? continuationToken)
+            where T : class
         {
             try
             {
@@ -35,13 +37,13 @@ namespace NV.Templates.Backend.Core.Framework.Continuation
                     return default;
                 }
 
-                return JsonConvert.DeserializeObject<T>(Encoding.UTF8.GetString(Convert.FromBase64String(continuationToken)));
+                return JsonSerializer.Deserialize<T>(Encoding.UTF8.GetString(Convert.FromBase64String(continuationToken)));
             }
             catch (Exception ex)
             {
-                if (ex is FormatException || ex is JsonReaderException)
+                if (ex is FormatException || ex is JsonException)
                 {
-                    throw new FormatException($"Malformed continuation token {continuationToken}", ex);
+                    throw new ValidationException($"Malformed continuation token {continuationToken}", ex);
                 }
 
                 throw;

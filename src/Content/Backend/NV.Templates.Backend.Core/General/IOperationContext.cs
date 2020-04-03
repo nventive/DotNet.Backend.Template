@@ -1,7 +1,5 @@
 ﻿using System;
-#if Auth
 using System.Security.Principal;
-#endif
 
 namespace NV.Templates.Backend.Core.General
 {
@@ -13,23 +11,16 @@ namespace NV.Templates.Backend.Core.General
         /// <summary>
         /// Gets or sets the current operation id.
         /// </summary>
-        string OperationId { get; set; }
+        string Id { get; set; }
 
-#if Auth
         /// <summary>
         /// Gets or sets the operation timestamp in UTC.
         /// </summary>
         DateTimeOffset Timestamp { get; set; }
 
         /// <summary>
-        /// Gets or sets the authenticated user identity, if any.
+        /// Gets or sets the <see cref="IPrincipal"/>, if any.
         /// </summary>
-        IIdentity UserIdentity { get; set; }
-#else
-        /// <summary>
-        /// Gets or sets the operation timestamp in UTC.
-        /// </summary>
-        DateTimeOffset Timestamp { get; set; }
-#endif
+        IPrincipal? User { get; set; }
     }
 }

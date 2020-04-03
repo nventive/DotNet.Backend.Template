@@ -1,23 +1,20 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using FluentValidation;
-using FluentValidation.AspNetCore;
-using FluentValidation.Results;
 using HelpDeskId;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using NV.Templates.Backend.Core.Framework.Exceptions;
 using NV.Templates.Backend.Core.General;
 
@@ -40,11 +37,11 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
         /// </summary>
         public static void ConfigureExceptionHandling(IApplicationBuilder app)
         {
-            var env = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
-            var mvcJsonOptions = app.ApplicationServices.GetRequiredService<IOptions<MvcJsonOptions>>();
+            var env = app.ApplicationServices.GetRequiredService<IHostEnvironment>();
+            var jsonOptions = app.ApplicationServices.GetRequiredService<IOptions<JsonOptions>>();
             var loggerFactory = app.ApplicationServices.GetRequiredService<ILoggerFactory>();
 
-            app.Run(httpContext => HandleException(httpContext, mvcJsonOptions.Value, env, loggerFactory.CreateLogger(nameof(ExceptionHandler))));
+            app.Run(httpContext => HandleException(httpContext, jsonOptions.Value, env, loggerFactory.CreateLogger(nameof(ExceptionHandler))));
         }
 
         /// <summary>
@@ -52,13 +49,13 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
         /// </summary>
         public static async Task HandleException(
             HttpContext context,
-            MvcJsonOptions jsonOptions,
-            IHostingEnvironment env,
+            JsonOptions jsonOptions,
+            IHostEnvironment env,
             ILogger logger)
         {
             var operationContext = context.RequestServices.GetService<IOperationContext>();
             var helpDeskIdGenerator = context.RequestServices.GetService<IHelpDeskIdGenerator>();
-            var operationId = operationContext?.OperationId ?? Activity.Current?.Id;
+            var operationId = operationContext?.Id ?? Activity.Current?.Id;
             var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
             var responseModel = CreateErrorModel(exceptionHandlerFeature?.Error);
             responseModel.Extensions[OperationIdProperty] = operationId;
@@ -66,21 +63,21 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
             if (!string.IsNullOrEmpty(helpDeskId))
             {
                 responseModel.Extensions[HelpDeskIdProperty] = helpDeskId;
-                logger.LogError("HelpDeskId: {helpDeskId}", helpDeskId);
+                logger.LogError("HelpDeskId: {helpDeskId} - Error: {Error}", helpDeskId, exceptionHandlerFeature?.Error?.ToStringDemystified());
             }
 
             if (env.IsDevelopment())
             {
                 responseModel.Extensions["exceptionType"] = exceptionHandlerFeature?.Error?.GetType()?.ToString();
-                responseModel.Extensions["stackTrace"] = exceptionHandlerFeature?.Error?.StackTrace?.Split(Environment.NewLine);
+                responseModel.Extensions["stackTrace"] = exceptionHandlerFeature?.Error?.ToStringDemystified()?.Split(Environment.NewLine);
             }
 
             context.Response.ContentType = "application/problem+json";
             context.Response.StatusCode = responseModel.Status ?? StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(responseModel, jsonOptions.SerializerSettings), Encoding.UTF8);
+            await context.Response.WriteAsync(JsonSerializer.Serialize(responseModel, jsonOptions.JsonSerializerOptions), Encoding.UTF8);
         }
 
-        private static ProblemDetails CreateErrorModel(Exception exception)
+        private static ProblemDetails CreateErrorModel(Exception? exception)
         {
             switch (exception)
             {
@@ -115,10 +112,7 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
                         Status = StatusCodes.Status409Conflict,
                     };
                 case ValidationException validationException:
-                    var modelState = new ModelStateDictionary();
-                    var validationResult = new ValidationResult(validationException.Errors);
-                    validationResult.AddToModelState(modelState, null);
-                    return new ValidationProblemDetails(modelState)
+                    return new ValidationProblemDetails()
                     {
                         Detail = validationException.Message,
                         Status = StatusCodes.Status400BadRequest,

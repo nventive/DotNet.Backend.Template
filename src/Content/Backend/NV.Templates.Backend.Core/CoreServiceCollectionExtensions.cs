@@ -1,10 +1,4 @@
-﻿using System;
-using FluentValidation;
-#if EFCore
-using Microsoft.EntityFrameworkCore;
-#endif
-using Microsoft.Extensions.Configuration;
-using NV.Templates.Backend.Core;
+﻿using Microsoft.Extensions.Configuration;
 using NV.Templates.Backend.Core.General;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -16,30 +10,12 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddCore(this IServiceCollection services, IConfiguration configuration)
         {
-            if (configuration is null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
+            // services.BindOptionsToConfigurationAndValidate<>(configuration);
 
-            services.AddValidatorsFromAssemblyContaining<IApplicationInfo>();
-            services.AutoRegisterServicesFromAssembly(typeof(CoreServiceCollectionExtensions).Assembly);
+            services.AutoRegisterServicesFromAssemblyContaining<IApplicationInfo>();
 
-#if EFCore
-            services
-                .AddDbContext<CoreDbContext>(options =>
-                {
-                    options.UseSqlServer(
-                        configuration.GetConnectionString(nameof(CoreDbContext)) ?? throw new ArgumentNullException($"Missing connection string for {nameof(CoreDbContext)}"),
-                        sqlServerOptions => sqlServerOptions.EnableRetryOnFailure());
-                });
+            services.AddHealthChecks();
 
-            services
-                .AddHealthChecks()
-                .AddDbContextCheck<CoreDbContext>();
-#else
-            services
-                .AddHealthChecks();
-#endif
             return services;
         }
     }

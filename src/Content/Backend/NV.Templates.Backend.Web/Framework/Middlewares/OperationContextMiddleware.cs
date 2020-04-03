@@ -31,13 +31,11 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
         /// </summary>
         public Task Invoke(HttpContext context, IOperationContext operationContext)
         {
-            operationContext.OperationId = Activity.Current.RootId;
+            operationContext.Id = Activity.Current.RootId;
             operationContext.Timestamp = DateTimeOffset.UtcNow;
-#if Auth
-            operationContext.UserIdentity = context.User.Identity;
-#endif
+            operationContext.User = context.User;
 
-            context.Response.Headers.Add(OperationIdHeader, operationContext.OperationId);
+            context.Response.Headers.Add(OperationIdHeader, operationContext.Id);
             return _next(context);
         }
     }

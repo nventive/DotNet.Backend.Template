@@ -5,7 +5,6 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
 namespace NV.Templates.Backend.Web.Tests
@@ -30,7 +29,7 @@ namespace NV.Templates.Backend.Web.Tests
             {
                 Subject = _identity,
             });
-            request.Headers.Authorization = new AuthenticationHeaderValue(JwtBearerDefaults.AuthenticationScheme, token);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             return base.SendAsync(request, cancellationToken);
         }
     }

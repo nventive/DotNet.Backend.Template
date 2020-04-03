@@ -32,9 +32,9 @@ namespace System.Collections.Generic
             var totalCount = paginatedResults.FirstOrDefault()?.TotalCount ?? 0;
             var items = paginatedResults.Select(x => x.Item).ToList();
 
-            return new ContinuationEnumerableDecorator<TEntity>(
+            return new ContinuationEnumerable<TEntity>(
                 items,
-                (items.Count() + pagination.Offset) < totalCount ? pagination.GetNextPageContinuationToken() : null);
+                (items.Count + pagination.Offset) < totalCount ? pagination.GetNextPageContinuationToken() : null);
         }
     }
 }

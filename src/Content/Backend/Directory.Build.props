@@ -1,10 +1,11 @@
 <Project>
   <!-- Common properties for all projects -->
   <PropertyGroup>
-    <Company>Company</Company>
-    <Copyright>Copyright (c) 2019, Company</Copyright>
+    <Authors>CompanyName</Authors>
+    <Copyright>Copyright (c) 2020, CompanyName</Copyright>
     <Product>NV.Templates.Backend</Product>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
     <NoWarn>1701;1702;1998</NoWarn>
@@ -16,7 +17,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.4">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
