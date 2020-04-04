@@ -6,9 +6,10 @@
     <title>NV.Templates</title>
     <authors>nventive</authors>
     <description>.NET Core Templates for applications and open-source components.</description>
-    <copyright>Copyright (c) 2019, nventive</copyright>
+    <copyright>Copyright (c) 2020, nventive</copyright>
     <license type="expression">Apache-2.0</license>
     <iconUrl>https://nventive-email-assets.s3.amazonaws.com/packages/nv-package-logo%400%2C25x.png</iconUrl>
+    <icon>images\icon.png</icon>
     <projectUrl>https://github.com/nventive/NV.Templates</projectUrl>
     <repository type="git" url="https://github.com/nventive/NV.Templates" />
     <packageTypes>
@@ -16,6 +17,7 @@
     </packageTypes>
   </metadata>
   <files>
-    <file src="**" exclude="**\bin\**\*;**\obj\**\*;**\.vs\**\*;**\*.user;**\*.lock.json" />
+    <file src="**" exclude="**\bin\**\*;**\obj\**\*;**\.vs\**\*;**\*.user;**\*.lock.json;**\package-lock.json" />
+    <file src="..\icon.png" target="images\" />
   </files>
 </package>

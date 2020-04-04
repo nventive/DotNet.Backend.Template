@@ -21,17 +21,13 @@ steps:
 
 - task: NuGetToolInstaller@1
   inputs:
-    versionSpec: '>= 4.9'
     checkLatest: true
 
 - task: NuGetCommand@2
   displayName: NuGet Pack
   inputs:
-    command: pack
-    packagesToPack: src/NV.Templates.nuspec
-    packDestination: $(build.artifactStagingDirectory)
-    versioningScheme: byEnvVar
-    versionEnvVar: GitVersion.NuGetVersionV2
+    command: custom
+    arguments: pack src/NV.Templates.nuspec -OutputDirectory $(build.artifactStagingDirectory) -version $(GitVersion.NuGetVersionV2) -NoDefaultExcludes
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Build Artifacts'
