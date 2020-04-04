@@ -27,7 +27,7 @@ steps:
   displayName: NuGet Pack
   inputs:
     command: custom
-    arguments: pack src/NV.Templates.nuspec -NonInteractive -OutputDirectory $(build.artifactStagingDirectory) -version $(GitVersion.NuGetVersionV2) -NoDefaultExcludes
+    arguments: pack src/NV.Templates.nuspec -OutputDirectory $(build.artifactStagingDirectory) -version $(GitVersion.NuGetVersionV2) -NoDefaultExcludes
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Build Artifacts'
