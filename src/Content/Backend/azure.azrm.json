@@ -45,23 +45,35 @@
     },
     "appServicePlanSku": {
       "type": "string",
-      "defaultValue": "S2",
+      "defaultValue": "P1V2",
       "metadata": {
         "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
       }
     },
-    "appServicePlanMinimumCapacity": {
+    "appServicePlanDefaultInstanceCount": {
       "type": "int",
       "defaultValue": 2,
       "metadata": {
-        "description": "Minimum number of machines in the hosting. Defaults to 2. This is also the instance count if you disable autoscaling (see appServicePlanMaximumCapacity)."
+        "description": "The default number of machines in the hosting. Defaults to 2."
       }
     },
-    "appServicePlanMaximumCapacity": {
-      "type": "int",
-      "defaultValue": 10,
+    "autoScaling": {
+      "type": "object",
+      "defaultValue": {
+        "enabled": true,
+        "minimumCapacity": 2,
+        "maximumCapacity": 10,
+        "scaleUpCPUThresholdPercentage": 80.0,
+        "scaleDownCPUThresholdPercentage": 40.0,
+        "scaleUpMemoryThresholdPercentage": 80.0,
+        "scaleDownMemoryThresholdPercentage": 40.0,
+        "scaleUpIncreaseBy": 1,
+        "scaleUpCooldown": "PT10M",
+        "scaleDownDecreaseBy": 1,
+        "scaleDownCooldown": "PT1H"
+      },
       "metadata": {
-        "description": "Maximum number of machines in the hosting when scaling out. Defaults to 10. Set to 0 to disable autoscaling."
+        "description": "Auto-scaling parameters."
       }
     },
     "customHostname": {
@@ -217,13 +229,13 @@
       },
       "sku": {
         "name": "[parameters('appServicePlanSku')]",
-        "capacity": "[parameters('appServicePlanMinimumCapacity')]"
+        "capacity": "[parameters('appServicePlanDefaultInstanceCount')]"
       }
     },
     {
       "type": "Microsoft.Insights/autoscalesettings",
       "name": "[variables('serverfarmsAutoScaleName')]",
-      "condition": "[not(equals(parameters('appServicePlanMaximumCapacity'), 0))]",
+      "condition": "[parameters('autoScaling').enabled]",
       "apiVersion": "2014-04-01",
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
@@ -237,9 +249,9 @@
           {
             "name": "[concat('default-', variables('serverfarmsAutoScaleName'))]",
             "capacity": {
-              "minimum": "[parameters('appServicePlanMinimumCapacity')]",
-              "maximum": "[parameters('appServicePlanMaximumCapacity')]",
-              "default": "[parameters('appServicePlanMinimumCapacity')]"
+              "minimum": "[parameters('autoScaling').minimumCapacity]",
+              "maximum": "[parameters('autoScaling').maximumCapacity]",
+              "default": "[parameters('appServicePlanDefaultInstanceCount')]"
             },
             "rules": [
               {
@@ -251,13 +263,13 @@
                   "timeWindow": "PT10M",
                   "timeAggregation": "Average",
                   "operator": "GreaterThan",
-                  "threshold": 80.0
+                  "threshold": "[parameters('autoScaling').scaleUpCPUThresholdPercentage]"
                 },
                 "scaleAction": {
                   "direction": "Increase",
                   "type": "ChangeCount",
-                  "value": 1,
-                  "cooldown": "PT10M"
+                  "value": "[parameters('autoScaling').scaleUpIncreaseBy]",
+                  "cooldown": "[parameters('autoScaling').scaleUpCooldown]"
                 }
               },
               {
@@ -269,13 +281,13 @@
                   "timeWindow": "PT10M",
                   "timeAggregation": "Average",
                   "operator": "GreaterThan",
-                  "threshold": 80.0
+                  "threshold": "[parameters('autoScaling').scaleUpMemoryThresholdPercentage]"
                 },
                 "scaleAction": {
                   "direction": "Increase",
                   "type": "ChangeCount",
-                  "value": 1,
-                  "cooldown": "PT10M"
+                  "value": "[parameters('autoScaling').scaleUpIncreaseBy]",
+                  "cooldown": "[parameters('autoScaling').scaleUpCooldown]"
                 }
               },
               {
@@ -287,13 +299,13 @@
                   "timeWindow": "PT10M",
                   "timeAggregation": "Average",
                   "operator": "LessThan",
-                  "threshold": 40.0
+                  "threshold": "[parameters('autoScaling').scaleDownCPUThresholdPercentage]"
                 },
                 "scaleAction": {
                   "direction": "Decrease",
                   "type": "ChangeCount",
-                  "value": 1,
-                  "cooldown": "PT1H"
+                  "value": "[parameters('autoScaling').scaleDownDecreaseBy]",
+                  "cooldown": "[parameters('autoScaling').scaleDownCooldown]"
                 }
               },
               {
@@ -305,13 +317,13 @@
                   "timeWindow": "PT10M",
                   "timeAggregation": "Average",
                   "operator": "LessThan",
-                  "threshold": 40.0
+                  "threshold": "[parameters('autoScaling').scaleDownMemoryThresholdPercentage]"
                 },
                 "scaleAction": {
                   "direction": "Decrease",
                   "type": "ChangeCount",
-                  "value": 1,
-                  "cooldown": "PT1H"
+                  "value": "[parameters('autoScaling').scaleDownDecreaseBy]",
+                  "cooldown": "[parameters('autoScaling').scaleDownCooldown]"
                 }
               }
             ]
