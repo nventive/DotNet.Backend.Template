@@ -1,0 +1,721 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "apiProfile": "2018-06-01-profile",
+  "parameters": {
+    "projectName": {
+      "type": "string",
+      "maxLength": 8,
+      "metadata": {
+        "description": "The abbreviated project name (lower case)."
+      }
+    },
+    "environment": {
+      "type": "string",
+      "maxLength": 3,
+      "metadata": {
+        "description": "The abbreviated environment (lower case)."
+      }
+    },
+    "billTo": {
+      "type": "string",
+      "metadata": {
+        "description": "Bill To / Internal Chargeback ID (for resource tags)."
+      }
+    },
+    "managedBy": {
+      "type": "string",
+      "metadata": {
+        "description": "Operator or Directly Responsible Individual (DRI) (for resource tags)."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "The location in which the resources should be deployed."
+      }
+    },
+    "appServicePlanKind": {
+      "type": "string",
+      "defaultValue": "app",
+      "metadata": {
+        "description": "The kind of machines for the hosting plan (Windows or Linux). Defaults to Windows."
+      }
+    },
+    "appServicePlanSku": {
+      "type": "string",
+      "defaultValue": "P1V2",
+      "metadata": {
+        "description": "Describes plan's pricing tier and capacity. Check details at https://azure.microsoft.com/en-us/pricing/details/app-service/"
+      }
+    },
+    "appServicePlanDefaultInstanceCount": {
+      "type": "int",
+      "defaultValue": 2,
+      "metadata": {
+        "description": "The default number of machines in the hosting. Defaults to 2."
+      }
+    },
+    "autoScaling": {
+      "type": "object",
+      "defaultValue": {
+        "enabled": true,
+        "minimumCapacity": 2,
+        "maximumCapacity": 10,
+        "scaleUpCPUThresholdPercentage": 80.0,
+        "scaleDownCPUThresholdPercentage": 40.0,
+        "scaleUpMemoryThresholdPercentage": 80.0,
+        "scaleDownMemoryThresholdPercentage": 40.0,
+        "scaleUpIncreaseBy": 1,
+        "scaleUpCooldown": "PT10M",
+        "scaleDownDecreaseBy": 1,
+        "scaleDownCooldown": "PT1H"
+      },
+      "metadata": {
+        "description": "Auto-scaling parameters."
+      }
+    },
+    "customHostname": {
+      "type": "string",
+      "defaultValue": "none",
+      "metadata": {
+        "description": "The custom hostname that you wish to add (see https://docs.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-custom-domain for more information)."
+      }
+    },
+    "certificateKeyVaultId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Existing Key Vault resource Id with an access policy to allow Microsoft.Web RP to read Key Vault secrets (see https://github.com/Azure/azure-quickstart-templates/tree/master/201-web-app-certificate-from-key-vault for more information)."
+      }
+    },
+    "certificateKeyVaultSecret": {
+      "type": "string",
+      "defaultValue": "none",
+      "metadata": {
+        "description": "Key Vault Secret that contains a PFX certificate"
+      }
+    },
+    "useStagingSlots": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Adds staging slots to app services. Must be disable on specific SKUs because it is not supported."
+      }
+    },
+    "diagnosticsLogsLevel": {
+      "type": "string",
+      "defaultValue": "Warning",
+      "allowedValues": [
+        "Verbose",
+        "Information",
+        "Warning",
+        "Error"
+      ],
+      "metadata": {
+        "description": "The degree of severity for diagnostics logs."
+      }
+    },
+    "diagnosticsLogsRetentionInDays": {
+      "type": "int",
+      "defaultValue": 90,
+      "metadata": {
+        "description": "Number of days for which the diagnostics logs will be retained."
+      }
+    },
+    "webTestsLocations": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "Id": "us-ca-sjc-azr"
+        },
+        {
+          "Id": "us-il-ch1-azr"
+        },
+        {
+          "Id": "us-va-ash-azr"
+        }
+      ],
+      "metadata": {
+        "description": "The origin locations where health checks pings are issued from."
+      }
+    }
+  },
+  "variables": {
+    "tags": {
+      "project": "[parameters('projectName')]",
+      "environment": "[parameters('environment')]",
+      "billTo": "[parameters('billTo')]",
+      "managedBy": "[parameters('managedBy')]"
+    },
+    "storageAccountName": "[toLower(concat(parameters('projectName'), parameters('environment'), 'stg'))]",
+    "appInsightsName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-ai'))]",
+    "configStoreName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-config'))]",
+    "serverfarmsName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-plan'))]",
+    "siteName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-site'))]",
+    "siteCertificateName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-cert'))]",
+    "serverfarmsAutoScaleName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-planscale'))]",
+    "webLogsContainerName": "weblogs",
+    "containerSasRequestContent": {
+      "signedServices": "bfqt",
+      "signedPermission": "rwdlacup",
+      "signedStart": "2019-12-01T00:00:00Z",
+      "signedExpiry": "2219-12-01T00:00:00Z",
+      "signedResourceTypes": "sco"
+    },
+    "functionsAppName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-func'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('storageAccountName')]",
+      "apiVersion": "2019-06-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_GRS",
+        "tier": "Standard"
+      },
+      "resources": [
+        {
+          "type": "blobServices/containers",
+          "name": "[concat('default/', variables('webLogsContainerName'))]",
+          "apiVersion": "2019-04-01",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[variables('storageAccountName')]"
+          ],
+          "properties": {
+            "publicAccess": "Blob"
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.Insights/components",
+      "name": "[variables('appInsightsName')]",
+      "apiVersion": "2015-05-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "kind": "web",
+      "properties": {
+        "ApplicationId": "[variables('appInsightsName')]",
+        "Application_Type": "web"
+      }
+    },
+    {
+      "type": "Microsoft.AppConfiguration/configurationStores",
+      "name": "[variables('configStoreName')]",
+      "apiVersion": "2019-11-01-preview",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "name": "[variables('serverfarmsName')]",
+      "apiVersion": "2018-02-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "kind": "[parameters('appServicePlanKind')]",
+      "properties": {
+        "name": "[variables('serverfarmsName')]"
+      },
+      "sku": {
+        "name": "[parameters('appServicePlanSku')]",
+        "capacity": "[parameters('appServicePlanDefaultInstanceCount')]"
+      }
+    },
+    {
+      "type": "Microsoft.Insights/autoscalesettings",
+      "name": "[variables('serverfarmsAutoScaleName')]",
+      "condition": "[parameters('autoScaling').enabled]",
+      "apiVersion": "2014-04-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "dependsOn": [
+        "[variables('serverfarmsName')]"
+      ],
+      "properties": {
+        "enabled": true,
+        "targetResourceUri": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('serverfarmsName'))]",
+        "profiles": [
+          {
+            "name": "[concat('default-', variables('serverfarmsAutoScaleName'))]",
+            "capacity": {
+              "minimum": "[parameters('autoScaling').minimumCapacity]",
+              "maximum": "[parameters('autoScaling').maximumCapacity]",
+              "default": "[parameters('appServicePlanDefaultInstanceCount')]"
+            },
+            "rules": [
+              {
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricResourceUri": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('serverfarmsName'))]",
+                  "timeGrain": "PT5M",
+                  "statistic": "Average",
+                  "timeWindow": "PT10M",
+                  "timeAggregation": "Average",
+                  "operator": "GreaterThan",
+                  "threshold": "[parameters('autoScaling').scaleUpCPUThresholdPercentage]"
+                },
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": "[parameters('autoScaling').scaleUpIncreaseBy]",
+                  "cooldown": "[parameters('autoScaling').scaleUpCooldown]"
+                }
+              },
+              {
+                "metricTrigger": {
+                  "metricName": "MemoryPercentage",
+                  "metricResourceUri": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('serverfarmsName'))]",
+                  "timeGrain": "PT5M",
+                  "statistic": "Average",
+                  "timeWindow": "PT10M",
+                  "timeAggregation": "Average",
+                  "operator": "GreaterThan",
+                  "threshold": "[parameters('autoScaling').scaleUpMemoryThresholdPercentage]"
+                },
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": "[parameters('autoScaling').scaleUpIncreaseBy]",
+                  "cooldown": "[parameters('autoScaling').scaleUpCooldown]"
+                }
+              },
+              {
+                "metricTrigger": {
+                  "metricName": "CpuPercentage",
+                  "metricResourceUri": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('serverfarmsName'))]",
+                  "timeGrain": "PT5M",
+                  "statistic": "Average",
+                  "timeWindow": "PT10M",
+                  "timeAggregation": "Average",
+                  "operator": "LessThan",
+                  "threshold": "[parameters('autoScaling').scaleDownCPUThresholdPercentage]"
+                },
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "ChangeCount",
+                  "value": "[parameters('autoScaling').scaleDownDecreaseBy]",
+                  "cooldown": "[parameters('autoScaling').scaleDownCooldown]"
+                }
+              },
+              {
+                "metricTrigger": {
+                  "metricName": "MemoryPercentage",
+                  "metricResourceUri": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', variables('serverfarmsName'))]",
+                  "timeGrain": "PT5M",
+                  "statistic": "Average",
+                  "timeWindow": "PT10M",
+                  "timeAggregation": "Average",
+                  "operator": "LessThan",
+                  "threshold": "[parameters('autoScaling').scaleDownMemoryThresholdPercentage]"
+                },
+                "scaleAction": {
+                  "direction": "Decrease",
+                  "type": "ChangeCount",
+                  "value": "[parameters('autoScaling').scaleDownDecreaseBy]",
+                  "cooldown": "[parameters('autoScaling').scaleDownCooldown]"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('siteName')]",
+      "apiVersion": "2018-11-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "dependsOn": [
+        "[variables('serverfarmsName')]"
+      ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "clientAffinityEnabled": false,
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]",
+        "httpsOnly": true,
+        "siteconfig": {
+          "alwaysOn": true,
+          "phpVersion": "",
+          "http20Enabled": true,
+          "minTlsVersion": "1.2",
+          "remoteDebuggingEnabled": false,
+          "ftpsState": "Disabled",
+          "use32BitWorkerProcess": false,
+          "healthCheckPath": "/api/info",
+          "metadata": [
+            {
+              "name": "CURRENT_STACK",
+              "value": "dotnetcore"
+            }
+          ],
+          "autoHealEnabled": true,
+          "autoHealRules": {
+            "triggers": {
+              "statusCodes": [
+                {
+                  "status": 500,
+                  "subStatus": 0,
+                  "count": 5,
+                  "timeInterval": "00:01:00"
+                }
+              ]
+            },
+            "actions": {
+              "actionType": "Recycle",
+              "minProcessExecutionTime": "00:01:00"
+            }
+          }
+        }
+      },
+      "resources": [
+        {
+          "type": "config",
+          "name": "logs",
+          "apiVersion": "2018-11-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[variables('storageAccountName')]",
+            "[variables('siteName')]"
+          ],
+          "properties": {
+            "applicationLogs": {
+              "azureBlobStorage": {
+                "level": "[parameters('diagnosticsLogsLevel')]",
+                "sasUrl": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('storageAccountName'), '2018-02-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
+              }
+            },
+            "httpLogs": {
+              "azureBlobStorage": {
+                "enabled": true,
+                "sasUrl": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('storageAccountName'), '2018-02-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
+              }
+            }
+          }
+        },
+        {
+          "type": "config",
+          "name": "appsettings",
+          "apiVersion": "2018-11-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[variables('appInsightsName')]",
+            "[variables('siteName')]"
+          ],
+          "properties": {
+            "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
+            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
+            "ApplicationInsightsAgent_EXTENSION_VERSION": "~2",
+            "XDT_MicrosoftApplicationInsights_Mode": "recommended"
+          }
+        },
+        {
+          "type": "config",
+          "name": "connectionstrings",
+          "apiVersion": "2018-11-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[variables('storageAccountName')]",
+            "[variables('configStoreName')]",
+            "[variables('siteName')]"
+          ],
+          "properties": {
+            "AppConfig": {
+              "value": "[listKeys(resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName')), '2019-10-01').value[0].connectionString]",
+              "type": "Custom"
+            },
+            "Storage": {
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2015-05-01-preview').key1))]",
+              "type": "Custom"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.Web/certificates",
+      "name": "[variables('siteCertificateName')]",
+      "condition": "[not(equals(parameters('certificateKeyVaultSecret'), 'none'))]",
+      "apiVersion": "2016-03-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "dependsOn": [
+        "[variables('siteName')]"
+      ],
+      "properties": {
+        "keyVaultId": "[parameters('certificateKeyVaultId')]",
+        "keyVaultSecretName": "[parameters('certificateKeyVaultSecret')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverFarms', variables('serverfarmsName'))]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostnameBindings",
+      "name": "[concat(variables('siteName'), '/', parameters('customHostname'))]",
+      "condition": "[not(equals(parameters('customHostname'), 'none'))]",
+      "apiVersion": "2018-11-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "dependsOn": [
+        "[variables('siteCertificateName')]"
+      ],
+      "properties": {
+        "sslState": "SniEnabled",
+        "thumbprint": "[if(not(equals(parameters('certificateKeyVaultSecret'), 'none')), reference(resourceId('Microsoft.Web/certificates', variables('siteCertificateName')), '2016-03-01').Thumbprint, '')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/slots",
+      "name": "[concat(variables('siteName'), '/staging')]",
+      "condition": "[parameters('useStagingSlots')]",
+      "apiVersion": "2018-11-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "dependsOn": [
+        "[variables('siteName')]"
+      ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
+      },
+      "resources": [
+        {
+          "type": "config",
+          "name": "appsettings",
+          "condition": "[parameters('useStagingSlots')]",
+          "apiVersion": "2018-11-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[variables('appInsightsName')]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging')]"
+          ],
+          "properties": {
+            "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
+            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
+            "ApplicationInsightsAgent_EXTENSION_VERSION": "~2",
+            "XDT_MicrosoftApplicationInsights_Mode": "recommended"
+          }
+        },
+        {
+          "type": "config",
+          "name": "connectionstrings",
+          "condition": "[parameters('useStagingSlots')]",
+          "apiVersion": "2018-11-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[variables('storageAccountName')]",
+            "[variables('configStoreName')]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging')]"
+          ],
+          "properties": {
+            "AppConfig": {
+              "value": "[listKeys(resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName')), '2019-10-01').value[0].connectionString]",
+              "type": "Custom"
+            },
+            "Storage": {
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2015-05-01-preview').key1))]",
+              "type": "Custom"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.Insights/webtests",
+      "name": "[concat(variables('appInsightsName'), '-webtest-', variables('siteName'))]",
+      "apiVersion": "2015-05-01",
+      "location": "[parameters('location')]",
+      "tags": {
+        "[concat('hidden-link:', resourceId('microsoft.insights/components/', variables('appInsightsName')))]": "Resource"
+      },
+      "dependsOn": [
+        "[variables('appInsightsName')]",
+        "[variables('siteName')]"
+      ],
+      "properties": {
+        "Name": "[concat(variables('appInsightsName'), '-webtest-', variables('siteName'))]",
+        "SyntheticMonitorId": "[concat(variables('appInsightsName'), '-webtest-', variables('siteName'))]",
+        "Description": "",
+        "Enabled": true,
+        "Frequency": 300,
+        "Timeout": 120,
+        "Kind": "ping",
+        "RetryEnabled": false,
+        "Locations": "[parameters('webTestsLocations')]",
+        "Configuration": {
+          "WebTest": "[concat('<WebTest Name=\"Health checks\" Id=\"7c86e527-16e6-42f4-9873-d7ac0e0791df\" Enabled=\"True\" CssProjectStructure=\"\" CssIteration=\"\" Timeout=\"120\" WorkItemIds=\"\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\" Description=\"\" CredentialUserName=\"\" CredentialPassword=\"\" PreAuthenticate=\"True\" Proxy=\"default\" StopOnError=\"False\" RecordedResultFile=\"\" ResultsLocale=\"\"><Items><Request Method=\"GET\" Guid=\"a8a3f2ed-acf8-619f-c0bc-f5b4908bb1d9\" Version=\"1.1\" Url=\"https://', reference(concat('Microsoft.Web/sites/', variables('siteName')), '2018-11-01').defaultHostName, '/api/health\" ThinkTime=\"0\" Timeout=\"120\" ParseDependentRequests=\"False\" FollowRedirects=\"True\" RecordResult=\"True\" Cache=\"False\" ResponseTimeGoal=\"0\" Encoding=\"utf-8\" ExpectedHttpStatusCode=\"200\" ExpectedResponseUrl=\"\" ReportingName=\"\" IgnoreHttpStatusCode=\"False\" /></Items></WebTest>')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "name": "[variables('functionsAppName')]",
+      "apiVersion": "2018-11-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "kind": "functionapp",
+      "dependsOn": [
+        "[variables('storageAccountName')]",
+        "[variables('serverfarmsName')]"
+      ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "clientAffinityEnabled": false,
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]",
+        "httpsOnly": true,
+        "siteconfig": {
+          "alwaysOn": true,
+          "cors": {
+            "allowedOrigins": [
+              "*"
+            ]
+          },
+          "phpVersion": "",
+          "http20Enabled": true,
+          "minTlsVersion": "1.2",
+          "remoteDebuggingEnabled": false,
+          "ftpsState": "Disabled",
+          "use32BitWorkerProcess": false
+        }
+      },
+      "resources": [
+        {
+          "type": "config",
+          "name": "appsettings",
+          "apiVersion": "2018-11-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[variables('appInsightsName')]",
+            "[variables('functionsAppName')]"
+          ],
+          "properties": {
+            "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
+            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
+            "FUNCTIONS_EXTENSION_VERSION": "~3",
+            "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]",
+            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]"
+          }
+        },
+        {
+          "type": "config",
+          "name": "connectionstrings",
+          "apiVersion": "2018-11-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[variables('storageAccountName')]",
+            "[variables('configStoreName')]",
+            "[variables('functionsAppName')]"
+          ],
+          "properties": {
+            "AppConfig": {
+              "value": "[listKeys(resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName')), '2019-10-01').value[0].connectionString]",
+              "type": "Custom"
+            },
+            "Storage": {
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2015-05-01-preview').key1))]",
+              "type": "Custom"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "Microsoft.Web/sites/slots",
+      "name": "[concat(variables('functionsAppName'), '/staging')]",
+      "condition": "[parameters('useStagingSlots')]",
+      "apiVersion": "2018-11-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "dependsOn": [
+        "[variables('functionsAppName')]"
+      ],
+      "kind": "functionapp",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
+      },
+      "resources": [
+        {
+          "type": "config",
+          "name": "appsettings",
+          "condition": "[parameters('useStagingSlots')]",
+          "apiVersion": "2018-11-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[variables('appInsightsName')]",
+            "[variables('storageAccountName')]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging')]"
+          ],
+          "properties": {
+            "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
+            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
+            "FUNCTIONS_EXTENSION_VERSION": "~3",
+            "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]",
+            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]"
+          }
+        },
+        {
+          "type": "config",
+          "name": "connectionstrings",
+          "condition": "[parameters('useStagingSlots')]",
+          "apiVersion": "2018-11-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[variables('storageAccountName')]",
+            "[variables('configStoreName')]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging')]"
+          ],
+          "properties": {
+            "AppConfig": {
+              "value": "[listKeys(resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName')), '2019-10-01').value[0].connectionString]",
+              "type": "Custom"
+            },
+            "Storage": {
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2015-05-01-preview').key1))]",
+              "type": "Custom"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "outputs": {
+    "siteUrl": {
+      "type": "string",
+      "value": "[concat('https://', reference(concat('Microsoft.Web/sites/', variables('siteName')), '2018-11-01').defaultHostName)]"
+    },
+    "functionsUrl": {
+      "type": "string",
+      "value": "[concat('https://', reference(concat('Microsoft.Web/sites/', variables('functionsAppName')), '2018-11-01').defaultHostName)]"
+    }
+  }
+}
