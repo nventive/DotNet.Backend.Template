@@ -41,6 +41,7 @@ To generate suitable hosts to run and expose it, use the following options:
 | --Functions | Generates an Azure Functions project                                  |
 | --Console   | Generates a Console (command-line) project                            |
 | --Auth      | Add authentication (JWT-based) support in Web projects                |
+| --Azure     | Add Azure ARM Template                                                |
 
 Options can be combined, e.g.
 ```shell
@@ -193,6 +194,28 @@ When using the `--Console` option, 2 projects are added to the solution:
   - Each command is a separate class, with argument parsing
 
 - `Console.Tests`: a [xUnit](https://xunit.net/) project for unit testing the commands
+
+#### Azure
+
+When using the `--Azure` option, an [Azure Resource Manager template](https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/) is added to the solution.
+
+To deploy the infrastructure, please install the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure) and run the following commands:
+
+```bash
+$ az group create -l <Resource Group Location> -n <Name of the Resource Group>
+$ az deployment group create --resource-group <Name of the Resource Group> --template-file azure.azrm.json --parameters projectName=<Project Name> environment=<Environment> billTo=<Dept or Individual> managedBy=<Dept or Individual>
+```
+e.g.
+```bash
+$ az group create -l canadacentral -n MyAwesomeApp.QA
+$ az deployment group create --resource-group MyAwesomeApp.QA --template-file azure.azrm.json --parameters projectName=aweapp environment=qa billTo=HR managedBy=john.doe@example.org
+```
+
+The template has many parameters documented, but here is a few items included:
+- [App Configuration](https://docs.microsoft.com/en-us/azure/azure-app-configuration/)
+- [App Service](https://docs.microsoft.com/en-us/azure/app-service/) with auto-scaling and staging slots
+- [Function App](https://docs.microsoft.com/en-us/azure/azure-functions/)
+- [Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/)
 
 ### NetStandard Component
 
