@@ -54,14 +54,42 @@
       "type": "int",
       "defaultValue": 2,
       "metadata": {
-        "description": "Minimum number of machines in the hosting. Defaults to 2."
+        "description": "Minimum number of machines in the hosting. Defaults to 2. This is also the instance count if you disable autoscaling (see appServicePlanMaximumCapacity)."
       }
     },
     "appServicePlanMaximumCapacity": {
       "type": "int",
       "defaultValue": 10,
       "metadata": {
-        "description": "Maximum number of machines in the hosting when scaling out. Defaults to 10."
+        "description": "Maximum number of machines in the hosting when scaling out. Defaults to 10. Set to 0 to disable autoscaling."
+      }
+    },
+    "customHostname": {
+      "type": "string",
+      "defaultValue": "none",
+      "metadata": {
+        "description": "The custom hostname that you wish to add (see https://docs.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-custom-domain for more information)."
+      }
+    },
+    "certificateKeyVaultId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Existing Key Vault resource Id with an access policy to allow Microsoft.Web RP to read Key Vault secrets (see https://github.com/Azure/azure-quickstart-templates/tree/master/201-web-app-certificate-from-key-vault for more information)."
+      }
+    },
+    "certificateKeyVaultSecret": {
+      "type": "string",
+      "defaultValue": "none",
+      "metadata": {
+        "description": "Key Vault Secret that contains a PFX certificate"
+      }
+    },
+    "useStagingSlots": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Adds staging slots to app services. Must be disable on specific SKUs because it is not supported."
       }
     },
     "diagnosticsLogsLevel": {
@@ -114,6 +142,7 @@
     "configStoreName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-config'))]",
     "serverfarmsName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-plan'))]",
     "siteName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-site'))]",
+    "siteCertificateName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-cert'))]",
     "serverfarmsAutoScaleName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-planscale'))]",
     "webLogsContainerName": "weblogs",
     "containerSasRequestContent": {
@@ -187,12 +216,14 @@
         "name": "[variables('serverfarmsName')]"
       },
       "sku": {
-        "name": "[parameters('appServicePlanSku')]"
+        "name": "[parameters('appServicePlanSku')]",
+        "capacity": "[parameters('appServicePlanMinimumCapacity')]"
       }
     },
     {
       "type": "Microsoft.Insights/autoscalesettings",
       "name": "[variables('serverfarmsAutoScaleName')]",
+      "condition": "[not(equals(parameters('appServicePlanMaximumCapacity'), 0))]",
       "apiVersion": "2014-04-01",
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
@@ -238,7 +269,7 @@
                   "timeWindow": "PT10M",
                   "timeAggregation": "Average",
                   "operator": "GreaterThan",
-                  "threshold": 90.0
+                  "threshold": 80.0
                 },
                 "scaleAction": {
                   "direction": "Increase",
@@ -256,7 +287,7 @@
                   "timeWindow": "PT10M",
                   "timeAggregation": "Average",
                   "operator": "LessThan",
-                  "threshold": 50.0
+                  "threshold": 40.0
                 },
                 "scaleAction": {
                   "direction": "Decrease",
@@ -274,7 +305,7 @@
                   "timeWindow": "PT10M",
                   "timeAggregation": "Average",
                   "operator": "LessThan",
-                  "threshold": 60.0
+                  "threshold": 40.0
                 },
                 "scaleAction": {
                   "direction": "Decrease",
@@ -408,8 +439,40 @@
       ]
     },
     {
+      "type": "Microsoft.Web/certificates",
+      "name": "[variables('siteCertificateName')]",
+      "condition": "[not(equals(parameters('certificateKeyVaultSecret'), 'none'))]",
+      "apiVersion": "2016-03-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "dependsOn": [
+        "[variables('siteName')]"
+      ],
+      "properties": {
+        "keyVaultId": "[parameters('certificateKeyVaultId')]",
+        "keyVaultSecretName": "[parameters('certificateKeyVaultSecret')]",
+        "serverFarmId": "[resourceId('Microsoft.Web/serverFarms', variables('serverfarmsName'))]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostnameBindings",
+      "name": "[concat(variables('siteName'), '/', parameters('customHostname'))]",
+      "condition": "[not(equals(parameters('customHostname'), 'none'))]",
+      "apiVersion": "2018-11-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "dependsOn": [
+        "[variables('siteCertificateName')]"
+      ],
+      "properties": {
+        "sslState": "SniEnabled",
+        "thumbprint": "[if(not(equals(parameters('certificateKeyVaultSecret'), 'none')), reference(resourceId('Microsoft.Web/certificates', variables('siteCertificateName')), '2016-03-01').Thumbprint, '')]"
+      }
+    },
+    {
       "type": "Microsoft.Web/sites/slots",
       "name": "[concat(variables('siteName'), '/staging')]",
+      "condition": "[parameters('useStagingSlots')]",
       "apiVersion": "2018-11-01",
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
@@ -426,6 +489,7 @@
         {
           "type": "config",
           "name": "appsettings",
+          "condition": "[parameters('useStagingSlots')]",
           "apiVersion": "2018-11-01",
           "location": "[parameters('location')]",
           "tags": "[variables('tags')]",
@@ -443,6 +507,7 @@
         {
           "type": "config",
           "name": "connectionstrings",
+          "condition": "[parameters('useStagingSlots')]",
           "apiVersion": "2018-11-01",
           "location": "[parameters('location')]",
           "tags": "[variables('tags')]",
@@ -566,12 +631,79 @@
           }
         }
       ]
+    },
+    {
+      "type": "Microsoft.Web/sites/slots",
+      "name": "[concat(variables('functionsAppName'), '/staging')]",
+      "condition": "[parameters('useStagingSlots')]",
+      "apiVersion": "2018-11-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "dependsOn": [
+        "[variables('functionsAppName')]"
+      ],
+      "kind": "functionapp",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
+      },
+      "resources": [
+        {
+          "type": "config",
+          "name": "appsettings",
+          "condition": "[parameters('useStagingSlots')]",
+          "apiVersion": "2018-11-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[variables('appInsightsName')]",
+            "[variables('storageAccountName')]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging')]"
+          ],
+          "properties": {
+            "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
+            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
+            "FUNCTIONS_EXTENSION_VERSION": "~3",
+            "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]",
+            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]"
+          }
+        },
+        {
+          "type": "config",
+          "name": "connectionstrings",
+          "condition": "[parameters('useStagingSlots')]",
+          "apiVersion": "2018-11-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[variables('storageAccountName')]",
+            "[variables('configStoreName')]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging')]"
+          ],
+          "properties": {
+            "AppConfig": {
+              "value": "[listKeys(resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName')), '2019-10-01').value[0].connectionString]",
+              "type": "Custom"
+            },
+            "Storage": {
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2015-05-01-preview').key1))]",
+              "type": "Custom"
+            }
+          }
+        }
+      ]
     }
   ],
   "outputs": {
     "siteUrl": {
       "type": "string",
       "value": "[concat('https://', reference(concat('Microsoft.Web/sites/', variables('siteName')), '2018-11-01').defaultHostName)]"
+    },
+    "functionsUrl": {
+      "type": "string",
+      "value": "[concat('https://', reference(concat('Microsoft.Web/sites/', variables('functionsAppName')), '2018-11-01').defaultHostName)]"
     }
   }
 }
