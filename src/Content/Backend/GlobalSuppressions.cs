@@ -21,3 +21,4 @@
 [assembly: SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated via Dependency Injection.")]
 [assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Conflicts with some standard patterns.")]
 [assembly: SuppressMessage("Reliability", "CA2007:Do not directly await a Task", Justification = "Not needed systematically.")]
+[assembly: SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "Conflicts with serialization.")]
