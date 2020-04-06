@@ -17,7 +17,7 @@ namespace NV.Templates.Backend.Core.Tests
         /// <param name="key">The section name. Defaults to typeof(T).Name (minus the -Options suffix).</param>
         public static IOptions<T> GetOptionsFromConfig<T>(string? key = null)
             where T : class, new()
-            => Options.Create(GetConfiguration().ReadOptions<T>(key));
+            => Options.Create(GetConfiguration().ReadOptionsAndValidate<T>(key));
 
         /// <summary>
         /// Creates a <see cref="IConfigurationRoot"/> using the appsettings.json and Environment variables.

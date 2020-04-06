@@ -95,6 +95,14 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
                         Instance = dependencyException.DependencyName,
                         Status = StatusCodes.Status502BadGateway,
                     };
+                case Refit.ApiException refitApiException:
+                    return new ProblemDetails
+                    {
+                        Title = "There has been an error while communicating with a dependency.",
+                        Detail = $"{refitApiException.Message} (StatusCode: {(int)refitApiException.StatusCode})",
+                        Instance = refitApiException.Uri?.ToString(),
+                        Status = StatusCodes.Status502BadGateway,
+                    };
                 case NotFoundException notFoundException:
                     return new ProblemDetails
                     {

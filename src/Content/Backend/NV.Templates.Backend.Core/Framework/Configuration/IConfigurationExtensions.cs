@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
 namespace Microsoft.Extensions.Configuration
@@ -23,7 +24,7 @@ namespace Microsoft.Extensions.Configuration
             => configuration.GetSection(key ?? DefaultOptionsName<T>());
 
         /// <summary>
-        /// Reads the current value for options.
+        /// Reads the current value for options and performs validation.
         /// The section name is either the options type name (minus the -Options prefix) or <paramref name="key"/>, if provided.
         /// <see cref="DefaultOptionsName{T}"/> as well.
         /// </summary>
@@ -31,10 +32,14 @@ namespace Microsoft.Extensions.Configuration
         /// <param name="configuration">The <see cref="IConfiguration"/>.</param>
         /// <param name="key">The section name key, if any.</param>
         /// <returns>The current value for <typeparamref name="T"/>.</returns>
-        public static T ReadOptions<T>(this IConfiguration configuration, string? key = null)
+        /// <exception cref="ValidationException">If the validation fails.</exception>
+        public static T ReadOptionsAndValidate<T>(this IConfiguration configuration, string? key = null)
             where T : new()
         {
-            return configuration.GetSection(key ?? DefaultOptionsName<T>()).Get<T>() ?? new T();
+            var options = configuration.GetSection(key ?? DefaultOptionsName<T>()).Get<T>() ?? new T();
+
+            Validator.ValidateObject(options, new ValidationContext(options));
+            return options;
         }
 
         /// <summary>

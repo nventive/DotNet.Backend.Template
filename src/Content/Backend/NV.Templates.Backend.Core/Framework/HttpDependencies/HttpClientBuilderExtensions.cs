@@ -59,7 +59,7 @@ namespace NV.Templates.Backend.Core.Framework.HttpDependencies
                 }
             });
 
-            var options = configuration.ReadOptions<TOptions>(key);
+            var options = configuration.ReadOptionsAndValidate<TOptions>(key);
 
             if (options.Timeout != TimeSpan.Zero)
             {

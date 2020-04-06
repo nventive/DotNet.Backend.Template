@@ -56,6 +56,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Registers <typeparamref name="T"/> as an option bound to the <paramref name="configuration"/>
         /// using the typename as key (minus the -Options prefix).
+        /// The validation, based on Data Annotations, happens when options are retrieved from DI,
+        /// not at the time of registration.
         /// </summary>
         /// <typeparam name="T">The type of options to register.</typeparam>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
