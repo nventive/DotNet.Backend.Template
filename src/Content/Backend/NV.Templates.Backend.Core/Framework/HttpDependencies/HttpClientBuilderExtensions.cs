@@ -15,44 +15,51 @@ namespace NV.Templates.Backend.Core.Framework.HttpDependencies
     /// </summary>
     public static class HttpClientBuilderExtensions
     {
-        public static IHttpClientBuilder AddHttpClient<TApi, TOptions>(
-            this IServiceCollection services,
-            IConfiguration configuration)
-            where TOptions : HttpDependencyOptions, new()
+        /// <summary>
+        /// Applies configuration from <see cref="HttpClientOptions"/> <typeparamref name="TOptions"/>
+        /// to the current <see cref="HttpClient"/> registration.
+        /// Options are automatically registered as well.
+        /// </summary>
+        /// <typeparam name="TOptions">The type of <see cref="HttpClientOptions"/> to register and use.</typeparam>
+        /// <param name="builder">The <see cref="IHttpClientBuilder"/>.</param>
+        /// <param name="configuration">The <see cref="IConfiguration"/>.</param>
+        /// <param name="key">
+        /// The configuration section key name to use.
+        /// If not provided, it will be the <typeparamref name="T"/> type name without the -Options prefix.
+        /// (see <see cref="ConfigurationExtensions.DefaultOptionsName(Type)"/>.
+        /// </param>
+        public static IHttpClientBuilder ConfigureWithOptions<TOptions>(
+            this IHttpClientBuilder builder,
+            IConfiguration configuration,
+            string? key = null)
+            where TOptions : HttpClientOptions, new()
         {
-            var httpClientName = $"{typeof(TApi).Name}Client";
+            builder.Services.BindOptionsToConfigurationAndValidate<TOptions>(configuration, key: key);
 
-            services.BindOptionsToConfigurationAndValidate<TOptions>(configuration);
-
-            var builder = services.AddHttpClient(
-                httpClientName,
-                (sp, client) =>
+            builder.ConfigureHttpClient((sp, client) =>
+            {
+                var options = sp.GetRequiredService<IOptionsMonitor<TOptions>>().CurrentValue;
+                if (options.BaseAddress != null)
                 {
-                    var options = sp.GetRequiredService<IOptionsMonitor<TOptions>>().CurrentValue;
-                    if (options.BaseAddress != null)
-                    {
-                        client.BaseAddress = options.BaseAddress;
-                    }
+                    client.BaseAddress = options.BaseAddress;
+                }
 
-                    if (options.Headers != null)
+                if (options.Headers != null)
+                {
+                    foreach (var header in options.Headers.Where(x => !string.IsNullOrEmpty(x.Value)))
                     {
-                        foreach (var header in options.Headers.Where(x => !string.IsNullOrEmpty(x.Value)))
-                        {
-                            client.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
-                        }
+                        client.DefaultRequestHeaders.TryAddWithoutValidation(header.Key, header.Value);
                     }
+                }
 
-                    if (client.DefaultRequestHeaders.UserAgent.Count == 0)
-                    {
-                        var appInfo = sp.GetRequiredService<IApplicationInfo>();
-                        client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", $"{appInfo.Name}/{appInfo.Version} ({appInfo.Environment})");
-                    }
-                });
+                if (client.DefaultRequestHeaders.UserAgent.Count == 0)
+                {
+                    var appInfo = sp.GetRequiredService<IApplicationInfo>();
+                    client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", $"{appInfo.Name}/{appInfo.Version} ({appInfo.Environment})");
+                }
+            });
 
-            var options = configuration
-                .GetSection(RegistrationServiceCollectionExtensions.DefaultOptionsName<TOptions>())
-                .Get<TOptions>()
-                ?? new TOptions();
+            var options = configuration.ReadOptions<TOptions>(key);
 
             if (options.Timeout != TimeSpan.Zero)
             {
@@ -91,6 +98,9 @@ namespace NV.Templates.Backend.Core.Framework.HttpDependencies
             return builder;
         }
 
+        /// <summary>
+        /// Computes a sleep duration with adequate randomness.
+        /// </summary>
         private static IEnumerable<TimeSpan> DecorrelatedJitter(int maxRetries, TimeSpan seedDelay, TimeSpan maxDelay)
         {
             var jitterer = new Random();

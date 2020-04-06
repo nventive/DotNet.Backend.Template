@@ -6,7 +6,7 @@ namespace NV.Templates.Backend.Core.Framework.HttpDependencies
     /// <summary>
     /// Base class for options related to <see cref="HttpClient"/>.
     /// </summary>
-    public class HttpDependencyOptions
+    public abstract class HttpClientOptions
     {
         /// <summary>
         /// Gets the default <see cref="Timeout"/> (10 seconds).
