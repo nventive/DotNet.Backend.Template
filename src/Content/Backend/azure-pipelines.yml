@@ -1,0 +1,12 @@
+trigger:
+  branches:
+    include:
+    - master
+  tags:
+    include:
+    - v*
+  
+pr: none
+
+stages:
+- template: azure-pipelines.build.yml
