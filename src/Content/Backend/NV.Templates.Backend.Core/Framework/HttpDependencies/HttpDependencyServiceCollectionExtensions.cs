@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Adds a Refit client for <see cref="TClient"/> and automatically applies the
         /// options for <typeparamref name="TOptions"/>.
-        /// <see cref="HttpClientBuilderExtensions.ConfigureWithOptions"/> fro more information.
+        /// <see cref="HttpClientBuilderExtensions.ConfigureWithOptions"/> for more information.
         /// </summary>
         /// <typeparam name="TClient">The Refit Client interface.</typeparam>
         /// <typeparam name="TOptions">The type of <see cref="HttpClientOptions"/>.</typeparam>
@@ -49,8 +49,10 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             return services
-                .AddRefitClient<TClient>(refitSettings)
-                .ConfigureWithOptions<TOptions>(configuration, key: key);
+                .AddSingleton(provider => RequestBuilder.ForType<TClient>(refitSettings))
+                .AddHttpClient(typeof(TClient).Name)
+                .ConfigureWithOptions<TOptions>(configuration, key: key)
+                .AddTypedClient((client, serviceProvider) => RestService.For(client, serviceProvider.GetService<IRequestBuilder<TClient>>()));
         }
     }
 }

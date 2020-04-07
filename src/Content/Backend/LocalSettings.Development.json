@@ -1,5 +1,5 @@
 {
-//#if Auth
+  //#if Auth
   "JwtBearer": {
     "Audience": "",
     "Authority": ""
@@ -17,20 +17,21 @@
     "AppName": "Name",
     "ClientId": "client-id"
   },
-//#endif
-//#if Web
+  //#endif
+  //#if Web
   "AllowedHosts": "*",
   "RequestTracingMiddleware": {
     "EnableFor": [
       "/api/.*"
     ]
   },
-//#endif
+  //#endif
   "Logging": {
     "LogLevel": {
-//#if Web
+      //#if Web
       "AspNetCoreRequestTracing.RequestTracingMiddleware": "Trace",
-//#endif
+      //#endif
+      "System.Net.Http.HttpClient": "Trace",
       "Default": "Information",
       "Microsoft": "Warning",
       "Microsoft.Hosting.Lifetime": "Information"

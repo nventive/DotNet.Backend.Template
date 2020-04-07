@@ -9,15 +9,11 @@ using Xunit.Abstractions;
 
 namespace NV.Templates.Backend.Web.Tests.RestApi
 {
-    [Collection(TestWebApplicationFactoryCollection.CollectionName)]
-    public class GeneralTests
+    public class GeneralTests : WebTests
     {
-        private readonly TestWebApplicationFactory _factory;
-
         public GeneralTests(TestWebApplicationFactory factory, ITestOutputHelper outputHelper)
+            : base(factory, outputHelper)
         {
-            _factory = factory;
-            _factory.OutputHelper = outputHelper;
         }
 
         internal interface IGeneralApi
@@ -38,7 +34,7 @@ namespace NV.Templates.Backend.Web.Tests.RestApi
         [Fact]
         public async Task ItShouldGetInfo()
         {
-            var api = _factory.GetApiClient<IGeneralApi>();
+            var api = Factory.GetApiClient<IGeneralApi>();
 
             var result = await api.GetInfo();
             result.Name!.Should().NotBeNullOrEmpty();
@@ -49,7 +45,7 @@ namespace NV.Templates.Backend.Web.Tests.RestApi
         [Fact]
         public virtual async Task ItShouldReturnHealthChecks()
         {
-            var api = _factory.GetApiClient<IGeneralApi>();
+            var api = Factory.GetApiClient<IGeneralApi>();
 
             var response = await api.GetHealth();
             response.StatusCode.Should().Be(StatusCodes.Status200OK);
@@ -58,7 +54,7 @@ namespace NV.Templates.Backend.Web.Tests.RestApi
         [Fact]
         public virtual async Task ItShouldReturnSwagger()
         {
-            var api = _factory.GetApiClient<IGeneralApi>();
+            var api = Factory.GetApiClient<IGeneralApi>();
 
             var response = await api.GetSwaggerDocument();
             response.StatusCode.Should().Be(StatusCodes.Status200OK);
@@ -67,7 +63,7 @@ namespace NV.Templates.Backend.Web.Tests.RestApi
         [Fact]
         public virtual async Task ItShouldReturnAttributions()
         {
-            var api = _factory.GetApiClient<IGeneralApi>();
+            var api = Factory.GetApiClient<IGeneralApi>();
 
             var response = await api.GetAttributions();
             response.StatusCode.Should().Be(StatusCodes.Status200OK);

@@ -93,8 +93,6 @@ namespace NV.Templates.Backend.Core.Framework.HttpDependencies
                     Policy.BulkheadAsync(options.MaxParallelization).AsAsyncPolicy<HttpResponseMessage>());
             }
 
-            builder = builder.AddHttpTracing(bufferRequests: true);
-
             return builder;
         }
 

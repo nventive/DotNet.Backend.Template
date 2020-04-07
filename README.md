@@ -88,6 +88,7 @@ is meant to reside. Contains:
   - An extension method to help registering all services in the Dependency Injection
     container (in `ServiceCollectionExtensions`)
   - A set of attributes that helps with auto-registration of services (see the `OperationContext` class for an example)
+  - Http Dependencies support with the help of `Refit`: all `HttpClient` options are standardized and `Polly` parameters are applied
 
 - `Core.Tests`: a [xUnit](https://xunit.net/) project for unit-tests. Contains:
   - `OptionsHelper` to help load [Options](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-3.1) from unit-tests projects configuration
