@@ -52,7 +52,7 @@
     },
     "Azure": {
       "type": "parameter",
-      "description": "Adds Azure ARM Template",
+      "description": "Adds Azure ARM Template and DevOps Pipelines",
       "datatype": "bool",
       "defaultValue": "false"
     },
@@ -106,7 +106,7 @@
       "generator": "guid",
       "replaces": "20403522-635f-44fd-ab82-8a754fe59c64",
       "parameters": {
-        "format":"D"
+        "format": "D"
       }
     }
   },
@@ -128,7 +128,7 @@
         },
         {
           "condition": "(!RestApi)",
-          "exclude": ["**/*RestApi*/**","**/*OpenApi*/**"]
+          "exclude": ["**/*RestApi*/**", "**/*OpenApi*/**"]
         },
         {
           "condition": "(!Functions)",
@@ -148,8 +148,7 @@
         },
         {
           "condition": "(!Azure)",
-          "exclude": [ "azure.azrm.json"
-          ]
+          "exclude": ["azure*"]
         }
       ]
     }

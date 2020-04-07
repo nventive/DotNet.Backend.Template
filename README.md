@@ -41,7 +41,7 @@ To generate suitable hosts to run and expose it, use the following options:
 | --Functions | Generates an Azure Functions project                                  |
 | --Console   | Generates a Console (command-line) project                            |
 | --Auth      | Add authentication (JWT-based) support in Web projects                |
-| --Azure     | Add Azure ARM Template                                                |
+| --Azure     | Add Azure ARM Template and DevOps Pipeline                            |
 
 Options can be combined, e.g.
 ```shell
@@ -217,6 +217,9 @@ The template has many parameters documented, but here is a few items included:
 - [App Service](https://docs.microsoft.com/en-us/azure/app-service/) with auto-scaling and staging slots
 - [Function App](https://docs.microsoft.com/en-us/azure/azure-functions/)
 - [Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/)
+
+Also, an Azure DevOps build pipeline is included to get started faster. This is intended to be a starting point
+more than a turn key solution though.
 
 ### NetStandard Component
 
