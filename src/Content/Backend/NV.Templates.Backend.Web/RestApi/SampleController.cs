@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using NV.Templates.Backend.Core.Framework.Continuation;
-using NV.Templates.Backend.Core.Framework.Entities;
 using NV.Templates.Backend.Web.Framework.Models;
+using Pantry.Continuation;
+using Pantry.Queries;
 
 namespace NV.Templates.Backend.Web.RestApi
 {
@@ -43,7 +44,7 @@ namespace NV.Templates.Backend.Web.RestApi
         {
             var createdModel = new SampleModel
             {
-                Id = IdGenerator.Generate(),
+                Id = Guid.NewGuid().ToString("n", CultureInfo.InvariantCulture),
                 Name = model.Name,
             };
 
@@ -99,7 +100,7 @@ namespace NV.Templates.Backend.Web.RestApi
             public string? Id { get; set; }
         }
 
-        public class SampleQuery : ContinuationQuery
+        public class SampleQuery : Query<SampleModel>
         {
             [Description("The name of the sample to query.")]
             public string? Name { get; set; }

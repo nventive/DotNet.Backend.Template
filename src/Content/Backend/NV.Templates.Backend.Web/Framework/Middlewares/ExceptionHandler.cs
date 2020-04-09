@@ -17,6 +17,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NV.Templates.Backend.Core.Framework.Exceptions;
 using NV.Templates.Backend.Core.General;
+using Pantry.Exceptions;
 
 namespace NV.Templates.Backend.Web.Framework.Middlewares
 {
@@ -108,7 +109,7 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
                     {
                         Title = "The target was not found.",
                         Detail = notFoundException.Message,
-                        Instance = notFoundException.Target,
+                        Instance = $"{notFoundException.TargetType}/{notFoundException.TargetId}",
                         Status = StatusCodes.Status404NotFound,
                     };
                 case ConcurrencyException concurrencyException:
@@ -116,7 +117,7 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
                     {
                         Title = "There has been an conflict while trying to update a target.",
                         Detail = concurrencyException.Message,
-                        Instance = concurrencyException.Target,
+                        Instance = $"{concurrencyException.TargetType}/{concurrencyException.TargetId}",
                         Status = StatusCodes.Status409Conflict,
                     };
                 case ValidationException validationException:
