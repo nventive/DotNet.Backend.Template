@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Security.Claims;
 using HttpTracing;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -50,6 +52,14 @@ namespace NV.Templates.Backend.Web.Tests
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder
+                .ConfigureAppConfiguration(config =>
+                {
+                    var rootProjectPath = Path.GetFullPath(Path.Combine("..", "..", "..", ".."));
+                    config.AddJsonFile(
+                        Path.Combine(rootProjectPath, "LocalSettings.Test.json"),
+                        optional: true,
+                        reloadOnChange: true);
+                })
                 .ConfigureLogging(logging =>
                 {
                     logging.AddXUnit(OutputHelper);
@@ -77,6 +87,7 @@ namespace NV.Templates.Backend.Web.Tests
                             };
                         });
 #endif
+                    services.AddHttpRecorderContextSupport();
                     // Adds test-specific services configuration.
                 });
         }

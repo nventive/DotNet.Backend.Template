@@ -1,6 +1,4 @@
-﻿using System;
-using System.Reflection;
-using System.Text.RegularExpressions;
+﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using NV.Templates.Backend.Core.Framework.DependencyInjection;
 
@@ -58,33 +56,30 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Registers <typeparamref name="T"/> as an option bound to the <paramref name="configuration"/>
         /// using the typename as key (minus the -Options prefix).
+        /// The validation, based on Data Annotations, happens when options are retrieved from DI,
+        /// not at the time of registration.
         /// </summary>
         /// <typeparam name="T">The type of options to register.</typeparam>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="configuration">The <see cref="IConfiguration"/>.</param>
+        /// <param name="key">
+        /// The configuration section key name to use.
+        /// If not provided, it will be the <typeparamref name="T"/> type name without the -Options prefix.
+        /// (see <see cref="ConfigurationExtensions.DefaultOptionsName(Type)"/>.
+        /// </param>
         /// <returns>The <see cref="IServiceCollection"/> with services registered.</returns>
-        public static IServiceCollection BindOptionsToConfigurationAndValidate<T>(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection BindOptionsToConfigurationAndValidate<T>(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            string? key = null)
             where T : class
         {
             services
                 .AddOptions<T>()
-                .Bind(configuration.GetSection(DefaultOptionsName<T>()))
+                .Bind(configuration.GetSectionForOptions<T>(key))
                 .ValidateDataAnnotations();
 
             return services;
         }
-
-        /// <summary>
-        /// Gets the default name for options of type <paramref name="optionsType"/>.
-        /// Removes the -Options prefix if any.
-        /// </summary>
-        public static string DefaultOptionsName(Type optionsType) => Regex.Replace(optionsType.Name, @"Options$", string.Empty);
-
-        /// <summary>
-        /// Gets the default name for options of type <typeparamref name="T"/>.
-        /// Removes the -Options prefix if any.
-        /// </summary>
-        /// <typeparam name="T">The Options type.</typeparam>
-        public static string DefaultOptionsName<T>() => DefaultOptionsName(typeof(T));
     }
 }

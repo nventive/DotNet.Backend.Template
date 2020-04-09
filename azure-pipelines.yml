@@ -1,18 +1,26 @@
 
 pool:
-  vmImage: 'windows-2019'
+  vmImage: 'windows-latest'
 
 steps:
-- task: GitVersion@4
+- task: GitVersion@5
   displayName: Git Version
   inputs:
     updateAssemblyInfo: false
 
+- task: NuGetCommand@2
+  displayName: Nuget restore
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'
+    feedsToUse: 'select'
+    
 - task: DotNetCoreCLI@2
   displayName: Build Projects
   inputs:
     command: build
     projects: '**/*.sln'
+    arguments: '--no-restore'
 
 - task: PowerShell@2
   displayName: Update TemplateVersion props

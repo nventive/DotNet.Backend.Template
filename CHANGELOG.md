@@ -10,11 +10,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Azure ARM Template
 - Azure DevOps Build Pipeline
+- HttpDependencies / Refit w/HttpClientOptions support.
 
 ### Changed
 
 - Added support for .Net Core 3.1 & C# 8
-- Removed appsettings.json files in favor of a unified `LocalSettings.Development.json` file outside the projects.
+- Removed appsettings.json files in favor of a unified `LocalSettings.Development.json` & `LocalSettings.Test.json` file outside the projects.
+- Updated HttpTracing & HttpRecorder dependencies
+- Core Tests use a TestHost now to retrieve services
 
 ### Deprecated
 
