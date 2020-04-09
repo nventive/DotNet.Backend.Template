@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Globalization;
 using System.Security.Principal;
 using NV.Templates.Backend.Core.Framework.DependencyInjection;
-using NV.Templates.Backend.Core.Framework.Entities;
 
 namespace NV.Templates.Backend.Core.General
 {
@@ -12,7 +12,7 @@ namespace NV.Templates.Backend.Core.General
     internal class OperationContext : IOperationContext
     {
         /// <inheritdoc/>
-        public string Id { get; set; } = IdGenerator.Generate();
+        public string Id { get; set; } = Guid.NewGuid().ToString("n", CultureInfo.InvariantCulture);
 
         /// <inheritdoc/>
         public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;

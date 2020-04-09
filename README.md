@@ -78,13 +78,7 @@ is meant to reside. Contains:
     environment of a single operation executed by the library; it is meant to be
     registered as a *Scoped* service, and the lifetime of it must be managed by the
     Dependency Injection container
-  - Various interfaces and base classes for Entity-type class (in the `Framework` namespace) 
-  - an `IdGenerator` utility class to generate unique ids as reasonably readable strings
-  - Inclusion of helpers and extension methods to handle pagination as Continuation tokens
-    (in `Framework/Continuation`) as the preferred method to handle pagination
-    (as opposed to offset pagination)
-  - A set of standard, application-level `Exception` classes to handle common cases
-    (`ConcurrencyException`, `DependencyException`, `NotFoundException`)
+  - Integration of the [Pantry](https://github.com/nventive/Pantry) framework abstractions
   - An extension method to help registering all services in the Dependency Injection
     container (in `ServiceCollectionExtensions`)
   - A set of attributes that helps with auto-registration of services (see the `OperationContext` class for an example)
