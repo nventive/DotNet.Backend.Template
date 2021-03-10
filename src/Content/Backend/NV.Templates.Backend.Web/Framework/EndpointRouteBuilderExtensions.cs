@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using NV.Templates.Backend.Core.Configuration;
 using NV.Templates.Backend.Web.Framework.Middlewares;
 
 namespace Microsoft.AspNetCore.Routing
@@ -42,6 +44,15 @@ namespace Microsoft.AspNetCore.Routing
         /// Maps root requests("/") to OpenApi UI ("/swagger").
         /// </summary>
         public static IEndpointRouteBuilder MapRootToOpenApiUi(this IEndpointRouteBuilder endpoints)
-            => endpoints.MapGetRedirect("/", "/swagger");
+        {
+            var conf = endpoints.ServiceProvider.GetService(typeof(IOptions<BackendOptions>)) as IOptions<BackendOptions>;
+
+            if (!(conf?.Value.EnableSwagger ?? false))
+            {
+                return endpoints;
+            }
+
+            return endpoints.MapGetRedirect("/", "/swagger");
+        }
     }
 }

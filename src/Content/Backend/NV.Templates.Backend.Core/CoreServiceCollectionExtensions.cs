@@ -1,5 +1,6 @@
 ﻿using HttpTracing;
 using Microsoft.Extensions.Configuration;
+using NV.Templates.Backend.Core.Configuration;
 using NV.Templates.Backend.Core.General;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -11,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         public static IServiceCollection AddCore(this IServiceCollection services, IConfiguration configuration)
         {
-            // services.BindOptionsToConfigurationAndValidate<>(configuration);
+            services.BindOptionsToConfigurationAndValidate<BackendOptions>(configuration);
 
             services.AddHttpTracingToAllHttpClients((sp, builder) =>
             {
