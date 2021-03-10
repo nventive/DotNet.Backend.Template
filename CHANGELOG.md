@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Azure DevOps Build Pipeline
 - HttpDependencies / Refit w/HttpClientOptions support.
 - Multiple ApiVersion support for NSwag
+- Ability to disable Swagger from configuration
 
 ### Changed
 
