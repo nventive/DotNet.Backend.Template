@@ -24,7 +24,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 })
                 .AddVersionedApiExplorer(options =>
                 {
-                    options.GroupNameFormat = "'v'V";
+                    options.GroupNameFormat = "'v'VV";
                     options.SubstituteApiVersionInUrl = true;
                 })
                 .AddControllers(options =>

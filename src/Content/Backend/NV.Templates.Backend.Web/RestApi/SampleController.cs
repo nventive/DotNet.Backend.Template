@@ -19,6 +19,8 @@ namespace NV.Templates.Backend.Web.RestApi
     {
         [HttpGet]
         [Description("Query samples")]
+        [ApiVersion("1.0")]
+        [ApiVersion("2.0")]
         public async Task<ContinuationEnumerableModel<SampleModel>> FindSamples([FromQuery] SampleQuery query)
         {
             return Enumerable.Empty<SampleModel>()
@@ -28,7 +30,20 @@ namespace NV.Templates.Backend.Web.RestApi
 
         [HttpGet("{id}")]
         [Description("Get a sample")]
+        [ApiVersion("1.0")]
         public async Task<SampleModel> GetSample(string id)
+        {
+            return new SampleModel
+            {
+                Id = id,
+                Name = "Foo",
+            };
+        }
+
+        [HttpGet("{id}")]
+        [Description("Get a sample - v2")]
+        [ApiVersion("2.0")]
+        public async Task<SampleModel> GetSampleV2(string id)
         {
             return new SampleModel
             {
@@ -39,6 +54,8 @@ namespace NV.Templates.Backend.Web.RestApi
 
         [HttpPost]
         [Description("Create a sample")]
+        [ApiVersion("1.0")]
+        [ApiVersion("2.0")]
         public async Task<ActionResult<SampleModel>> CreateSample([FromBody] SampleModelAttributes model)
         {
             var createdModel = new SampleModel
@@ -52,6 +69,8 @@ namespace NV.Templates.Backend.Web.RestApi
 
         [HttpPut("{id}")]
         [Description("Update a sample")]
+        [ApiVersion("1.0")]
+        [ApiVersion("2.0")]
         public async Task<SampleModel> UpdateSample(string id, [FromBody] SampleModelAttributes model)
         {
             var updatedModel = new SampleModel
@@ -65,6 +84,8 @@ namespace NV.Templates.Backend.Web.RestApi
 
         [HttpPatch("{id}")]
         [Description("Update a sample")]
+        [ApiVersion("1.0")]
+        [ApiVersion("2.0")]
         public async Task<SampleModel> UpdateSample(string id, [FromBody] JsonPatchDocument<SampleModelAttributes> patch)
         {
             var existingModel = new SampleModel
@@ -79,6 +100,8 @@ namespace NV.Templates.Backend.Web.RestApi
 
         [HttpDelete("{id}")]
         [Description("Delete a sample")]
+        [ApiVersion("1.0")]
+        [ApiVersion("2.0")]
         public async Task<IActionResult> DeleteSample(string id)
         {
             return NoContent();

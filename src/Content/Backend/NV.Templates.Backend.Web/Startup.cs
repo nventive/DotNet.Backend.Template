@@ -88,14 +88,8 @@ namespace NV.Templates.Backend.Web
 #endif
             });
 
-            app.UseOpenApi()
-               .UseSwaggerUi3(configure =>
-                {
-                    configure.DocExpansion = "list";
-#if Auth
-                    configure.OAuth2Client = app.ApplicationServices.GetRequiredService<IOptions<NSwag.AspNetCore.OAuth2ClientSettings>>().Value;
-#endif
-                });
+            app.UseCommonOpenApi();
+
 #if SPA
             app.UseSpaStaticFiles();
             app.UseSpa(spa =>
