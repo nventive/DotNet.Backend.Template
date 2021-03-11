@@ -12,7 +12,7 @@
     },
     "environment": {
       "type": "string",
-      "maxLength": 3,
+      "maxLength": 4,
       "metadata": {
         "description": "The abbreviated environment (lower case)."
       }
@@ -140,6 +140,27 @@
       "metadata": {
         "description": "The origin locations where health checks pings are issued from."
       }
+    },
+    "cacheSku": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "metadata": {
+        "description": "The pricing tier of the new Azure Redis Cache (Basic, Standard, Premium)."
+      }
+    },
+    "cacheSkuFamily": {
+      "type": "string",
+      "defaultValue": "C",
+      "metadata": {
+        "description": "The family for the sku for the new Azure Redis Cache (C or P)."
+      }
+    },
+    "cacheCapacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "The size of the new Azure Redis Cache instance."
+      }
     }
   },
   "variables": {
@@ -152,6 +173,7 @@
     "storageAccountName": "[toLower(concat(parameters('projectName'), parameters('environment'), 'stg'))]",
     "appInsightsName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-ai'))]",
     "configStoreName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-config'))]",
+    "cacheName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-cache'))]",
     "serverfarmsName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-plan'))]",
     "siteName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-site'))]",
     "siteCertificateName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-cert'))]",
@@ -215,6 +237,18 @@
         "name": "Standard"
       },
       "properties": {
+      }
+    },
+    {
+      "type": "Microsoft.Cache/Redis",
+      "name": "[variables('cacheName')]",
+      "apiVersion": "2018-03-01",
+      "location": "[parameters('location')]",
+      "tags": {
+        "project": "[parameters('projectName')]",
+        "environment": "[parameters('environment')]",
+        "billTo": "[parameters('billTo')]",
+        "managedBy": "[parameters('managedBy')]"
       }
     },
     {
@@ -445,6 +479,10 @@
             "Storage": {
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2015-05-01-preview').key1))]",
               "type": "Custom"
+            },
+            "Cache": {
+              "value": "[concat(variables('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2015-08-01').primaryKey)]",
+              "type": "RedisCache"
             }
           }
         }
@@ -536,6 +574,10 @@
             "Storage": {
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2015-05-01-preview').key1))]",
               "type": "Custom"
+            },
+            "Cache": {
+              "value": "[concat(variables('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2015-08-01').primaryKey)]",
+              "type": "RedisCache"
             }
           }
         }
@@ -639,6 +681,10 @@
             "Storage": {
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2015-05-01-preview').key1))]",
               "type": "Custom"
+            },
+            "Cache": {
+              "value": "[concat(variables('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2015-08-01').primaryKey)]",
+              "type": "RedisCache"
             }
           }
         }
@@ -702,6 +748,10 @@
             "Storage": {
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2015-05-01-preview').key1))]",
               "type": "Custom"
+            },
+            "Cache": {
+              "value": "[concat(variables('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2015-08-01').primaryKey)]",
+              "type": "RedisCache"
             }
           }
         }

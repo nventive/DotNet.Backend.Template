@@ -34,10 +34,10 @@ namespace NV.Templates.Backend.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services
+                .AddRedisCacheIfPresent(_configuration)
+                .AutoRegisterServicesFromAssemblyContaining<Startup>()
                 .AddCore(_configuration)
-                .AddWeb(_configuration);
-
-            services
+                .AddWeb(_configuration)
                 .AddRestApi()
                 .AddOpenApi(_configuration);
 #if Auth
