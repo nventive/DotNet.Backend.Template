@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - HttpDependencies / Refit w/HttpClientOptions support.
 - Multiple ApiVersion support for NSwag
 - Ability to disable Swagger from configuration
+- Default in memory distributed cache
+- Ability to setup Redis cache to replace the default in memory distributed cache
 
 ### Changed
 
