@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using NV.Templates.Backend.Core.Framework.Continuation;
@@ -42,9 +43,16 @@ namespace NV.Templates.Backend.Web.RestApi
 
         [HttpGet("{id}")]
         [Description("Get a sample - v2")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        [ResponseCache(VaryByHeader = "Accept-Language", Duration = 10800)]
         [ApiVersion("2.0")]
         public async Task<SampleModel> GetSampleV2(string id)
         {
+            // Do time consuming stuff
+            await Task.Delay(5000);
+
             return new SampleModel
             {
                 Id = id,
