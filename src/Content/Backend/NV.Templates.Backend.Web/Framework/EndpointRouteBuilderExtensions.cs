@@ -49,7 +49,9 @@ namespace Microsoft.AspNetCore.Routing
 
             if (!(conf?.Value.EnableSwagger ?? false))
             {
-                return endpoints;
+                // If Swagger is not enabled, calls to root path are routed to ping controller to
+                // prevent AppService AlwaysOn feature to generate failed requests
+                return endpoints.MapGetRedirect("/", "/ping");
             }
 
             return endpoints.MapGetRedirect("/", "/swagger");
