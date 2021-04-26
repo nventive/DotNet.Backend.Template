@@ -1,76 +1,74 @@
 parameters:
-  vmImage: "ubuntu-latest"
+  vmImage: "ubuntu-18.04"
   dotNetCoreVersion: "3.1.x"
   nodeJsVersion: "12.x"
   configuration: "Release"
-  publishRuntimeIdentifier: "win-x64"
+  publishRuntimeIdentifier: "linux-x64"
 
-stages:
-  - stage: Build
-    jobs:
-      - job: Build
-        pool:
-          vmImage: ${{ parameters.vmImage }}
-          workspace:
-            clean: all
-        variables:
-          disable.coverage.autogenerate: "true"
-        steps:
-          - task: UseDotNet@2
-            displayName: Use .NET Core 2.1.x for GitVersion
-            inputs:
-              version: 2.1.x
+jobs:
+- job: Build
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+    workspace:
+      clean: all
+  variables:
+    disable.coverage.autogenerate: "true"
+  steps:
+  - task: UseDotNet@2
+    displayName: Use .NET Core 2.1.x for GitVersion
+    inputs:
+      version: 2.1.x
 
-          - task: UseDotNet@2
-            displayName: Use .NET Core ${{ parameters.dotNetCoreVersion }}
-            inputs:
-              version: ${{ parameters.dotNetCoreVersion }}
+  - task: UseDotNet@2
+    displayName: Use .NET Core ${{ parameters.dotNetCoreVersion }}
+    inputs:
+      version: ${{ parameters.dotNetCoreVersion }}
 
-          - task: NodeTool@0
-            displayName: Use Node.js ${{ parameters.nodeJsVersion }}
-            inputs:
-              versionSpec: ${{ parameters.nodeJsVersion }}
+  - task: NodeTool@0
+    displayName: Use Node.js ${{ parameters.nodeJsVersion }}
+    inputs:
+      versionSpec: ${{ parameters.nodeJsVersion }}
 
-          - task: GitVersion@5
-            displayName: Git Version
-            inputs:
-              runtime: 'core'
-              updateAssemblyInfo: false
+  - task: GitVersion@5
+    displayName: Git Version
+    inputs:
+      runtime: 'core'
+      updateAssemblyInfo: false
 
-          - script: dotnet test --configuration ${{ parameters.configuration }} --logger trx --collect "XPlat Code Coverage"
-            displayName: Run Tests
+  - script: dotnet test --configuration ${{ parameters.configuration }} --logger trx --collect "XPlat Code Coverage"
+    displayName: Run Tests
 
-          - task: PublishTestResults@2
-            displayName: Publish Test Results
-            condition: succeededOrFailed()
-            inputs:
-              testRunner: VSTest
-              testResultsFiles: "**/*.trx"
+  - task: PublishTestResults@2
+    displayName: Publish Test Results
+    condition: succeededOrFailed()
+    inputs:
+      testRunner: VSTest
+      testResultsFiles: "**/*.trx"
 
-          - task: reportgenerator@4
-            displayName: "Generate Code Coverage Report"
-            inputs:
-              reports: "**/coverage.cobertura.xml"
-              reporttypes: "HtmlInline_AzurePipelines;Cobertura"
-              targetdir: "$(System.DefaultWorkingDirectory)/coveragereport"
-              assemblyfilters: "-xunit*;-microsoft*"
+  - task: reportgenerator@4
+    displayName: "Generate Code Coverage Report"
+    inputs:
+      reports: "**/coverage.cobertura.xml"
+      reporttypes: "HtmlInline_AzurePipelines;Cobertura"
+      targetdir: "$(System.DefaultWorkingDirectory)/coveragereport"
+      assemblyfilters: "-xunit*;-microsoft*"
 
-          - task: PublishCodeCoverageResults@1
-            displayName: Publish Code Coverage Results
-            inputs:
-              summaryFileLocation: "$(System.DefaultWorkingDirectory)/coveragereport/Cobertura.xml"
-              reportDirectory: "$(System.DefaultWorkingDirectory)/coveragereport"
+  - task: PublishCodeCoverageResults@1
+    displayName: Publish Code Coverage Results
+    inputs:
+      summaryFileLocation: "$(System.DefaultWorkingDirectory)/coveragereport/Cobertura.xml"
+      reportDirectory: "$(System.DefaultWorkingDirectory)/coveragereport"
 
-          - script: dotnet publish --output $(Build.ArtifactStagingDirectory)/Web --configuration ${{ parameters.configuration }} --self-contained --runtime ${{ parameters.publishRuntimeIdentifier }} -property:Version=$(GitVersion.AssemblySemVer) -property:FileVersion=$(GitVersion.AssemblySemVer) -property:InformationalVersion=$(GitVersion.FullSemVer).$(GitVersion.ShortSha)
-            displayName: Publish Web
+  - script: dotnet publish --output $(Build.ArtifactStagingDirectory)/Web --configuration ${{ parameters.configuration }} --self-contained false --runtime ${{ parameters.publishRuntimeIdentifier }} -property:Version=$(GitVersion.AssemblySemVer) -property:FileVersion=$(GitVersion.AssemblySemVer) -property:InformationalVersion=$(GitVersion.FullSemVer).$(GitVersion.ShortSha)
+    displayName: Publish Web
 
-          - task: PowerShell@2
-            displayName: Publish ARM Template
-            inputs:
-              targetType: inline
-              script: '(Get-Content azure.azrm.json).Replace("1.0.0.0", "$(GitVersion.AssemblySemVer)") | Out-File $(Build.ArtifactStagingDirectory)/azure.azrm.json'
+  - task: PowerShell@2
+    displayName: Publish ARM Template
+    inputs:
+      targetType: inline
+      script: '(Get-Content azure.azrm.json).Replace("1.0.0.0", "$(GitVersion.AssemblySemVer)") | Out-File $(Build.ArtifactStagingDirectory)/azure.azrm.json'
 
-          - publish: $(Build.ArtifactStagingDirectory)
-            displayName: Publish Build Artifacts
-            input:
-              artifactName: "App"
+  - publish: $(Build.ArtifactStagingDirectory)
+    displayName: Publish Build Artifacts
+    artifact: NV.Templates.Backend
+
