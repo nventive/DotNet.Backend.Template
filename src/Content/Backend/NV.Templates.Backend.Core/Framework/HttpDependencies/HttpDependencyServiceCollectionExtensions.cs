@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using NV.Templates.Backend.Core.Framework.HttpDependencies;
@@ -34,18 +35,30 @@ namespace Microsoft.Extensions.DependencyInjection
             where TClient : class
             where TOptions : HttpClientOptions, new()
         {
+            services.BindOptionsToConfigurationAndValidate<TOptions>(configuration, key: key);
+
+            var options = configuration.ReadOptionsAndValidate<TOptions>(key);
+
             if (refitSettings is null)
             {
-                var jsonSerializerOptions = new JsonSerializerOptions
+                if ("xml".Equals(options.Serializer, StringComparison.OrdinalIgnoreCase))
                 {
-                    IgnoreNullValues = true,
-                    PropertyNameCaseInsensitive = true,
-                };
+                    refitSettings = new RefitSettings(new XmlContentSerializer());
+                }
+                else
+                {
+                    var jsonSerializerOptions = new JsonSerializerOptions
+                    {
+                        IgnoreNullValues = true,
+                        PropertyNameCaseInsensitive = true,
+                        WriteIndented = true,
+                    };
 
-                jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                jsonSerializerOptions.Converters.Add(new JsonTimeSpanConverter());
-                jsonSerializerOptions.Converters.Add(new JsonNullableTimeSpanConverter());
-                refitSettings = new RefitSettings(new SystemTextJsonContentSerializer(jsonSerializerOptions));
+                    jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    jsonSerializerOptions.Converters.Add(new JsonTimeSpanConverter());
+                    jsonSerializerOptions.Converters.Add(new JsonNullableTimeSpanConverter());
+                    refitSettings = new RefitSettings(new SystemTextJsonContentSerializer(jsonSerializerOptions));
+                }
             }
 
             return services
