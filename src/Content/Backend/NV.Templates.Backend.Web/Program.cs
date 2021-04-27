@@ -13,9 +13,12 @@ namespace NV.Templates.Backend.Web
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .UseLocalSettingsInDevelopment()
+                .UseAzureAppConfigurationWhenPresent()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder
+                        .ConfigureKestrel(options => options.AddServerHeader = false)
+                        .UseStartup<Startup>();
                 });
     }
 }
