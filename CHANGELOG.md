@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Added
+- Add default build/release multistage pipeline
+- Add default AppConfiguration setup in the code
+- Add XML serializer for HTTP clients
+- Add ability to ignore SSL certificates validation for dependencies
+
+### Changed
+- Adjust default HTTP headers to remove unsecured headers or refine required ones
+
+### Deprecated
+
+### Removed
+
+## 2.2.1
+
+### Added
 
 - Azure ARM Template
 - Azure DevOps Build Pipeline
