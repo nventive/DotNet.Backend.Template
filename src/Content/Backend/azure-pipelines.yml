@@ -2,11 +2,60 @@ trigger:
   branches:
     include:
     - master
+    - develop
+    - release/*
+    - hotfix/*
   tags:
     include:
     - v*
   
 pr: none
 
+variables:
+  IsLightBuild: $[eq(variables['Build.Reason'], 'PullRequest')]
+  IsReleaseBranch: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), startsWith(variables['Build.SourceBranch'], 'refs/heads/releases/'), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))]
+  IsReleaseBuild: $[and(ne(variables['IsLightBuild'], 'true'), eq(variables['IsReleaseBranch'], 'true'))]
+
 stages:
-- template: azure-pipelines.build.yml
+#########################
+# Build                 #
+#########################
+- stage: Build
+  jobs:
+  - template: azure-pipelines.build.yml
+      
+#########################
+# Deploy on DEV env     #
+#########################
+- stage: Deploy_DEV
+  dependsOn: Build
+  condition: and(succeeded(), ne(variables['IsLightBuild'], 'true'))
+  jobs:
+  - template: azure-pipelines.deploy.yml 
+    parameters:
+      deploymentEnvironment : 'NV.Templates.Backend_DEV'
+      variableGroup: 'NV.Templates.Backend.DEV'
+      
+#########################
+# Deploy on QA env      #
+#########################
+- stage: Deploy_QA
+  dependsOn: Deploy_DEV
+  condition: succeeded()
+  jobs:
+  - template: azure-pipelines.deploy.yml 
+    parameters:
+      deploymentEnvironment : 'NV.Templates.Backend_QA'
+      variableGroup: 'NV.Templates.Backend.QA'
+      
+#########################
+# Deploy on PROD env    #
+#########################
+- stage: Deploy_PROD
+  dependsOn: Deploy_QA
+  condition: and(succeeded(), eq(variables['IsReleaseBuild'], 'true'))
+  jobs:
+  - template: azure-pipelines.deploy.yml 
+    parameters:
+      deploymentEnvironment : 'NV.Templates.Backend_PROD'
+      variableGroup: 'NV.Templates.Backend.PROD'

@@ -1,0 +1,59 @@
+parameters:
+  vmImage: 'windows-latest'
+  deploymentEnvironment: ''
+  variableGroup: ''
+
+jobs: 
+- deployment: Deploy_Backend
+  displayName: Deploy ${{ parameters.deploymentEnvironment }}
+  
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+
+  environment: ${{ parameters.deploymentEnvironment }}
+
+  variables:
+  - group: ${{ parameters.variableGroup }}
+
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - checkout: none
+
+        - task: DownloadBuildArtifacts@0
+          displayName: 'Download artifact'
+          inputs:
+            buildType: current
+            downloadType: single
+            artifactName: NV.Templates.Backend
+
+        - task: AzureResourceManagerTemplateDeployment@3
+          displayName: 'Run ARM Template'
+          inputs:
+            azureResourceManagerConnection: 'NVTemplatesBackendServiceConnection'
+            subscriptionId: $(AzureSubscriptionId)
+            resourceGroupName: '$(ResourceGroup)'
+            location: '$(Location)'
+            csmFile: '$(Pipeline.Workspace)/NV.Templates.Backend/azure.azrm.json'
+            overrideParameters: '-projectName $(ProjectName) -environment $(Environment) -billTo $(BillTo) -managedBy $(ManagedBy) -location $(Location) -appServicePlanSku $(AppServicePlanSku) -appServicePlanDefaultInstanceCount $(AppServicePlanDefaultInstanceCount) -autoScaling $(AppServicePlanAutoScaling) -diagnosticsLogsLevel $(DiagnosticsLogsLevel) -diagnosticsLogsRetentionInDays $(DiagnosticsLogsRetentionInDays) -webTestsLocations $(WebTestsLocations) -appConfigurationSku $(AppConfigurationSku)'
+            
+        - task: AzureRmWebAppDeployment@4
+          displayName: 'Deploy API Staging Slot'
+          inputs:
+            azureSubscription: 'NVTemplatesBackendServiceConnection'
+            appType: webAppLinux
+            WebAppName: '$(ProjectName)-$(Environment)-site'
+            deployToSlotOrASE: true
+            SlotName: staging
+            ResourceGroupName: '$(ResourceGroup)'
+            packageForLinux: '$(Pipeline.Workspace)/NV.Templates.Backend/Web'
+            StartupCommand: 'dotnet NV.Templates.Backend.Web.dll'
+            
+        - task: AzureAppServiceManage@0
+          displayName: 'Swap API Slots'
+          inputs:
+            azureSubscription: 'NVTemplatesBackendServiceConnection'
+            WebAppName: '$(ProjectName)-$(Environment)-site'
+            ResourceGroupName: '$(ResourceGroup)'
+            SourceSlot: staging
