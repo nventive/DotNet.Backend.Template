@@ -34,8 +34,6 @@ namespace NV.Templates.Backend.Core.Framework.HttpDependencies
             string? key = null)
             where TOptions : HttpClientOptions, new()
         {
-            builder.Services.BindOptionsToConfigurationAndValidate<TOptions>(configuration, key: key);
-
             builder.ConfigureHttpClient((sp, client) =>
             {
                 var options = sp.GetRequiredService<IOptionsMonitor<TOptions>>().CurrentValue;
@@ -91,6 +89,14 @@ namespace NV.Templates.Backend.Core.Framework.HttpDependencies
             {
                 builder = builder.AddPolicyHandler(
                     Policy.BulkheadAsync(options.MaxParallelization).AsAsyncPolicy<HttpResponseMessage>());
+            }
+
+            if (options.IgnoreCertificateValidation)
+            {
+                builder.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler()
+                {
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
+                });
             }
 
             return builder;

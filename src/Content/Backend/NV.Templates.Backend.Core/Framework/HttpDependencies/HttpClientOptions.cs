@@ -44,6 +44,11 @@ namespace NV.Templates.Backend.Core.Framework.HttpDependencies
         public static readonly int DefaultMaxParallelization = 0;
 
         /// <summary>
+        /// Gets the default <see cref="Serializer"/>. (json).
+        /// </summary>
+        public static readonly string DefaultSerializer = "json";
+
+        /// <summary>
         /// Gets or sets the <see cref="HttpClient.BaseAddress"/> value.
         /// </summary>
         public Uri? BaseAddress { get; set; }
@@ -92,5 +97,15 @@ namespace NV.Templates.Backend.Core.Framework.HttpDependencies
         /// Set to 0 for unlimited parallel requests.
         /// </summary>
         public int MaxParallelization { get; set; } = DefaultMaxParallelization;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether we bypass SSL certificate validation or not.
+        /// </summary>
+        public bool IgnoreCertificateValidation { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Serializer for the API (json/xml).
+        /// </summary>
+        public string Serializer { get; set; } = DefaultSerializer;
     }
 }
