@@ -2,6 +2,7 @@ parameters:
   vmImage: 'windows-latest'
   deploymentEnvironment: ''
   variableGroup: ''
+  azureResourceManagerConnection: ''
 
 jobs: 
 - deployment: Deploy_Backend
@@ -26,34 +27,36 @@ jobs:
           inputs:
             buildType: current
             downloadType: single
-            artifactName: NV.Templates.Backend
+            artifactName: drop
 
         - task: AzureResourceManagerTemplateDeployment@3
           displayName: 'Run ARM Template'
           inputs:
-            azureResourceManagerConnection: 'NVTemplatesBackendServiceConnection'
+            azureResourceManagerConnection: ${{ parameters.azureResourceManagerConnection }}
             subscriptionId: $(AzureSubscriptionId)
             resourceGroupName: '$(ResourceGroup)'
             location: '$(Location)'
-            csmFile: '$(Pipeline.Workspace)/NV.Templates.Backend/azure.azrm.json'
-            overrideParameters: '-projectName $(ProjectName) -environment $(Environment) -billTo $(BillTo) -managedBy $(ManagedBy) -location $(Location) -appServicePlanSku $(AppServicePlanSku) -appServicePlanDefaultInstanceCount $(AppServicePlanDefaultInstanceCount) -autoScaling $(AppServicePlanAutoScaling) -diagnosticsLogsLevel $(DiagnosticsLogsLevel) -diagnosticsLogsRetentionInDays $(DiagnosticsLogsRetentionInDays) -webTestsLocations $(WebTestsLocations) -appConfigurationSku $(AppConfigurationSku)'
+            csmFile: '$(Pipeline.Workspace)/drop/azure.azrm.json'
+            overrideParameters: '-projectName $(ProjectName) -environment $(Environment) -billTo $(BillTo) -managedBy $(ManagedBy) -location $(Location) -appServicePlanSku $(AppServicePlanSku) -appServicePlanDefaultInstanceCount $(AppServicePlanDefaultInstanceCount) -autoScaling $(AppServicePlanAutoScaling) -diagnosticsLogsLevel $(DiagnosticsLogsLevel) -diagnosticsLogsRetentionInDays $(DiagnosticsLogsRetentionInDays) -webTestsLocations $(WebTestsLocations) -appConfigurationSku $(AppConfigurationSku) -useStagingSlots $(UseStagingSlots)'
             
         - task: AzureRmWebAppDeployment@4
-          displayName: 'Deploy API Staging Slot'
+          displayName: 'Deploy AppService'
           inputs:
-            azureSubscription: 'NVTemplatesBackendServiceConnection'
+            azureSubscription: ${{ parameters.azureResourceManagerConnection }}
             appType: webAppLinux
             WebAppName: '$(ProjectName)-$(Environment)-site'
-            deployToSlotOrASE: true
-            SlotName: staging
+            ${{ if eq(variables.UseStagingSlots, true) }}:
+              deployToSlotOrASE: true
+              SlotName: staging
             ResourceGroupName: '$(ResourceGroup)'
-            packageForLinux: '$(Pipeline.Workspace)/NV.Templates.Backend/Web'
+            packageForLinux: '$(Pipeline.Workspace)/drop/Web'
             StartupCommand: 'dotnet NV.Templates.Backend.Web.dll'
             
         - task: AzureAppServiceManage@0
-          displayName: 'Swap API Slots'
+          displayName: 'Swap AppService Slots'
+          condition: and(succeeded(), eq(variables['UseStagingSlots'], true))
           inputs:
-            azureSubscription: 'NVTemplatesBackendServiceConnection'
+            azureSubscription: ${{ parameters.azureResourceManagerConnection }}
             WebAppName: '$(ProjectName)-$(Environment)-site'
             ResourceGroupName: '$(ResourceGroup)'
             SourceSlot: staging
