@@ -35,6 +35,7 @@ stages:
     parameters:
       deploymentEnvironment : 'NV.Templates.Backend_DEV'
       variableGroup: 'NV.Templates.Backend.DEV'
+      azureResourceManagerConnection: NVTemplatesBackendServiceConnection
       
 #########################
 # Deploy on QA env      #
@@ -47,6 +48,7 @@ stages:
     parameters:
       deploymentEnvironment : 'NV.Templates.Backend_QA'
       variableGroup: 'NV.Templates.Backend.QA'
+      azureResourceManagerConnection: NVTemplatesBackendServiceConnection
       
 #########################
 # Deploy on PROD env    #
@@ -59,3 +61,4 @@ stages:
     parameters:
       deploymentEnvironment : 'NV.Templates.Backend_PROD'
       variableGroup: 'NV.Templates.Backend.PROD'
+      azureResourceManagerConnection: NVTemplatesBackendServiceConnection

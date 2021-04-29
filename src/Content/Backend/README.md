@@ -22,10 +22,9 @@ Before adding the pipeline to Azure DevOps, there is some adjustments/setup to d
     | Key | Example | Description  |
     |-|-|-|
     | AppConfigurationSku | free | The [AppConfiguration SKU](https://azure.microsoft.com/en-us/pricing/details/app-configuration/) |
-    | AppServicePlanAutoScaling | { "enabled": false } | The AppService autoscaling configuration, in a JSON format |
+    | AppServicePlanAutoScaling | { "enabled": false } | The AppService autoscaling configuration, in JSON |
     | AppServicePlanDefaultInstanceCount | 2 | The default number of instance to create in the AppService Plan |
     | AppServicePlanSku | P1v2 | The [AppService plan SKU](https://azure.microsoft.com/en-us/pricing/details/app-service/linux/). The project is setup to deploy on Linux AppService by default.|
-    | AzureResourceManagerConnection | MyARMConnectionName | The Azure Resource Manager connection name created in Azure DevOps |
     | BillTo | MyName/MyProjectName | A string set in the `BillTo` resource tag. Usually used to understand what is billed for what project. |
     | DiagnosticsLogsLevel | Verbose | The AppService diagnostic log level |
     | DiagnosticsLogsRetentionInDays | 90 | The number of days logs are retained |
@@ -34,29 +33,20 @@ Before adding the pipeline to Azure DevOps, there is some adjustments/setup to d
     | ManagedBy | MyName | A string set in the `ManagedBy` resource tag. Usually used to indicate a primary contact for the resources. |
     | ProjectName | MyProjectName | A 8-letters string describing the project. Used to generate resource names. |
     | ResourceGroup | MyResourceGroupName | The name of the resource group to use. The resource group will be created in the given Azure Subscription if not exist |
-    | WebTestsLocations | [{"Id":"us-ca-sjc-azr"},{"Id":"us-il-ch1-azr"},{"Id":"us-va-ash-azr"}] | The list of WebTests locations to use in JSON format |
+    | UseStagingSlots | true | A boolean to indicate whether the deployment process will use deloyment slot or not. Note that not all App Service Plan support deployment slots |
+    | WebTestsLocations | [{"Id":"us-ca-sjc-azr"},{"Id":"us-il-ch1-azr"},{"Id":"us-va-ash-azr"}] | The list of WebTests locations to use, in JSON |
 
 1. Create the Azure DevOps pipeline environments for the 3 release stages
    - Don't forget to setup environment's Approvals & Checks before the 1st pipeline run, otherwise all stages will be executed and all environments will be instanciated. 
 
 1. Adjust the file `azure-pipelines.yml`
    - For each release stage, update:
-     - `deploymentEnvironment` parameter
-     - `variableGroup` parameter
-     
-1. Adjust the file `azure-pipelines.build.yml`
-   - In the final `publish` task, update the artifact name, based on your project
-     
+     - `deploymentEnvironment` parameter, with the corresponding deployment environment created above
+     - `variableGroup` parameter, with the corresponding variable group created above
+     - `azureResourceManagerConnection` parameter, with the Azure Resource Manager connection name
+          
 1. Adjust the file `azure-pipelines.deploy.yml`
-   - In the `DownloadBuildArtifacts@0` task, update the artifact name, based on your project
-   - In the `AzureResourceManagerTemplateDeployment@3` task
-     - Update the `azureResourceManagerConnection` parameter with the Azure Resource Manager connection name
-     - Update the `csmFile` parameter with the correct ARM template file path, based on your project
    - In the `AzureRmWebAppDeployment@4` task
-     - Update the `azureSubscription` parameter with the Azure Resource Manager connection name
-     - Update the `packageForLinux` parameter with the correct Web directory path, based on your project
      - Update the `StartupCommand` parameter based on your project
-   - In the `AzureAppServiceManage@0` task
-     - Update the `azureSubscription` parameter with the Azure Resource Manager connection name
     
 1. Finally, add the pipeline to Azure DevOps.
