@@ -1,4 +1,4 @@
-# NV.Templates
+# DotNet.Backend.Template
 
 .NET Templates for backend applications and open-source components.
 
