@@ -24,7 +24,7 @@ namespace NV.Templates.Backend.Web.Tests.RestApi
             [Get("/api/health")]
             Task<HttpResponseMessage> GetHealth();
 
-            [Get("/swagger/v1/swagger.json")]
+            [Get("/swagger/v1.0/swagger.json")]
             Task<HttpResponseMessage> GetSwaggerDocument();
 
             [Get("/attributions.txt")]

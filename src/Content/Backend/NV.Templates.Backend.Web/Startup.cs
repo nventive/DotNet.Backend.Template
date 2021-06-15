@@ -70,12 +70,13 @@ namespace NV.Templates.Backend.Web
 
             app.UseRequestTracing()
                .UseExceptionHandler(ExceptionHandler.ConfigureExceptionHandling)
-               .UseResponseCaching()
-               .UseMiddleware<OperationContextMiddleware>();
+               .UseResponseCaching();
 #if Auth
             app.UseAuthentication()
                .UseAuthorization();
 #endif
+            app.UseMiddleware<OperationContextMiddleware>();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
