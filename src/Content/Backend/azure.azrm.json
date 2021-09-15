@@ -61,7 +61,7 @@
       "type": "object",
       "defaultValue": {
         "enabled": true,
-        "minimumCapacity": 2,
+        "minimumCapacity": 1,
         "maximumCapacity": 10,
         "scaleUpCPUThresholdPercentage": 80.0,
         "scaleDownCPUThresholdPercentage": 40.0,
@@ -161,7 +161,33 @@
       "metadata": {
         "description": "The size of the new Azure Redis Cache instance."
       }
+    },
+    "keyVaultName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The key vault service name (lowercase)"
+      }
+    },
+    "kvSkuName": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "allowedValues": [
+        "Standard",
+        "Premium"
+      ],
+      "metadata": {
+        "description": "Specifies whether the key vault is a standard vault or a premium vault."
+      }
+    },
+    "kvSkuFamily": {
+      "type": "string",
+      "defaultValue": "A",
+      "metadata": {
+        "description": "SKU family name"
+      }
     }
+
   },
   "variables": {
     "tags": {
@@ -249,6 +275,13 @@
         "environment": "[parameters('environment')]",
         "billTo": "[parameters('billTo')]",
         "managedBy": "[parameters('managedBy')]"
+      },
+      "properties": {
+        "sku": {
+          "name": "[parameters('cacheSku')]",
+          "family": "[parameters('cacheSkuFamily')]",
+          "capacity": "[parameters('cacheCapacity')]"
+        }
       }
     },
     {
@@ -457,7 +490,8 @@
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
             "ApplicationInsightsAgent_EXTENSION_VERSION": "~2",
-            "XDT_MicrosoftApplicationInsights_Mode": "recommended"
+            "XDT_MicrosoftApplicationInsights_Mode": "recommended",
+            "KeyVaultName": "[parameters('keyVaultName')]"
           }
         },
         {
@@ -551,7 +585,8 @@
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
             "ApplicationInsightsAgent_EXTENSION_VERSION": "~2",
-            "XDT_MicrosoftApplicationInsights_Mode": "recommended"
+            "XDT_MicrosoftApplicationInsights_Mode": "recommended",
+            "KeyVaultName": "[parameters('keyVaultName')]"
           }
         },
         {
@@ -659,7 +694,8 @@
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
             "FUNCTIONS_EXTENSION_VERSION": "~3",
             "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]",
-            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]"
+            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]",
+            "KeyVaultName": "[parameters('keyVaultName')]"
           }
         },
         {
@@ -725,7 +761,8 @@
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
             "FUNCTIONS_EXTENSION_VERSION": "~3",
             "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]",
-            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]"
+            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]",
+            "KeyVaultName": "[parameters('keyVaultName')]"
           }
         },
         {
@@ -755,6 +792,39 @@
             }
           }
         }
+      ]
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2021-06-01-preview",
+      "location": "[resourceGroup().location]",
+      "name": "[parameters('keyVaultName')]",
+      "properties": {
+        "sku": {
+          "name": "[parameters('kvSkuName')]",
+          "family": "[parameters('kvSkuFamily')]"
+        },
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantid]",
+            "objectId": "[reference(concat(resourceId('Microsoft.Web/sites', variables('siteName')), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2018-11-30').principalId]",
+            "permissions": {
+              "keys": [],
+              "secrets": [
+                "get",
+                "list"
+              ],
+              "certificates": []
+            }
+          },
+        ],
+        "tenantId": "[subscription().tenantId]",
+        "enabledForDeployment": false,
+        "enabledForTemplateDeployment": true,
+        "enabledForVolumeEncryption": false
+      },
+      "dependsOn": [
+        "[variables('siteName')]"
       ]
     }
   ],
