@@ -14,6 +14,7 @@ namespace NV.Templates.Backend.Web
             Host.CreateDefaultBuilder(args)
                 .UseLocalSettingsInDevelopment()
                 .UseAzureAppConfigurationWhenPresent()
+                .UseAzureKeyVaultWhenPresent<Startup>()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
