@@ -297,6 +297,47 @@
       },
       "dependsOn": [
         "[variables('siteName')]"
+      ],
+      "resources": [
+        {
+          "type": "Microsoft.KeyVault/vaults/accessPolicies",
+          "apiVersion": "2021-06-01-preview",
+          "name": "string",
+          "properties": {
+            "accessPolicies": [
+              {
+                "tenantId": "[subscription().tenantid]",
+                "objectId": "[reference(concat(resourceId('Microsoft.Web/sites', variables('siteName')), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2018-11-30').principalId]",
+                "permissions": {
+                  "keys": [],
+                  "secrets": [
+                    "get",
+                    "list"
+                  ],
+                  "certificates": []
+                }
+              },
+              {
+                "tenantId": "[subscription().tenantid]",
+                "objectId": "[reference(concat(resourceId('Microsoft.Web/sites', variables('functionsAppName')), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2018-11-30').principalId]",
+                "permissions": {
+                  "keys": [],
+                  "secrets": [
+                    "get",
+                    "list"
+                  ],
+                  "certificates": []
+                }
+              }
+            ]
+          },
+          "dependsOn": [
+            "[variables('siteName')]",
+            "[variables('functionsAppName')]",
+            "[resourceId('Microsoft.Web/sites', variables('siteName'))]",
+            "[resourceId('Microsoft.Web/sites', variables('functionsAppName'))]"
+
+          ]
       ]
     },
     {
