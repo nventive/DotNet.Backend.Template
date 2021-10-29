@@ -205,7 +205,7 @@
       "signedResourceTypes": "sco"
     },
     "functionsAppName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-func'))]",
-    "keyVaultName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-kv'))]",
+    "keyVaultName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-kv'))]"
   },
   "resources": [
     {
