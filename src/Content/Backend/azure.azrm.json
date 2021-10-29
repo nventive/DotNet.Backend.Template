@@ -161,6 +161,24 @@
       "metadata": {
         "description": "The size of the new Azure Redis Cache instance."
       }
+    },
+    "kvSkuName": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "allowedValues": [
+        "Standard",
+        "Premium"
+      ],
+      "metadata": {
+        "description": "Specifies whether the key vault is a standard vault or a premium vault."
+      }
+    },
+    "kvSkuFamily": {
+      "type": "string",
+      "defaultValue": "A",
+      "metadata": {
+        "description": "SKU family name"
+      }
     }
   },
   "variables": {
@@ -186,7 +204,9 @@
       "signedExpiry": "2219-12-01T00:00:00Z",
       "signedResourceTypes": "sco"
     },
-    "functionsAppName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-func'))]"
+    "functionsAppName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-func'))]",
+    "keyVaultName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-kv'))]",
+    "keyVaultUri": "[concat('https://',variables('keyVaultName'),'vault.azure.net/')]"
   },
   "resources": [
     {
@@ -257,6 +277,27 @@
           "capacity": "[parameters('cacheCapacity')]"
         }
       }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2021-06-01-preview",
+      "location": "[resourceGroup().location]",
+      "name": "[variables('keyVaultName')]",
+      "properties": {
+        "sku": {
+          "name": "[parameters('kvSkuName')]",
+          "family": "[parameters('kvSkuFamily')]"
+        },
+        "accessPolicies": [
+        ],
+        "tenantId": "[subscription().tenantId]",
+        "enabledForDeployment": false,
+        "enabledForTemplateDeployment": true,
+        "enabledForVolumeEncryption": false
+      },
+      "dependsOn": [
+        "[variables('siteName')]"
+      ]
     },
     {
       "type": "Microsoft.Web/serverfarms",
@@ -379,7 +420,7 @@
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
       "dependsOn": [
-        "[variables('serverfarmsName')]"
+        "[variables('serverfarmsName')]",
       ],
       "identity": {
         "type": "SystemAssigned"
@@ -458,13 +499,16 @@
           "tags": "[variables('tags')]",
           "dependsOn": [
             "[variables('appInsightsName')]",
-            "[variables('siteName')]"
+            "[variables('siteName')]",
+            "[variables('keyVaultName')]",
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
           ],
           "properties": {
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
             "ApplicationInsightsAgent_EXTENSION_VERSION": "~2",
-            "XDT_MicrosoftApplicationInsights_Mode": "recommended"
+            "XDT_MicrosoftApplicationInsights_Mode": "recommended",
+            "KeyVault": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2021-04-01-preview').vaultUri]"
           }
         },
         {
@@ -552,13 +596,16 @@
           "tags": "[variables('tags')]",
           "dependsOn": [
             "[variables('appInsightsName')]",
-            "[resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging')]"
+            "[resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging')]",
+            "[variables('keyVaultName')]",
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
           ],
           "properties": {
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
             "ApplicationInsightsAgent_EXTENSION_VERSION": "~2",
-            "XDT_MicrosoftApplicationInsights_Mode": "recommended"
+            "XDT_MicrosoftApplicationInsights_Mode": "recommended",
+            "KeyVault": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2021-04-01-preview').vaultUri]"
           }
         },
         {
@@ -659,14 +706,17 @@
           "tags": "[variables('tags')]",
           "dependsOn": [
             "[variables('appInsightsName')]",
-            "[variables('functionsAppName')]"
+            "[variables('functionsAppName')]",
+            "[variables('keyVaultName')]",
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
           ],
           "properties": {
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
             "FUNCTIONS_EXTENSION_VERSION": "~3",
             "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]",
-            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]"
+            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]",
+            "KeyVault": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2021-04-01-preview').vaultUri]"
           }
         },
         {
@@ -725,14 +775,17 @@
           "dependsOn": [
             "[variables('appInsightsName')]",
             "[variables('storageAccountName')]",
-            "[resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging')]"
+            "[resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging')]",
+            "[variables('keyVaultName')]",
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
           ],
           "properties": {
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
             "FUNCTIONS_EXTENSION_VERSION": "~3",
             "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]",
-            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]"
+            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]",
+            "KeyVault": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2021-04-01-preview').vaultUri]"
           }
         },
         {
@@ -765,14 +818,14 @@
       ]
     }
   ],
-  "outputs": {
-    "siteUrl": {
-      "type": "string",
-      "value": "[concat('https://', reference(concat('Microsoft.Web/sites/', variables('siteName')), '2018-11-01').defaultHostName)]"
-    },
-    "functionsUrl": {
-      "type": "string",
-      "value": "[concat('https://', reference(concat('Microsoft.Web/sites/', variables('functionsAppName')), '2018-11-01').defaultHostName)]"
+    "outputs": {
+      "siteUrl": {
+        "type": "string",
+        "value": "[concat('https://', reference(concat('Microsoft.Web/sites/', variables('siteName')), '2018-11-01').defaultHostName)]"
+      },
+      "functionsUrl": {
+        "type": "string",
+        "value": "[concat('https://', reference(concat('Microsoft.Web/sites/', variables('functionsAppName')), '2018-11-01').defaultHostName)]"
+      }
     }
   }
-}
