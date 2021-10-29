@@ -26,6 +26,7 @@ namespace NV.Templates.Backend.Functions
 
             var configuration = new ConfigurationBuilder()
                 .AddLocalSettings(rootProjectPath)
+                .AddAzureKeyVaultWhenPresent()
                 .AddEnvironmentVariables()
                 .AddUserSecrets<Startup>()
                 .Build();
