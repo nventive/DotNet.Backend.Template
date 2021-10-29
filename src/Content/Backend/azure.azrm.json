@@ -206,7 +206,6 @@
     },
     "functionsAppName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-func'))]",
     "keyVaultName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-kv'))]",
-    "keyVaultUri": "[concat('https://',variables('keyVaultName'),'vault.azure.net/')]"
   },
   "resources": [
     {
