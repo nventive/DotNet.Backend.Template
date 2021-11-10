@@ -249,6 +249,13 @@
         "environment": "[parameters('environment')]",
         "billTo": "[parameters('billTo')]",
         "managedBy": "[parameters('managedBy')]"
+      },
+      "properties": {
+        "sku": {
+          "name": "[parameters('cacheSku')]",
+          "family": "[parameters('cacheSkuFamily')]",
+          "capacity": "[parameters('cacheCapacity')]"
+        }
       }
     },
     {
