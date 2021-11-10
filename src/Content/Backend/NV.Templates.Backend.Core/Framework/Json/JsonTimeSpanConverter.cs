@@ -19,7 +19,8 @@ namespace NV.Templates.Backend.Core.Framework.Json
                 throw new JsonException();
             }
 
-            return TimeSpan.ParseExact(reader.GetString(), "c", CultureInfo.InvariantCulture);
+            var date = reader.GetString();
+            return TimeSpan.ParseExact(date != null ? date : "", "c", CultureInfo.InvariantCulture);
         }
 
         /// <inheritdoc />
