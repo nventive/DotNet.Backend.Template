@@ -869,9 +869,7 @@
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging')]",
-        "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]",
-        "[resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName'))]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
       ],
       "kind": "functionapp,linux",
       "identity": {
