@@ -53,7 +53,10 @@ namespace Microsoft.Extensions.Hosting
         /// </summary>
         public static IHostBuilder UseKeyVaultWithManagedIdentityWhenPresent(this IHostBuilder hostBuilder)
         {
-            hostBuilder.ConfigureAppConfiguration((context, config) => config.AddAzureKeyVaultWhenPresent());
+            hostBuilder.ConfigureAppConfiguration((context, config) =>
+            {
+                config.AddAzureKeyVaultWhenPresent(context);
+            });
             return hostBuilder;
         }
     }

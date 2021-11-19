@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using Azure.Core;
 using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.Extensions.Configuration
 {
@@ -34,7 +36,7 @@ namespace Microsoft.Extensions.Configuration
         /// See https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration?view=aspnetcore-3.0#use-managed-identities-for-azure-resources
         /// for more information.
         /// </summary>
-        public static IConfigurationBuilder AddAzureKeyVaultWhenPresent(this IConfigurationBuilder config)
+        public static IConfigurationBuilder AddAzureKeyVaultWhenPresent(this IConfigurationBuilder config, HostBuilderContext context)
         {
             var builtConfig = config.Build();
             var keyVault = builtConfig["KeyVault"];
@@ -46,6 +48,10 @@ namespace Microsoft.Extensions.Configuration
                 var secretClient = new SecretClient(new Uri(keyVault), tokenCredential);
 
                 config.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
+            }
+            else if (context.HostingEnvironment.IsDevelopment())
+            {
+                config.AddUserSecrets(Assembly.GetExecutingAssembly());
             }
 
             return config;
