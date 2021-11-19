@@ -50,7 +50,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
                     document.DocumentProcessors.Add(new HealthChecksDocumentProcessor());
                     document.OperationProcessors.Add(new CommonHeadersOperationProcessor());
-
 #if Auth
                     var openApiSecurityScheme = sp.GetRequiredService<IOptions<OpenApiSecurityScheme>>().Value;
                     document.AddSecurity("OAuth2", openApiSecurityScheme);
