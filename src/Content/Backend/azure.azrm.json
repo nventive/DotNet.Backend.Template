@@ -621,7 +621,6 @@
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging')]",
         "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
       ],
       "identity": {
