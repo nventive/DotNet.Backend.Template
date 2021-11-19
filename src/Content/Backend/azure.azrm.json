@@ -584,7 +584,7 @@
               "type": "Custom"
             },
             "Storage": {
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2021-04-01').key1))]",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2021-04-01').keys[0].value))]",
               "type": "Custom"
             },
             "Cache": {
@@ -696,7 +696,7 @@
               "type": "Custom"
             },
             "Storage": {
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('slotsStorageAccountName'),';AccountKey=', concat(listKeys(variables('slotsStorageAccountName'), '2021-04-01').key1))]",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('slotsStorageAccountName'),';AccountKey=', concat(listKeys(variables('slotsStorageAccountName'), '2021-04-01').keys[0].value))]",
               "type": "Custom"
             },
             "Cache": {
@@ -850,7 +850,7 @@
               "type": "Custom"
             },
             "Storage": {
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2021-04-01').key1))]",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2021-04-01').keys[0].value))]",
               "type": "Custom"
             },
             "Cache": {
@@ -954,7 +954,7 @@
               "type": "Custom"
             },
             "Storage": {
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('slotsStorageAccountName'),';AccountKey=', concat(listKeys(variables('slotsStorageAccountName'), '2021-04-01').key1))]",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('slotsStorageAccountName'),';AccountKey=', concat(listKeys(variables('slotsStorageAccountName'), '2021-04-01').keys[0].value))]",
               "type": "Custom"
             },
             "Cache": {
