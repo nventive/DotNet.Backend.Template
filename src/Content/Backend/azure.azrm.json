@@ -634,6 +634,7 @@
         {
           "type": "config",
           "name": "logs",
+          "condition": "[parameters('useStagingSlots')]",
           "apiVersion": "2021-01-15",
           "location": "[parameters('location')]",
           "tags": "[variables('tags')]",
@@ -645,14 +646,14 @@
             "applicationLogs": {
               "azureBlobStorage": {
                 "level": "[parameters('diagnosticsLogsLevel')]",
-                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName'))).primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
                 "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
               }
             },
             "httpLogs": {
               "azureBlobStorage": {
                 "enabled": true,
-                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName'))).primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
                 "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
               }
             }
@@ -903,14 +904,14 @@
             "applicationLogs": {
               "azureBlobStorage": {
                 "level": "[parameters('diagnosticsLogsLevel')]",
-                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName'))).primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
                 "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
               }
             },
             "httpLogs": {
               "azureBlobStorage": {
                 "enabled": true,
-                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName'))).primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
                 "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
               }
             }
