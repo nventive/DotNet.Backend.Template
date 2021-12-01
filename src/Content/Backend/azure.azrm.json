@@ -225,6 +225,7 @@
       ]
     },
     {
+      "condition": "[parameters('useStagingSlots')]",
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('slotsStorageAccountName')]",
       "apiVersion": "2021-04-01",
@@ -312,6 +313,7 @@
             }
           },
           {
+            "condition": "[parameters('useStagingSlots')]",
             "tenantId": "[subscription().tenantid]",
             "objectId": "[reference(resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging'), '2021-01-15', 'Full').identity.principalId]",
             "permissions": {
@@ -332,6 +334,7 @@
             }
           },
           {
+            "condition": "[parameters('useStagingSlots')]",
             "tenantId": "[subscription().tenantid]",
             "objectId": "[reference(resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging'), '2021-01-15', 'Full').identity.principalId]",
             "permissions": {
@@ -351,9 +354,7 @@
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('siteName'))]",
-        "[resourceId('Microsoft.Web/sites', variables('functionsAppName'))]",
-        "[resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging')]",
-        "[resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging')]"
+        "[resourceId('Microsoft.Web/sites', variables('functionsAppName'))]"
       ]
     },
     {
@@ -748,6 +749,7 @@
         "type": "SystemAssigned"
       },
       "properties": {
+        "reserved": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]",
         "siteConfig": {
           "linuxFxVersion": "DOTNETCORE|3.1",
@@ -876,6 +878,7 @@
         "type": "SystemAssigned"
       },
       "properties": {
+        "reserved": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]",
         "siteConfig": {
           "linuxFxVersion": "DOTNETCORE|3.1",
@@ -973,7 +976,7 @@
     },
     "functionsUrl": {
       "type": "string",
-      "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites/', 'functionsAppName'), '2021-01-15').defaultHostName)]"
+      "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites/', 'functionsAppName'), '2021-01-15').defaultHostName)]" 
     }
   }
 }
