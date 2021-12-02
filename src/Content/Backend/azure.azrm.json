@@ -38,7 +38,7 @@
     },
     "appServicePlanKind": {
       "type": "string",
-      "defaultValue": "app",
+      "defaultValue": "linux",
       "metadata": {
         "description": "The kind of machines for the hosting plan (Windows or Linux). Defaults to Windows."
       }
@@ -238,6 +238,7 @@
       },
       "resources": [
         {
+          "condition": "[parameters('useStagingSlots')]",
           "type": "blobServices/containers",
           "name": "[concat('default/', variables('webLogsContainerName'))]",
           "apiVersion": "2019-04-01",
@@ -302,20 +303,24 @@
           "family": "[parameters('keyVaultSkuFamily')]"
         },
         "accessPolicies": [
+        ],
+        "tenantId": "[subscription().tenantId]",
+        "enabledForDeployment": false,
+        "enabledForTemplateDeployment": true,
+        "enabledForVolumeEncryption": false,
+        "enableSoftDelete": true,
+        "softDeleteRetentionInDays": 90
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/accessPolicies",
+      "apiVersion": "2021-06-01-preview",
+      "name": "[concat(variables('keyVaultName'),'/add')]",
+      "properties": {
+        "accessPolicies": [
           {
             "tenantId": "[subscription().tenantid]",
             "objectId": "[reference(resourceId('Microsoft.Web/sites', variables('siteName')), '2021-01-15', 'Full').identity.principalId]",
-            "permissions": {
-              "secrets": [
-                "get",
-                "list"
-              ]
-            }
-          },
-          {
-            "condition": "[parameters('useStagingSlots')]",
-            "tenantId": "[subscription().tenantid]",
-            "objectId": "[reference(resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging'), '2021-01-15', 'Full').identity.principalId]",
             "permissions": {
               "secrets": [
                 "get",
@@ -332,29 +337,13 @@
                 "list"
               ]
             }
-          },
-          {
-            "condition": "[parameters('useStagingSlots')]",
-            "tenantId": "[subscription().tenantid]",
-            "objectId": "[reference(resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging'), '2021-01-15', 'Full').identity.principalId]",
-            "permissions": {
-              "secrets": [
-                "get",
-                "list"
-              ]
-            }
           }
-        ],
-        "tenantId": "[subscription().tenantId]",
-        "enabledForDeployment": false,
-        "enabledForTemplateDeployment": true,
-        "enabledForVolumeEncryption": false,
-        "enableSoftDelete": true,
-        "softDeleteRetentionInDays": 90
+        ]
       },
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('siteName'))]",
-        "[resourceId('Microsoft.Web/sites', variables('functionsAppName'))]"
+        "[resourceId('Microsoft.Web/sites', variables('functionsAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
       ]
     },
     {
@@ -365,6 +354,7 @@
       "tags": "[variables('tags')]",
       "kind": "[parameters('appServicePlanKind')]",
       "properties": {
+        "reserved": true,
         "name": "[variables('serverfarmsName')]"
       },
       "sku": {
@@ -646,14 +636,14 @@
             "applicationLogs": {
               "azureBlobStorage": {
                 "level": "[parameters('diagnosticsLogsLevel')]",
-                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "sasUrl": "[if(equals(parameters('useStagingSlots'), 'true' ), concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken),'not evaluated when no slots use')]",
                 "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
               }
             },
             "httpLogs": {
               "azureBlobStorage": {
                 "enabled": true,
-                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "sasUrl": "[if(equals(parameters('useStagingSlots'), 'true' ), concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken),'not evaluated when no slots use')]",
                 "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
               }
             }
@@ -698,7 +688,7 @@
               "type": "Custom"
             },
             "Storage": {
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('slotsStorageAccountName'),';AccountKey=', concat(listKeys(variables('slotsStorageAccountName'), '2021-04-01').keys[0].value))]",
+              "value": "[if(equals(parameters('useStagingSlots'), 'true' ),concat('DefaultEndpointsProtocol=https;AccountName=', variables('slotsStorageAccountName'),';AccountKey=', concat(listKeys(variables('slotsStorageAccountName'), '2021-04-01').keys[0].value)),'not evaluated when no slots use')]",
               "type": "Custom"
             },
             "Cache": {
@@ -893,6 +883,7 @@
         {
           "type": "config",
           "name": "logs",
+          "condition": "[parameters('useStagingSlots')]",
           "apiVersion": "2021-01-15",
           "location": "[parameters('location')]",
           "tags": "[variables('tags')]",
@@ -904,14 +895,14 @@
             "applicationLogs": {
               "azureBlobStorage": {
                 "level": "[parameters('diagnosticsLogsLevel')]",
-                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "sasUrl": "[if(equals(parameters('useStagingSlots'), 'true' ), concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken),'not evaluated when no slots use')]",
                 "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
               }
             },
             "httpLogs": {
               "azureBlobStorage": {
                 "enabled": true,
-                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "sasUrl": "[if(equals(parameters('useStagingSlots'), 'true' ), concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken),'not evaluated when no slots use')]",
                 "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
               }
             }
@@ -934,8 +925,8 @@
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')),'2020-02-02').InstrumentationKey]",
             "FUNCTIONS_EXTENSION_VERSION": "~3",
-            "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('slotsStorageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')), '2021-04-01').keys[0].value,';')]",
-            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('slotsStorageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')), '2021-04-01').keys[0].value,';')]",
+            "AzureWebJobsStorage": "[if(equals(parameters('useStagingSlots'), 'true' ),concat('DefaultEndpointsProtocol=https;AccountName=',variables('slotsStorageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')), '2021-04-01').keys[0].value,';'),'not evaluated when no slots use')]",
+            "AzureWebJobsDashboard": "[if(equals(parameters('useStagingSlots'), 'true' ),concat('DefaultEndpointsProtocol=https;AccountName=',variables('slotsStorageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')), '2021-04-01').keys[0].value,';'),'not evaluated when no slots use')]",
             "KeyVault": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2021-04-01-preview').vaultUri]"
           }
         },
@@ -958,7 +949,7 @@
               "type": "Custom"
             },
             "Storage": {
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('slotsStorageAccountName'),';AccountKey=', concat(listKeys(variables('slotsStorageAccountName'), '2021-04-01').keys[0].value))]",
+              "value": "[if(equals(parameters('useStagingSlots'), 'true' ),concat('DefaultEndpointsProtocol=https;AccountName=', variables('slotsStorageAccountName'),';AccountKey=', concat(listKeys(variables('slotsStorageAccountName'), '2021-04-01').keys[0].value)),'not evaluated when no slots use')]",
               "type": "Custom"
             },
             "Cache": {
