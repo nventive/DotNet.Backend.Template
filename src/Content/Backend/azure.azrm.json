@@ -347,6 +347,41 @@
       ]
     },
     {
+      "condition": "[parameters('useStagingSlots')]",
+      "type": "Microsoft.KeyVault/vaults/accessPolicies",
+      "apiVersion": "2021-06-01-preview",
+      "name": "[concat(variables('keyVaultName'),'slots','/add')]",
+      "properties": {
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantid]",
+            "objectId": "[if(equals(parameters('useStagingSlots'), 'true' ), reference(resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging'), '2021-01-15', 'Full').identity.principalId,'t')]",
+            "permissions": {
+              "secrets": [
+                "get",
+                "list"
+              ]
+            }
+          },
+          {
+            "tenantId": "[subscription().tenantid]",
+            "objectId": "[if(equals(parameters('useStagingSlots'), 'true' ), reference(resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging'), '2021-01-15', 'Full').identity.principalId,'t')]",
+            "permissions": {
+              "secrets": [
+                "get",
+                "list"
+              ]
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "[resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging')]",
+        "[resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging')]"
+      ]
+    },
+    {
       "type": "Microsoft.Web/serverfarms",
       "name": "[variables('serverfarmsName')]",
       "apiVersion": "2018-02-01",
