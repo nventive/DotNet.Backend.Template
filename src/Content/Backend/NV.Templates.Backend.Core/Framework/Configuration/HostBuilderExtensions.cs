@@ -55,7 +55,7 @@ namespace Microsoft.Extensions.Hosting
         {
             hostBuilder.ConfigureAppConfiguration((context, config) =>
             {
-                config.AddAzureKeyVaultWhenPresent(context);
+                config.AddAzureKeyVaultWhenPresent(context.HostingEnvironment);
             });
             return hostBuilder;
         }

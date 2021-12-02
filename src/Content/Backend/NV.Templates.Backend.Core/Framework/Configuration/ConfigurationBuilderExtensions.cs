@@ -36,7 +36,7 @@ namespace Microsoft.Extensions.Configuration
         /// See https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration?view=aspnetcore-3.0#use-managed-identities-for-azure-resources
         /// for more information.
         /// </summary>
-        public static IConfigurationBuilder AddAzureKeyVaultWhenPresent(this IConfigurationBuilder config, HostBuilderContext context)
+        public static IConfigurationBuilder AddAzureKeyVaultWhenPresent(this IConfigurationBuilder config, IHostEnvironment hostEnvironment)
         {
             var builtConfig = config.Build();
             var keyVault = builtConfig["KeyVault"];
@@ -49,7 +49,7 @@ namespace Microsoft.Extensions.Configuration
 
                 config.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
             }
-            else if (context.HostingEnvironment.IsDevelopment())
+            else if (hostEnvironment.IsDevelopment())
             {
                 config.AddUserSecrets(Assembly.GetExecutingAssembly());
             }

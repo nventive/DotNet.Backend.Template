@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 [assembly: FunctionsStartup(typeof(NV.Templates.Backend.Functions.Startup))]
 
@@ -24,9 +25,13 @@ namespace NV.Templates.Backend.Functions
 
             var rootProjectPath = Path.GetFullPath(Path.Combine("..", "..", "..", ".."));
 
+            var hostingEnvironment = builder.Services
+               .BuildServiceProvider()
+               .GetService<IHostEnvironment>();
+
             var configuration = new ConfigurationBuilder()
                 .AddLocalSettings(rootProjectPath)
-                .AddAzureKeyVaultWhenPresent()
+                .AddAzureKeyVaultWhenPresent(hostingEnvironment!)
                 .AddEnvironmentVariables()
                 .AddUserSecrets<Startup>()
                 .Build();
