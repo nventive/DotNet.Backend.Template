@@ -51,6 +51,18 @@ jobs:
             ResourceGroupName: '$(ResourceGroup)'
             packageForLinux: '$(Pipeline.Workspace)/drop/Web'
             StartupCommand: 'dotnet NV.Templates.Backend.Web.dll'
+
+        - task: AzureRmWebAppDeployment@4
+          displayName: 'Deploy FunctionApp'
+          inputs:
+            azureSubscription: ${{ parameters.azureResourceManagerConnection }}
+            appType: functionAppLinux
+            WebAppName: '$(ProjectName)-$(Environment)-func'
+            ${{ if eq(variables.UseStagingSlots, true) }}:
+              deployToSlotOrASE: true
+              SlotName: staging
+            ResourceGroupName: '$(ResourceGroup)'
+            package: '$(Pipeline.Workspace)/drop/Functions'
             
         - task: AzureAppServiceManage@0
           displayName: 'Swap AppService Slots'
