@@ -43,5 +43,21 @@ namespace Microsoft.Extensions.Hosting
 
             return hostBuilder;
         }
+
+        /// <summary>
+        /// Adds KeyVault as a source of configuration when a configuration key named "KeyVault" is present.
+        /// The "KeyVault" configuration key must contain the KeyVault URL.
+        /// The connection is made using Azure System Managed Identities.
+        /// See https://docs.microsoft.com/en-us/aspnet/core/security/key-vault-configuration?view=aspnetcore-3.0#use-managed-identities-for-azure-resources
+        /// for more information.
+        /// </summary>
+        public static IHostBuilder UseKeyVaultWithManagedIdentityWhenPresent(this IHostBuilder hostBuilder)
+        {
+            hostBuilder.ConfigureAppConfiguration((context, config) =>
+            {
+                config.AddAzureKeyVaultWhenPresent(context.HostingEnvironment);
+            });
+            return hostBuilder;
+        }
     }
 }

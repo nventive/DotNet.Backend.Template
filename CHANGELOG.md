@@ -11,10 +11,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add default AppConfiguration setup in the code
 - Add XML serializer for HTTP clients
 - Add ability to ignore SSL certificates validation for dependencies
+- Add default Keyvault setup in the code with user secret for local development
+- Add default Keyvault with access policies and system managed identity
 
 ### Changed
 - Adjust default HTTP headers to remove unsecured headers or refine required ones
-
+- Update api vesion in ARM template for schema, components and referenceId functions
 ### Deprecated
 
 ### Removed

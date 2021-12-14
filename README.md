@@ -27,7 +27,7 @@ dotnet new -i NV.Templates
 
 Run the template with the relevant options:
 ```shell
-dotnet new nv-backend -n <project name> -c <company name> [options]
+dotnet new nv-backend -n <project name> -C <company name> [options]
 ```
 
 By default, the project will only generate a `Core` library to host the
@@ -45,7 +45,7 @@ To generate suitable hosts to run and expose it, use the following options:
 
 Options can be combined, e.g.
 ```shell
-dotnet new nv-backend -n <project name> -c <company name> --RestApi --SPA --Functions --Console --Auth
+dotnet new nv-backend -n <project name> -C <company name> --RestApi --SPA --Functions --Console --Auth
 ```
 
 For more details on each project type, see the [Features / Backend](#backend) section.
@@ -54,7 +54,7 @@ For more details on each project type, see the [Features / Backend](#backend) se
 
 Run the template:
 ```shell
-dotnet new nv-netstandard-component -n <component name> -c <company name>
+dotnet new nv-netstandard-component -n <component name> -C <company name>
 ```
 
 For more details on what's provided, see the [Features / Component](#component) section.
