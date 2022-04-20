@@ -38,7 +38,7 @@
     },
     "appServicePlanKind": {
       "type": "string",
-      "defaultValue": "app",
+      "defaultValue": "linux",
       "metadata": {
         "description": "The kind of machines for the hosting plan (Windows or Linux). Defaults to Windows."
       }
@@ -74,27 +74,6 @@
       },
       "metadata": {
         "description": "Auto-scaling parameters."
-      }
-    },
-    "customHostname": {
-      "type": "string",
-      "defaultValue": "none",
-      "metadata": {
-        "description": "The custom hostname that you wish to add (see https://docs.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-custom-domain for more information)."
-      }
-    },
-    "certificateKeyVaultId": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Existing Key Vault resource Id with an access policy to allow Microsoft.Web RP to read Key Vault secrets (see https://github.com/Azure/azure-quickstart-templates/tree/master/201-web-app-certificate-from-key-vault for more information)."
-      }
-    },
-    "certificateKeyVaultSecret": {
-      "type": "string",
-      "defaultValue": "none",
-      "metadata": {
-        "description": "Key Vault Secret that contains a PFX certificate"
       }
     },
     "useStagingSlots": {
@@ -161,6 +140,35 @@
       "metadata": {
         "description": "The size of the new Azure Redis Cache instance."
       }
+    },
+    "keyVaultSkuName": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "allowedValues": [
+        "Standard",
+        "Premium"
+      ],
+      "metadata": {
+        "description": "Specifies whether the key vault is a standard vault or a premium vault."
+      }
+    },
+    "keyVaultSkuFamily": {
+      "type": "string",
+      "defaultValue": "A",
+      "metadata": {
+        "description": "SKU family name"
+      }
+    },
+    "appConfigurationSku": {
+      "type": "string",
+      "defaultValue": "free",
+      "allowedValues": [
+        "free",
+        "standard"
+      ],
+      "metadata": {
+        "description": "The pricing tier of App Configuration"
+      }
     }
   },
   "variables": {
@@ -171,12 +179,12 @@
       "managedBy": "[parameters('managedBy')]"
     },
     "storageAccountName": "[toLower(concat(parameters('projectName'), parameters('environment'), 'stg'))]",
+    "slotsStorageAccountName": "[toLower(concat(parameters('projectName'), parameters('environment'), 'slotsstg'))]",
     "appInsightsName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-ai'))]",
     "configStoreName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-config'))]",
     "cacheName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-cache'))]",
     "serverfarmsName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-plan'))]",
     "siteName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-site'))]",
-    "siteCertificateName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-cert'))]",
     "serverfarmsAutoScaleName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-planscale'))]",
     "webLogsContainerName": "weblogs",
     "containerSasRequestContent": {
@@ -186,13 +194,14 @@
       "signedExpiry": "2219-12-01T00:00:00Z",
       "signedResourceTypes": "sco"
     },
-    "functionsAppName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-func'))]"
+    "functionsAppName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-func'))]",
+    "keyVaultName": "[toLower(concat(parameters('projectName'), '-', parameters('environment'), '-kv'))]"
   },
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[variables('storageAccountName')]",
-      "apiVersion": "2019-06-01",
+      "apiVersion": "2021-04-01",
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
       "kind": "StorageV2",
@@ -208,6 +217,34 @@
           "tags": "[variables('tags')]",
           "dependsOn": [
             "[variables('storageAccountName')]"
+          ],
+          "properties": {
+            "publicAccess": "Blob"
+          }
+        }
+      ]
+    },
+    {
+      "condition": "[parameters('useStagingSlots')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('slotsStorageAccountName')]",
+      "apiVersion": "2021-04-01",
+      "location": "[parameters('location')]",
+      "tags": "[variables('tags')]",
+      "kind": "StorageV2",
+      "sku": {
+        "name": "Standard_GRS",
+        "tier": "Standard"
+      },
+      "resources": [
+        {
+          "condition": "[parameters('useStagingSlots')]",
+          "type": "blobServices/containers",
+          "name": "[concat('default/', variables('webLogsContainerName'))]",
+          "apiVersion": "2019-04-01",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[variables('slotsStorageAccountName')]"
           ],
           "properties": {
             "publicAccess": "Blob"
@@ -234,7 +271,7 @@
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
       "sku": {
-        "name": "Standard"
+        "name": "[parameters('appConfigurationSku')]"
       },
       "properties": {
       }
@@ -242,21 +279,107 @@
     {
       "type": "Microsoft.Cache/Redis",
       "name": "[variables('cacheName')]",
-      "apiVersion": "2018-03-01",
+      "apiVersion": "2020-12-01",
       "location": "[parameters('location')]",
-      "tags": {
-        "project": "[parameters('projectName')]",
-        "environment": "[parameters('environment')]",
-        "billTo": "[parameters('billTo')]",
-        "managedBy": "[parameters('managedBy')]"
-      },
+      "tags": "[variables('tags')]",
       "properties": {
+        "enableNonSslPort": false,
         "sku": {
           "name": "[parameters('cacheSku')]",
           "family": "[parameters('cacheSkuFamily')]",
           "capacity": "[parameters('cacheCapacity')]"
         }
       }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults",
+      "apiVersion": "2021-06-01-preview",
+      "location": "[resourceGroup().location]",
+      "tags": "[variables('tags')]",
+      "name": "[variables('keyVaultName')]",
+      "properties": {
+        "sku": {
+          "name": "[parameters('keyVaultSkuName')]",
+          "family": "[parameters('keyVaultSkuFamily')]"
+        },
+        "accessPolicies": [
+        ],
+        "tenantId": "[subscription().tenantId]",
+        "enabledForDeployment": false,
+        "enabledForTemplateDeployment": true,
+        "enabledForVolumeEncryption": false,
+        "enableSoftDelete": true,
+        "softDeleteRetentionInDays": 90
+      }
+    },
+    {
+      "type": "Microsoft.KeyVault/vaults/accessPolicies",
+      "apiVersion": "2021-06-01-preview",
+      "name": "[concat(variables('keyVaultName'),'/add')]",
+      "properties": {
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantid]",
+            "objectId": "[reference(resourceId('Microsoft.Web/sites', variables('siteName')), '2021-01-15', 'Full').identity.principalId]",
+            "permissions": {
+              "secrets": [
+                "get",
+                "list"
+              ]
+            }
+          },
+          {
+            "tenantId": "[subscription().tenantid]",
+            "objectId": "[reference(resourceId('Microsoft.Web/sites', variables('functionsAppName')), '2021-01-15', 'Full').identity.principalId]",
+            "permissions": {
+              "secrets": [
+                "get",
+                "list"
+              ]
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('siteName'))]",
+        "[resourceId('Microsoft.Web/sites', variables('functionsAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('useStagingSlots')]",
+      "type": "Microsoft.KeyVault/vaults/accessPolicies",
+      "apiVersion": "2021-06-01-preview",
+      "name": "[concat(variables('keyVaultName'),'slots','/add')]",
+      "properties": {
+        "accessPolicies": [
+          {
+            "tenantId": "[subscription().tenantid]",
+            "objectId": "[if(equals(parameters('useStagingSlots'), 'true' ), reference(resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging'), '2021-01-15', 'Full').identity.principalId,'t')]",
+            "permissions": {
+              "secrets": [
+                "get",
+                "list"
+              ]
+            }
+          },
+          {
+            "tenantId": "[subscription().tenantid]",
+            "objectId": "[if(equals(parameters('useStagingSlots'), 'true' ), reference(resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging'), '2021-01-15', 'Full').identity.principalId,'t')]",
+            "permissions": {
+              "secrets": [
+                "get",
+                "list"
+              ]
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+        "[resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging')]",
+        "[resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging')]"
+      ]
     },
     {
       "type": "Microsoft.Web/serverfarms",
@@ -266,6 +389,7 @@
       "tags": "[variables('tags')]",
       "kind": "[parameters('appServicePlanKind')]",
       "properties": {
+        "reserved": true,
         "name": "[variables('serverfarmsName')]"
       },
       "sku": {
@@ -281,7 +405,7 @@
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
       "dependsOn": [
-        "[variables('serverfarmsName')]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
       ],
       "properties": {
         "enabled": true,
@@ -379,7 +503,7 @@
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
       "dependsOn": [
-        "[variables('serverfarmsName')]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
       ],
       "identity": {
         "type": "SystemAssigned"
@@ -390,7 +514,6 @@
         "httpsOnly": true,
         "siteconfig": {
           "alwaysOn": true,
-          "phpVersion": "",
           "http20Enabled": true,
           "minTlsVersion": "1.2",
           "remoteDebuggingEnabled": false,
@@ -426,25 +549,25 @@
         {
           "type": "config",
           "name": "logs",
-          "apiVersion": "2018-11-01",
+          "apiVersion": "2021-01-15",
           "location": "[parameters('location')]",
           "tags": "[variables('tags')]",
           "dependsOn": [
-            "[variables('storageAccountName')]",
-            "[variables('siteName')]"
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+            "[resourceId('Microsoft.Web/sites', variables('siteName'))]"
           ],
           "properties": {
             "applicationLogs": {
               "azureBlobStorage": {
                 "level": "[parameters('diagnosticsLogsLevel')]",
-                "sasUrl": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('storageAccountName'), '2018-02-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))).primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('storageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
                 "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
               }
             },
             "httpLogs": {
               "azureBlobStorage": {
                 "enabled": true,
-                "sasUrl": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('storageAccountName'), '2018-02-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))).primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('storageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
                 "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
               }
             }
@@ -453,78 +576,68 @@
         {
           "type": "config",
           "name": "appsettings",
-          "apiVersion": "2018-11-01",
+          "apiVersion": "2020-12-01",
           "location": "[parameters('location')]",
           "tags": "[variables('tags')]",
           "dependsOn": [
-            "[variables('appInsightsName')]",
-            "[variables('siteName')]"
+            "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+            "[resourceId('Microsoft.Web/sites', variables('siteName'))]",
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
           ],
           "properties": {
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
-            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
+            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').InstrumentationKey]",
             "ApplicationInsightsAgent_EXTENSION_VERSION": "~2",
-            "XDT_MicrosoftApplicationInsights_Mode": "recommended"
+            "XDT_MicrosoftApplicationInsights_Mode": "recommended",
+            "KeyVault": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2021-04-01-preview').vaultUri]"
           }
         },
         {
           "type": "config",
           "name": "connectionstrings",
-          "apiVersion": "2018-11-01",
+          "apiVersion": "2021-01-15",
           "location": "[parameters('location')]",
           "tags": "[variables('tags')]",
           "dependsOn": [
-            "[variables('storageAccountName')]",
-            "[variables('configStoreName')]",
-            "[variables('siteName')]"
+            "[resourceId('Microsoft.Cache/Redis', variables('cacheName'))]",
+            "[resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+            "[resourceId('Microsoft.Web/sites', variables('siteName'))]"
           ],
           "properties": {
             "AppConfig": {
-              "value": "[listKeys(resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName')), '2019-10-01').value[0].connectionString]",
+              "value": "[listKeys(resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName')), '2021-03-01-preview').value[0].connectionString]",
               "type": "Custom"
             },
             "Storage": {
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2015-05-01-preview').key1))]",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2021-04-01').keys[0].value))]",
               "type": "Custom"
             },
             "Cache": {
-              "value": "[concat(variables('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2015-08-01').primaryKey)]",
-              "type": "RedisCache"
+              "value": "[concat(variables('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2020-12-01').primaryKey)]",
+              "type": "Custom"
             }
+          }
+        },
+        {
+          "apiVersion": "2021-01-15",
+          "name": "slotConfigNames",
+          "type": "config",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('siteName'))]"
+          ],
+          "properties": {
+            "connectionStringNames": [
+              "AppConfig",
+              "Storage",
+              "Cache"
+            ],
+            "appSettingNames": [
+              "KeyVault"
+            ]
           }
         }
       ]
-    },
-    {
-      "type": "Microsoft.Web/certificates",
-      "name": "[variables('siteCertificateName')]",
-      "condition": "[not(equals(parameters('certificateKeyVaultSecret'), 'none'))]",
-      "apiVersion": "2016-03-01",
-      "location": "[parameters('location')]",
-      "tags": "[variables('tags')]",
-      "dependsOn": [
-        "[variables('siteName')]"
-      ],
-      "properties": {
-        "keyVaultId": "[parameters('certificateKeyVaultId')]",
-        "keyVaultSecretName": "[parameters('certificateKeyVaultSecret')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverFarms', variables('serverfarmsName'))]"
-      }
-    },
-    {
-      "type": "Microsoft.Web/sites/hostnameBindings",
-      "name": "[concat(variables('siteName'), '/', parameters('customHostname'))]",
-      "condition": "[not(equals(parameters('customHostname'), 'none'))]",
-      "apiVersion": "2018-11-01",
-      "location": "[parameters('location')]",
-      "tags": "[variables('tags')]",
-      "dependsOn": [
-        "[variables('siteCertificateName')]"
-      ],
-      "properties": {
-        "sslState": "SniEnabled",
-        "thumbprint": "[if(not(equals(parameters('certificateKeyVaultSecret'), 'none')), reference(resourceId('Microsoft.Web/certificates', variables('siteCertificateName')), '2016-03-01').Thumbprint, '')]"
-      }
     },
     {
       "type": "Microsoft.Web/sites/slots",
@@ -534,7 +647,7 @@
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
       "dependsOn": [
-        "[variables('siteName')]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
       ],
       "identity": {
         "type": "SystemAssigned"
@@ -545,46 +658,77 @@
       "resources": [
         {
           "type": "config",
-          "name": "appsettings",
+          "name": "logs",
           "condition": "[parameters('useStagingSlots')]",
-          "apiVersion": "2018-11-01",
+          "apiVersion": "2021-01-15",
           "location": "[parameters('location')]",
           "tags": "[variables('tags')]",
           "dependsOn": [
-            "[variables('appInsightsName')]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName'))]",
             "[resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging')]"
           ],
           "properties": {
+            "applicationLogs": {
+              "azureBlobStorage": {
+                "level": "[parameters('diagnosticsLogsLevel')]",
+                "sasUrl": "[if(equals(parameters('useStagingSlots'), 'true' ), concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken),'not evaluated when no slots use')]",
+                "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
+              }
+            },
+            "httpLogs": {
+              "azureBlobStorage": {
+                "enabled": true,
+                "sasUrl": "[if(equals(parameters('useStagingSlots'), 'true' ), concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken),'not evaluated when no slots use')]",
+                "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
+              }
+            }
+          }
+        },
+        {
+          "type": "config",
+          "name": "appsettings",
+          "condition": "[parameters('useStagingSlots')]",
+          "apiVersion": "2020-12-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging')]",
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
+          ],
+          "properties": {
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
-            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
+            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').InstrumentationKey]",
             "ApplicationInsightsAgent_EXTENSION_VERSION": "~2",
-            "XDT_MicrosoftApplicationInsights_Mode": "recommended"
+            "XDT_MicrosoftApplicationInsights_Mode": "recommended",
+            "KeyVault": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2021-04-01-preview').vaultUri]"
           }
         },
         {
           "type": "config",
           "name": "connectionstrings",
           "condition": "[parameters('useStagingSlots')]",
-          "apiVersion": "2018-11-01",
+          "apiVersion": "2021-01-15",
           "location": "[parameters('location')]",
           "tags": "[variables('tags')]",
           "dependsOn": [
-            "[variables('storageAccountName')]",
-            "[variables('configStoreName')]",
+            "[resourceId('Microsoft.Cache/Redis', variables('cacheName'))]",
+            "[resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName'))]",
             "[resourceId('Microsoft.Web/sites/slots', variables('siteName'), 'staging')]"
           ],
           "properties": {
             "AppConfig": {
-              "value": "[listKeys(resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName')), '2019-10-01').value[0].connectionString]",
+              "value": "[listKeys(resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName')), '2021-03-01-preview').value[0].connectionString]",
               "type": "Custom"
             },
             "Storage": {
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2015-05-01-preview').key1))]",
+              "value": "[if(equals(parameters('useStagingSlots'), 'true' ),concat('DefaultEndpointsProtocol=https;AccountName=', variables('slotsStorageAccountName'),';AccountKey=', concat(listKeys(variables('slotsStorageAccountName'), '2021-04-01').keys[0].value)),'not evaluated when no slots use')]",
               "type": "Custom"
             },
             "Cache": {
-              "value": "[concat(variables('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2015-08-01').primaryKey)]",
-              "type": "RedisCache"
+              "value": "[concat(variables('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2020-12-01').primaryKey)]",
+              "type": "Custom"
             }
           }
         }
@@ -600,12 +744,11 @@
       },
       "dependsOn": [
         "[variables('appInsightsName')]",
-        "[variables('siteName')]"
+        "[resourceId('Microsoft.Web/sites', variables('siteName'))]"
       ],
       "properties": {
         "Name": "[concat(variables('appInsightsName'), '-webtest-', variables('siteName'))]",
         "SyntheticMonitorId": "[concat(variables('appInsightsName'), '-webtest-', variables('siteName'))]",
-        "Description": "",
         "Enabled": true,
         "Frequency": 300,
         "Timeout": 120,
@@ -613,7 +756,7 @@
         "RetryEnabled": false,
         "Locations": "[parameters('webTestsLocations')]",
         "Configuration": {
-          "WebTest": "[concat('<WebTest Name=\"Health checks\" Id=\"7c86e527-16e6-42f4-9873-d7ac0e0791df\" Enabled=\"True\" CssProjectStructure=\"\" CssIteration=\"\" Timeout=\"120\" WorkItemIds=\"\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\" Description=\"\" CredentialUserName=\"\" CredentialPassword=\"\" PreAuthenticate=\"True\" Proxy=\"default\" StopOnError=\"False\" RecordedResultFile=\"\" ResultsLocale=\"\"><Items><Request Method=\"GET\" Guid=\"a8a3f2ed-acf8-619f-c0bc-f5b4908bb1d9\" Version=\"1.1\" Url=\"https://', reference(concat('Microsoft.Web/sites/', variables('siteName')), '2018-11-01').defaultHostName, '/api/health\" ThinkTime=\"0\" Timeout=\"120\" ParseDependentRequests=\"False\" FollowRedirects=\"True\" RecordResult=\"True\" Cache=\"False\" ResponseTimeGoal=\"0\" Encoding=\"utf-8\" ExpectedHttpStatusCode=\"200\" ExpectedResponseUrl=\"\" ReportingName=\"\" IgnoreHttpStatusCode=\"False\" /></Items></WebTest>')]"
+          "WebTest": "[concat('<WebTest Name=\"Health checks\" Id=\"7c86e527-16e6-42f4-9873-d7ac0e0791df\" Enabled=\"True\" CssProjectStructure=\"\" CssIteration=\"\" Timeout=\"120\" WorkItemIds=\"\" xmlns=\"http://microsoft.com/schemas/VisualStudio/TeamTest/2010\" Description=\"\" CredentialUserName=\"\" CredentialPassword=\"\" PreAuthenticate=\"True\" Proxy=\"default\" StopOnError=\"False\" RecordedResultFile=\"\" ResultsLocale=\"\"><Items><Request Method=\"GET\" Guid=\"a8a3f2ed-acf8-619f-c0bc-f5b4908bb1d9\" Version=\"1.1\" Url=\"https://', reference(resourceId('Microsoft.Web/sites', variables('siteName')), '2021-01-15').defaultHostName, '/api/health\" ThinkTime=\"0\" Timeout=\"120\" ParseDependentRequests=\"False\" FollowRedirects=\"True\" RecordResult=\"True\" Cache=\"False\" ResponseTimeGoal=\"0\" Encoding=\"utf-8\" ExpectedHttpStatusCode=\"200\" ExpectedResponseUrl=\"\" ReportingName=\"\" IgnoreHttpStatusCode=\"False\" /></Items></WebTest>')]"
         }
       }
     },
@@ -623,75 +766,125 @@
       "apiVersion": "2018-11-01",
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
-      "kind": "functionapp",
+      "kind": "functionapp,linux",
       "dependsOn": [
-        "[variables('storageAccountName')]",
-        "[variables('serverfarmsName')]"
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+        "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
       ],
       "identity": {
         "type": "SystemAssigned"
       },
       "properties": {
-        "clientAffinityEnabled": false,
+        "reserved": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]",
-        "httpsOnly": true,
-        "siteconfig": {
+        "siteConfig": {
+          "linuxFxVersion": "DOTNETCORE|3.1",
           "alwaysOn": true,
-          "cors": {
-            "allowedOrigins": [
-              "*"
-            ]
-          },
-          "phpVersion": "",
           "http20Enabled": true,
           "minTlsVersion": "1.2",
           "remoteDebuggingEnabled": false,
           "ftpsState": "Disabled",
-          "use32BitWorkerProcess": false
+          "use32BitWorkerProcess": false,
+          "healthCheckPath": "/api/info",
+          "metadata": [
+            {
+              "name": "CURRENT_STACK",
+              "value": "dotnetcore"
+            }
+          ],
+          "autoHealEnabled": true,
+          "autoHealRules": {
+            "triggers": {
+              "statusCodes": [
+                {
+                  "status": 500,
+                  "subStatus": 0,
+                  "count": 5,
+                  "timeInterval": "00:01:00"
+                }
+              ]
+            },
+            "actions": {
+              "actionType": "Recycle",
+              "minProcessExecutionTime": "00:01:00"
+            }
+          }
         }
       },
       "resources": [
         {
           "type": "config",
-          "name": "appsettings",
-          "apiVersion": "2018-11-01",
+          "name": "logs",
+          "apiVersion": "2021-01-15",
           "location": "[parameters('location')]",
           "tags": "[variables('tags')]",
           "dependsOn": [
-            "[variables('appInsightsName')]",
-            "[variables('functionsAppName')]"
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+            "[resourceId('Microsoft.Web/sites', variables('functionsAppName'))]"
+          ],
+          "properties": {
+            "applicationLogs": {
+              "azureBlobStorage": {
+                "level": "[parameters('diagnosticsLogsLevel')]",
+                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))).primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('storageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
+              }
+            },
+            "httpLogs": {
+              "azureBlobStorage": {
+                "enabled": true,
+                "sasUrl": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))).primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('storageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken)]",
+                "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
+              }
+            }
+          }
+        },
+        {
+          "type": "config",
+          "name": "appsettings",
+          "apiVersion": "2020-12-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+            "[resourceId('Microsoft.Web/sites', variables('functionsAppName'))]",
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
           ],
           "properties": {
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
-            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
+            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').InstrumentationKey]",
             "FUNCTIONS_EXTENSION_VERSION": "~3",
-            "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]",
-            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]"
+            "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+            "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2021-04-01').keys[0].value,';')]",
+            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2021-04-01').keys[0].value,';')]",
+            "KeyVault": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2021-04-01-preview').vaultUri]"
           }
         },
         {
           "type": "config",
           "name": "connectionstrings",
-          "apiVersion": "2018-11-01",
+          "apiVersion": "2021-01-15",
           "location": "[parameters('location')]",
           "tags": "[variables('tags')]",
           "dependsOn": [
-            "[variables('storageAccountName')]",
-            "[variables('configStoreName')]",
-            "[variables('functionsAppName')]"
+            "[resourceId('Microsoft.Cache/Redis', variables('cacheName'))]",
+            "[resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]",
+            "[resourceId('Microsoft.Web/sites', variables('functionsAppName'))]"
           ],
           "properties": {
             "AppConfig": {
-              "value": "[listKeys(resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName')), '2019-10-01').value[0].connectionString]",
+              "value": "[listKeys(resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName')), '2021-03-01-preview').value[0].connectionString]",
               "type": "Custom"
             },
             "Storage": {
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2015-05-01-preview').key1))]",
+              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2021-04-01').keys[0].value))]",
               "type": "Custom"
             },
             "Cache": {
-              "value": "[concat(variables('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2015-08-01').primaryKey)]",
-              "type": "RedisCache"
+              "value": "[concat(variables('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2020-12-01').primaryKey)]",
+              "type": "Custom"
             }
           }
         }
@@ -705,59 +898,99 @@
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
       "dependsOn": [
-        "[variables('functionsAppName')]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
       ],
-      "kind": "functionapp",
+      "kind": "functionapp,linux",
       "identity": {
         "type": "SystemAssigned"
       },
       "properties": {
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
+        "reserved": true,
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]",
+        "siteConfig": {
+          "linuxFxVersion": "DOTNETCORE|3.1",
+          "alwaysOn": true,
+          "http20Enabled": true,
+          "minTlsVersion": "1.2",
+          "ftpsState": "Disabled"
+        }
       },
       "resources": [
         {
           "type": "config",
-          "name": "appsettings",
+          "name": "logs",
           "condition": "[parameters('useStagingSlots')]",
-          "apiVersion": "2018-11-01",
+          "apiVersion": "2021-01-15",
           "location": "[parameters('location')]",
           "tags": "[variables('tags')]",
           "dependsOn": [
-            "[variables('appInsightsName')]",
-            "[variables('storageAccountName')]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName'))]",
             "[resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging')]"
           ],
           "properties": {
+            "applicationLogs": {
+              "azureBlobStorage": {
+                "level": "[parameters('diagnosticsLogsLevel')]",
+                "sasUrl": "[if(equals(parameters('useStagingSlots'), 'true' ), concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken),'not evaluated when no slots use')]",
+                "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
+              }
+            },
+            "httpLogs": {
+              "azureBlobStorage": {
+                "enabled": true,
+                "sasUrl": "[if(equals(parameters('useStagingSlots'), 'true' ), concat(reference(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')),'2021-04-01').primaryEndpoints.blob, variables('webLogsContainerName'), '?', listAccountSas(variables('slotsStorageAccountName'), '2021-04-01', variables('containerSasRequestContent')).accountSasToken),'not evaluated when no slots use')]",
+                "retentionInDays": "[parameters('diagnosticsLogsRetentionInDays')]"
+              }
+            }
+          }
+        },
+        {
+          "type": "config",
+          "name": "appsettings",
+          "condition": "[parameters('useStagingSlots')]",
+          "apiVersion": "2020-12-01",
+          "location": "[parameters('location')]",
+          "tags": "[variables('tags')]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Insights/components', variables('appInsightsName'))]",
+            "[resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging')]",
+            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName'))]"
+          ],
+          "properties": {
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
-            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2015-05-01').InstrumentationKey]",
+            "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')),'2020-02-02').InstrumentationKey]",
             "FUNCTIONS_EXTENSION_VERSION": "~3",
-            "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]",
-            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2018-11-01').keys[0].value,';')]"
+            "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+            "AzureWebJobsStorage": "[if(equals(parameters('useStagingSlots'), 'true' ),concat('DefaultEndpointsProtocol=https;AccountName=',variables('slotsStorageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')), '2021-04-01').keys[0].value,';'),'not evaluated when no slots use')]",
+            "AzureWebJobsDashboard": "[if(equals(parameters('useStagingSlots'), 'true' ),concat('DefaultEndpointsProtocol=https;AccountName=',variables('slotsStorageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')), '2021-04-01').keys[0].value,';'),'not evaluated when no slots use')]",
+            "KeyVault": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2021-04-01-preview').vaultUri]"
           }
         },
         {
           "type": "config",
           "name": "connectionstrings",
           "condition": "[parameters('useStagingSlots')]",
-          "apiVersion": "2018-11-01",
+          "apiVersion": "2021-01-15",
           "location": "[parameters('location')]",
           "tags": "[variables('tags')]",
           "dependsOn": [
-            "[variables('storageAccountName')]",
-            "[variables('configStoreName')]",
+            "[resourceId('Microsoft.Cache/Redis', variables('cacheName'))]",
+            "[resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName'))]",
+            "[resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName'))]",
             "[resourceId('Microsoft.Web/sites/slots', variables('functionsAppName'), 'staging')]"
           ],
           "properties": {
             "AppConfig": {
-              "value": "[listKeys(resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName')), '2019-10-01').value[0].connectionString]",
+              "value": "[listKeys(resourceId('Microsoft.AppConfiguration/configurationStores', variables('configStoreName')), '2021-03-01-preview').value[0].connectionString]",
               "type": "Custom"
             },
             "Storage": {
-              "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', variables('storageAccountName'),';AccountKey=', concat(listKeys(variables('storageAccountName'), '2015-05-01-preview').key1))]",
+              "value": "[if(equals(parameters('useStagingSlots'), 'true' ),concat('DefaultEndpointsProtocol=https;AccountName=', variables('slotsStorageAccountName'),';AccountKey=', concat(listKeys(variables('slotsStorageAccountName'), '2021-04-01').keys[0].value)),'not evaluated when no slots use')]",
               "type": "Custom"
             },
             "Cache": {
-              "value": "[concat(variables('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2015-08-01').primaryKey)]",
+              "value": "[concat(variables('cacheName'),'.redis.cache.windows.net,abortConnect=false,ssl=true,password=', listKeys(resourceId('Microsoft.Cache/Redis', variables('cacheName')), '2020-12-01').primaryKey)]",
               "type": "RedisCache"
             }
           }
@@ -768,11 +1001,11 @@
   "outputs": {
     "siteUrl": {
       "type": "string",
-      "value": "[concat('https://', reference(concat('Microsoft.Web/sites/', variables('siteName')), '2018-11-01').defaultHostName)]"
+      "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites/', 'siteName'), '2021-01-15').defaultHostName)]"
     },
     "functionsUrl": {
       "type": "string",
-      "value": "[concat('https://', reference(concat('Microsoft.Web/sites/', variables('functionsAppName')), '2018-11-01').defaultHostName)]"
+      "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites/', 'functionsAppName'), '2021-01-15').defaultHostName)]" 
     }
   }
 }

@@ -90,7 +90,6 @@ namespace NV.Templates.Backend.Web
             });
 
             app.UseCommonOpenApi();
-
 #if SPA
             app.UseSpaStaticFiles();
             app.UseSpa(spa =>
