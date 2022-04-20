@@ -49,7 +49,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     var jsonSerializerOptions = new JsonSerializerOptions
                     {
-                        IgnoreNullValues = true,
+                        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                         PropertyNameCaseInsensitive = true,
                         WriteIndented = true,
                     };

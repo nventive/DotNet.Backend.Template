@@ -1,6 +1,6 @@
 parameters:
   vmImage: "ubuntu-18.04"
-  dotNetCoreVersion: "5.x"
+  dotNetCoreVersion: "6.x"
   nodeJsVersion: "12.x"
   configuration: "Release"
   publishRuntimeIdentifier: "linux-x64"
@@ -59,8 +59,11 @@ jobs:
       summaryFileLocation: "$(System.DefaultWorkingDirectory)/coveragereport/Cobertura.xml"
       reportDirectory: "$(System.DefaultWorkingDirectory)/coveragereport"
 
-  - script: dotnet publish --output $(Build.ArtifactStagingDirectory)/Web --configuration ${{ parameters.configuration }} --self-contained false --runtime ${{ parameters.publishRuntimeIdentifier }} -property:Version=$(GitVersion.AssemblySemVer) -property:FileVersion=$(GitVersion.AssemblySemVer) -property:InformationalVersion=$(GitVersion.FullSemVer).$(GitVersion.ShortSha)
+  - script: dotnet publish NV.Templates.Backend.Web --output $(Build.ArtifactStagingDirectory)/Web --configuration ${{ parameters.configuration }} --self-contained false --runtime ${{ parameters.publishRuntimeIdentifier }} -property:Version=$(GitVersion.AssemblySemVer) -property:FileVersion=$(GitVersion.AssemblySemVer) -property:InformationalVersion=$(GitVersion.FullSemVer).$(GitVersion.ShortSha)
     displayName: Publish Web
+
+  - script: dotnet publish NV.Templates.Backend.Functions --output $(Build.ArtifactStagingDirectory)/Functions --configuration ${{ parameters.configuration }} --self-contained false --runtime ${{ parameters.publishRuntimeIdentifier }} -property:Version=$(GitVersion.AssemblySemVer) -property:FileVersion=$(GitVersion.AssemblySemVer) -property:InformationalVersion=$(GitVersion.FullSemVer).$(GitVersion.ShortSha)
+    displayName: Publish Functions
 
   - task: PowerShell@2
     displayName: Publish ARM Template

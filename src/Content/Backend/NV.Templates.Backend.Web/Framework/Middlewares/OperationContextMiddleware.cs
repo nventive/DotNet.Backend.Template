@@ -31,7 +31,7 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
         /// </summary>
         public Task Invoke(HttpContext context, IOperationContext operationContext)
         {
-            operationContext.Id = Activity.Current?.RootId ?? "";
+            operationContext.Id = Activity.Current?.RootId ?? string.Empty;
             operationContext.Timestamp = DateTimeOffset.UtcNow;
             operationContext.User = context.User;
 

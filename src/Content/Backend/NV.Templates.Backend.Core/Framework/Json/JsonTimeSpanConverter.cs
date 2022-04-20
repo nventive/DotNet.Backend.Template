@@ -20,7 +20,7 @@ namespace NV.Templates.Backend.Core.Framework.Json
             }
 
             var date = reader.GetString();
-            return TimeSpan.ParseExact(date != null ? date : "", "c", CultureInfo.InvariantCulture);
+            return TimeSpan.ParseExact(date != null ? date : string.Empty, "c", CultureInfo.InvariantCulture);
         }
 
         /// <inheritdoc />
