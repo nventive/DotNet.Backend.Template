@@ -502,6 +502,7 @@
       "apiVersion": "2018-11-01",
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
+      "kind": "app,linux",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
       ],
@@ -515,6 +516,7 @@
         "siteconfig": {
           "alwaysOn": true,
           "http20Enabled": true,
+          "linuxFxVersion": "DOTNETCORE|6.0",
           "minTlsVersion": "1.2",
           "remoteDebuggingEnabled": false,
           "ftpsState": "Disabled",
@@ -646,6 +648,7 @@
       "apiVersion": "2018-11-01",
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
+      "kind": "app,linux",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
       ],
