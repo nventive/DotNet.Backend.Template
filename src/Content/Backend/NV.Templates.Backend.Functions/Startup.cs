@@ -33,7 +33,7 @@ namespace NV.Templates.Backend.Functions
                 .AddLocalSettings(rootProjectPath)
                 .AddAzureKeyVaultWhenPresent(hostingEnvironment!)
                 .AddEnvironmentVariables()
-                .AddUserSecrets<Startup>()
+                .AddUserSecrets<Startup>(true)
                 .Build();
 
             builder.Services.AddSingleton<IConfiguration>(configuration);
