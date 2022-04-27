@@ -36,12 +36,11 @@ namespace Microsoft.Extensions.DependencyInjection
                 })
                 .AddJsonOptions(options =>
                 {
-                    options.JsonSerializerOptions.IgnoreNullValues = true;
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                     options.JsonSerializerOptions.Converters.Add(new JsonTimeSpanConverter());
                     options.JsonSerializerOptions.Converters.Add(new JsonNullableTimeSpanConverter());
-                })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+                });
 
             return services;
         }

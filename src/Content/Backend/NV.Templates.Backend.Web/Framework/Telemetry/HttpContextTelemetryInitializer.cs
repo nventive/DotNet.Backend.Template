@@ -36,7 +36,7 @@ namespace NV.Templates.Backend.Web.Framework.Telemetry
         {
             var httpContext = _httpContextAccessor.HttpContext;
 
-            if (httpContext != null)
+            if (httpContext != null && httpContext.User.Identity != null)
             {
                 if (httpContext.User.Identity.IsAuthenticated)
                 {

@@ -20,8 +20,8 @@ namespace NV.Templates.Backend.Core.General
         /// </summary>
         public ApplicationInfo(IHostEnvironment hostEnvironment)
         {
-            Name = hostEnvironment?.ApplicationName ?? typeof(ApplicationInfo).Assembly.GetName().Name;
-            Version = typeof(ApplicationInfo).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion;
+            Name = hostEnvironment?.ApplicationName ?? (typeof(ApplicationInfo).Assembly.GetName().Name ?? string.Empty);
+            Version = typeof(ApplicationInfo).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? string.Empty;
             Environment = hostEnvironment?.EnvironmentName ?? Environments.Production;
         }
 

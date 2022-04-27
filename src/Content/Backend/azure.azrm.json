@@ -502,6 +502,7 @@
       "apiVersion": "2018-11-01",
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
+      "kind": "app,linux",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
       ],
@@ -515,6 +516,7 @@
         "siteconfig": {
           "alwaysOn": true,
           "http20Enabled": true,
+          "linuxFxVersion": "DOTNETCORE|6.0",
           "minTlsVersion": "1.2",
           "remoteDebuggingEnabled": false,
           "ftpsState": "Disabled",
@@ -646,6 +648,7 @@
       "apiVersion": "2018-11-01",
       "location": "[parameters('location')]",
       "tags": "[variables('tags')]",
+      "kind": "app,linux",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]"
       ],
@@ -778,7 +781,7 @@
         "reserved": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]",
         "siteConfig": {
-          "linuxFxVersion": "DOTNETCORE|3.1",
+          "linuxFxVersion": "DOTNETCORE|6.0",
           "alwaysOn": true,
           "http20Enabled": true,
           "minTlsVersion": "1.2",
@@ -854,10 +857,9 @@
           "properties": {
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').InstrumentationKey]",
-            "FUNCTIONS_EXTENSION_VERSION": "~3",
+            "FUNCTIONS_EXTENSION_VERSION": "~4",
             "FUNCTIONS_WORKER_RUNTIME": "dotnet",
             "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2021-04-01').keys[0].value,';')]",
-            "AzureWebJobsDashboard": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2021-04-01').keys[0].value,';')]",
             "KeyVault": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2021-04-01-preview').vaultUri]"
           }
         },
@@ -908,7 +910,7 @@
         "reserved": true,
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('serverfarmsName'))]",
         "siteConfig": {
-          "linuxFxVersion": "DOTNETCORE|3.1",
+          "linuxFxVersion": "DOTNETCORE|6.0",
           "alwaysOn": true,
           "http20Enabled": true,
           "minTlsVersion": "1.2",
@@ -960,10 +962,9 @@
           "properties": {
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')),'2020-02-02').InstrumentationKey]",
-            "FUNCTIONS_EXTENSION_VERSION": "~3",
+            "FUNCTIONS_EXTENSION_VERSION": "~4",
             "FUNCTIONS_WORKER_RUNTIME": "dotnet",
             "AzureWebJobsStorage": "[if(equals(parameters('useStagingSlots'), 'true' ),concat('DefaultEndpointsProtocol=https;AccountName=',variables('slotsStorageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')), '2021-04-01').keys[0].value,';'),'not evaluated when no slots use')]",
-            "AzureWebJobsDashboard": "[if(equals(parameters('useStagingSlots'), 'true' ),concat('DefaultEndpointsProtocol=https;AccountName=',variables('slotsStorageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')), '2021-04-01').keys[0].value,';'),'not evaluated when no slots use')]",
             "KeyVault": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2021-04-01-preview').vaultUri]"
           }
         },
@@ -1001,11 +1002,11 @@
   "outputs": {
     "siteUrl": {
       "type": "string",
-      "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites/', 'siteName'), '2021-01-15').defaultHostName)]"
+      "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites/', variables('siteName')), '2021-01-15').defaultHostName)]"
     },
     "functionsUrl": {
       "type": "string",
-      "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites/', 'functionsAppName'), '2021-01-15').defaultHostName)]" 
+      "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites/', variables('functionsAppName')), '2021-01-15').defaultHostName)]"
     }
   }
 }

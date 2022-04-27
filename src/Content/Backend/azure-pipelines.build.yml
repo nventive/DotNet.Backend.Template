@@ -1,6 +1,6 @@
 parameters:
   vmImage: "ubuntu-18.04"
-  dotNetCoreVersion: "3.1.x"
+  dotNetCoreVersion: "6.x"
   nodeJsVersion: "12.x"
   configuration: "Release"
   publishRuntimeIdentifier: "linux-x64"
