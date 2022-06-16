@@ -62,7 +62,7 @@ namespace NV.Templates.Backend.Web.Tests
                 })
                 .ConfigureLogging(logging =>
                 {
-                    logging.AddXUnit(OutputHelper);
+                    logging.AddXUnit(OutputHelper!);
                     logging.AddFilter((category, level) => category.EndsWith("TraceHandler", StringComparison.OrdinalIgnoreCase));
                 })
                 .ConfigureTestServices(services =>

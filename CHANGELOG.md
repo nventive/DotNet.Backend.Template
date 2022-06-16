@@ -6,7 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## 2.4.1
+
 ### Added
+
 - Add default build/release multistage pipeline
 - Add default AppConfiguration setup in the code
 - Add XML serializer for HTTP clients
@@ -15,8 +18,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add default Keyvault with access policies and system managed identity
 
 ### Changed
+
 - Adjust default HTTP headers to remove unsecured headers or refine required ones
 - Update api vesion in ARM template for schema, components and referenceId functions
+- Migrate from 3.1 to .net 6 ( Web / Core/ AzFunction)
+
 ### Deprecated
 
 ### Removed

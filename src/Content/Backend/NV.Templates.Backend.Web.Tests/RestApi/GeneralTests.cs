@@ -1,4 +1,6 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -48,7 +50,7 @@ namespace NV.Templates.Backend.Web.Tests.RestApi
             var api = Factory.GetApiClient<IGeneralApi>();
 
             var response = await api.GetHealth();
-            response.StatusCode.Should().Be(StatusCodes.Status200OK);
+            response.StatusCode.Should().Be((HttpStatusCode)StatusCodes.Status200OK);
         }
 
         [Fact]
@@ -57,7 +59,7 @@ namespace NV.Templates.Backend.Web.Tests.RestApi
             var api = Factory.GetApiClient<IGeneralApi>();
 
             var response = await api.GetSwaggerDocument();
-            response.StatusCode.Should().Be(StatusCodes.Status200OK);
+            response.StatusCode.Should().Be((HttpStatusCode)StatusCodes.Status200OK);
         }
 
         [Fact]
@@ -66,7 +68,7 @@ namespace NV.Templates.Backend.Web.Tests.RestApi
             var api = Factory.GetApiClient<IGeneralApi>();
 
             var response = await api.GetAttributions();
-            response.StatusCode.Should().Be(StatusCodes.Status200OK);
+            response.StatusCode.Should().Be((HttpStatusCode)StatusCodes.Status200OK);
         }
     }
 }

@@ -65,7 +65,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton(provider => RequestBuilder.ForType<TClient>(refitSettings))
                 .AddHttpClient(typeof(TClient).Name)
                 .ConfigureWithOptions<TOptions>(configuration, key: key)
-                .AddTypedClient((client, serviceProvider) => RestService.For(client, serviceProvider.GetService<IRequestBuilder<TClient>>()));
+                .AddTypedClient((client, serviceProvider) => RestService.For(client, serviceProvider.GetRequiredService<IRequestBuilder<TClient>>()));
         }
     }
 }

@@ -19,7 +19,7 @@ namespace NV.Templates.Backend.Console.Tests
                 Mock.Of<ILogger<InfoCommand>>());
 
             Func<Task<int>> act = async () => await command.OnExecuteAsync();
-            act.Should().NotThrow();
+            await act.Should().NotThrowAsync();
         }
 
         [Fact]
@@ -29,7 +29,7 @@ namespace NV.Templates.Backend.Console.Tests
                 Mock.Of<ILogger<AttributionsCommand>>());
 
             Func<Task<int>> act = async () => await command.OnExecuteAsync();
-            act.Should().NotThrow();
+            await act.Should().NotThrowAsync();
         }
     }
 }
