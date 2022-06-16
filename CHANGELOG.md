@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+ - Migrate from 3.1 to .net 6  Finalize package reference to lts
+
 ## 2.4.1
 
 ### Added
