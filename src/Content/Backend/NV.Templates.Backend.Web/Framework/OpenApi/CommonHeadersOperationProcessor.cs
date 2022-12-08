@@ -23,8 +23,7 @@ namespace NV.Templates.Backend.Web.Framework.OpenApi
             foreach (var response in context.OperationDescription.Operation.Responses.Values)
             {
                 response.Headers.Add(
-                    OperationContextMiddleware.OperationIdHeader,
-                    new JsonSchema { Type = JsonObjectType.String });
+                    OperationContextMiddleware.OperationIdHeader, new OpenApiHeader() { Schema = new JsonSchema { Type = JsonObjectType.String } });
             }
 
             return true;
