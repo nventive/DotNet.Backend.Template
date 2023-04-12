@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NV.Templates.Backend.Core.Framework.DependencyInjection;
 
@@ -7,7 +8,7 @@ namespace NV.Templates.Backend.Core.General
     /// <summary>
     /// <see cref="IApplicationInfo"/> implementation.
     /// </summary>
-    [RegisterSingletonService]
+    [RegisterService(ServiceLifetime.Singleton)]
     internal class ApplicationInfo : IApplicationInfo
     {
         public ApplicationInfo()

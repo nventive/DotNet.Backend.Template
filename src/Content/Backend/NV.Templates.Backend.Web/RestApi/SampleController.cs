@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using NV.Templates.Backend.Core.Framework.Continuation;
-using NV.Templates.Backend.Core.Framework.Entities;
 using NV.Templates.Backend.Web.Framework.Models;
 
 namespace NV.Templates.Backend.Web.RestApi
@@ -68,7 +68,7 @@ namespace NV.Templates.Backend.Web.RestApi
         {
             var createdModel = new SampleModel
             {
-                Id = IdGenerator.Generate(),
+                Id = $"{Guid.NewGuid()}",
                 Name = model.Name,
             };
 
