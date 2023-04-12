@@ -1,0 +1,19 @@
+name: Publish
+on:
+  push:
+    tags:
+      - v*
+      
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build NuGet Package
+      run: nuget pack src/NV.Templates.nuspec -Version ${{ github.ref }} -OutputDirectory ./artifacts
+
+    - name: Publish NuGet package
+      run: nuget push ./artifacts/NV.Templates.*.nupkg ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json
