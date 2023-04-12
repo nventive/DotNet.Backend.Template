@@ -4,8 +4,13 @@
 
 ## Pre-Requisites
 
-- [Visual Studio 2019](https://visualstudio.microsoft.com/)
-- [.NET Core SDK 3.1](https://.microsoft.com/download/dotnet-core/3.1)
+- [Visual Studio 2022](https://visualstudio.microsoft.com/)
+- [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+
+## Recommended Extensions
+
+- [SwitchStartupProject for VS2022](https://heptapod.host/thirteen/switchstartupproject/) - Install from Visual Studio Extensions directly - This extension allows to start mutliple projects at once based on a configuration file.
+- [VSColorOutput](https://mike-ward.net/vscoloroutput/) - Install from Visual Studio Extensions - This extension colors the output windows to help identify build warnings and errors.
 
 ## Build/release pipeline
 
@@ -50,3 +55,9 @@ Before adding the pipeline to Azure DevOps, there is some adjustments/setup to d
      - Update the `StartupCommand` parameter based on your project
     
 1. Finally, add the pipeline to Azure DevOps.
+
+## Client App
+
+If you want an SPA with, don't forget to run these commands :
+- `cd NV.Templates.Backend.Web/ClientApp`
+- `npm init`
