@@ -5,15 +5,18 @@ on:
       - v*
       
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Extract tag version
+      run: echo "::set-env name=TAG_VERSION::$(echo ${{ env.GITHUB_REF }} | sed -e 's/refs\/tags\///')"
+
     - name: Build NuGet Package
-      run: nuget pack src/NV.Templates.nuspec -Version ${{ github.ref }} -OutputDirectory ./artifacts
+      run: nuget pack src/NV.Templates.nuspec -Version ${{ env.TAG_VERSION }} -OutputDirectory ./artifacts
 
     - name: Publish NuGet package
       run: nuget push ./artifacts/NV.Templates.*.nupkg ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json
