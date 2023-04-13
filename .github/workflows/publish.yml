@@ -13,7 +13,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Build NuGet Package
-      run: nuget pack src/NV.Templates.nuspec -Version ${GITHUB_REF#refs/*/} -OutputDirectory ./artifacts
+      run: nuget pack src/NV.Templates.nuspec -Version ${GITHUB_REF#refs/tags/v} -OutputDirectory ./artifacts
 
     - name: Publish NuGet package
       run: nuget push ./artifacts/NV.Templates.*.nupkg ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json
