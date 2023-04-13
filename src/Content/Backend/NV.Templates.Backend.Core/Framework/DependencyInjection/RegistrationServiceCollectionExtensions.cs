@@ -10,32 +10,68 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class RegistrationServiceCollectionExtensions
     {
         /// <summary>
-        /// Registers all services in <paramref name="assembly"/> that are marked with <see cref="RegisterSingletonServiceAttribute"/>,
-        /// <see cref="RegisterScopedServiceAttribute"/> or <see cref="RegisterTransientServiceAttribute"/>.
+        /// Registers all services in <paramref name="assembly"/> that are marked with <see cref="RegisterServiceAttribute"/>.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection"/>.</param>
         /// <param name="assembly">The <see cref="Assembly"/> to scan.</param>
         /// <returns>The <see cref="IServiceCollection"/> with services registered.</returns>
-        public static IServiceCollection AutoRegisterServicesFromAssembly(this IServiceCollection services, Assembly assembly)
+        public static IServiceCollection AutoRegisterServicesFromAssembly(this IServiceCollection services, Assembly? assembly = null)
         {
+            assembly ??= Assembly.GetCallingAssembly();
             services.Scan(scan =>
             {
                 scan
                     .FromAssemblies(assembly)
-                    .AddClasses(classes => classes.WithAttribute<RegisterSingletonServiceAttribute>())
+                    .AddClasses(classes => classes
+                        .WithAttribute<RegisterServiceAttribute>(a =>
+                            a.Modes.HasFlag(RegistrationModes.Interface) &&
+                            a.Lifetime == ServiceLifetime.Singleton))
                     .AsImplementedInterfaces()
                     .WithSingletonLifetime();
 
                 scan
                     .FromAssemblies(assembly)
-                    .AddClasses(classes => classes.WithAttribute<RegisterScopedServiceAttribute>())
+                    .AddClasses(classes => classes
+                        .WithAttribute<RegisterServiceAttribute>(a =>
+                            a.Modes.HasFlag(RegistrationModes.ConcreteClass) &&
+                            a.Lifetime == ServiceLifetime.Singleton))
+                    .AsSelf()
+                    .WithSingletonLifetime();
+
+                scan
+                    .FromAssemblies(assembly)
+                    .AddClasses(classes => classes
+                        .WithAttribute<RegisterServiceAttribute>(a =>
+                            a.Modes.HasFlag(RegistrationModes.Interface) &&
+                            a.Lifetime == ServiceLifetime.Scoped))
                     .AsImplementedInterfaces()
                     .WithScopedLifetime();
 
                 scan
                     .FromAssemblies(assembly)
-                    .AddClasses(classes => classes.WithAttribute<RegisterTransientServiceAttribute>())
+                    .AddClasses(classes => classes
+                        .WithAttribute<RegisterServiceAttribute>(a =>
+                            a.Modes.HasFlag(RegistrationModes.ConcreteClass) &&
+                            a.Lifetime == ServiceLifetime.Scoped))
+                    .AsSelf()
+                    .WithScopedLifetime();
+
+                scan
+                    .FromAssemblies(assembly)
+                    .AddClasses(classes => classes
+                        .WithAttribute<RegisterServiceAttribute>(a =>
+                            a.Modes.HasFlag(RegistrationModes.Interface) &&
+                            a.Lifetime == ServiceLifetime.Transient))
                     .AsImplementedInterfaces()
+                    .WithTransientLifetime();
+
+                scan
+                    .FromAssemblies(assembly)
+                    .AddClasses(classes => classes
+                        .WithAttribute<RegisterServiceAttribute>(a =>
+                            a.Modes.HasFlag(RegistrationModes.ConcreteClass) &&
+                            a.Lifetime == ServiceLifetime.Transient))
+                    .AsSelf()
                     .WithTransientLifetime();
             });
 

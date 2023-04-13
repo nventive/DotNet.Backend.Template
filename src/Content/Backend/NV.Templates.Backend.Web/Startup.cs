@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using NV.Templates.Backend.Web.Framework.Middlewares;
 using NV.Templates.Backend.Web.RestApi;
 
@@ -35,7 +33,7 @@ namespace NV.Templates.Backend.Web
         {
             services
                 .AddRedisCacheIfPresent(_configuration)
-                .AutoRegisterServicesFromAssemblyContaining<Startup>()
+                .AutoRegisterServicesFromAssembly()
                 .AddCore(_configuration)
                 .AddWeb(_configuration)
                 .AddRestApi()

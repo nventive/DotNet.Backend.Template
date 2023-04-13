@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Security.Principal;
+using Microsoft.Extensions.DependencyInjection;
 using NV.Templates.Backend.Core.Framework.DependencyInjection;
-using NV.Templates.Backend.Core.Framework.Entities;
 
 namespace NV.Templates.Backend.Core.General
 {
     /// <summary>
     /// <see cref="IOperationContext"/> implementation.
     /// </summary>
-    [RegisterScopedService]
+    [RegisterService(ServiceLifetime.Scoped)]
     internal class OperationContext : IOperationContext
     {
         /// <inheritdoc/>
-        public string Id { get; set; } = IdGenerator.Generate();
+        public string Id { get; set; } = $"{Guid.NewGuid()}";
 
         /// <inheritdoc/>
         public DateTimeOffset Timestamp { get; set; } = DateTimeOffset.UtcNow;

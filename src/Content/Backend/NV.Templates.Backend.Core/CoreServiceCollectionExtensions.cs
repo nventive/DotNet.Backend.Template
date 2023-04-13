@@ -1,7 +1,6 @@
 ﻿using HttpTracing;
 using Microsoft.Extensions.Configuration;
 using NV.Templates.Backend.Core.Configuration;
-using NV.Templates.Backend.Core.General;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -22,7 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 };
             });
 
-            services.AutoRegisterServicesFromAssemblyContaining<IApplicationInfo>();
+            services.AutoRegisterServicesFromAssembly();
 
             services.AddHealthChecks();
 

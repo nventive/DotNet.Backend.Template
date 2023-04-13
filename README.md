@@ -132,7 +132,7 @@ When using the `--RestApi` option, 2 projects are added to the solution:
     enabled and setup with support for versioning of the API in the URL (e.g. `/api/v1/...`)
   - [Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview) is configured
   - HTTPS is enforced and [HSTS](https://fr.wikipedia.org/wiki/HTTP_Strict_Transport_Security) is configured
-  - [CORS](https://developer.mozilla.org/fr/docs/Web/HTTP/CORS) is configured
+  - [CORS](https://developer.mozilla.org/en-us/docs/Web/HTTP/CORS) is configured
   - Full request and response tracing is available, courtesy of the `AspNetCoreRequestTracing` component
   - Generic error handling middleware is already setup (in `Framework.Middleware.ExceptionHandler`)
     and configured for the exception classes provided in the Core project
