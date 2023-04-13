@@ -3,20 +3,19 @@ on:
   push:
     tags:
       - v*
-      
+
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Extract tag version
-      run: echo "::set-env name=TAG_VERSION::$(echo ${{ env.GITHUB_REF }} | sed -e 's/refs\/tags\///')"
+      uses: actions/checkout@v2
 
     - name: Build NuGet Package
-      run: nuget pack src/NV.Templates.nuspec -Version ${{ env.TAG_VERSION }} -OutputDirectory ./artifacts
+      run: |
+        version = $(echo "${{ github.ref }}" | sed -n 's/refs\/tags\/v//p')
+        nuget pack src/NV.Templates.nuspec -Version $version -OutputDirectory ./artifacts
 
     - name: Publish NuGet package
       run: nuget push ./artifacts/NV.Templates.*.nupkg ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json
