@@ -3,7 +3,7 @@ on:
   push:
     tags:
       - v*
-
+      
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,9 +13,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Build NuGet Package
-      run: |
-        version = $(echo "${{ github.ref }}" | sed -n 's/refs\/tags\/v//p')
-        nuget pack src/NV.Templates.nuspec -Version $version -OutputDirectory ./artifacts
+      run: nuget pack src/NV.Templates.nuspec -Version ${{ github.ref_name }} -OutputDirectory ./artifacts
 
     - name: Publish NuGet package
       run: nuget push ./artifacts/NV.Templates.*.nupkg ${{ secrets.NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json
