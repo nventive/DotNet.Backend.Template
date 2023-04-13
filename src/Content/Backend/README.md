@@ -56,8 +56,6 @@ Before adding the pipeline to Azure DevOps, there is some adjustments/setup to d
     
 1. Finally, add the pipeline to Azure DevOps.
 
-## Client App
+## Client App / SPA
 
-If you want an SPA with, don't forget to run these commands :
-- `cd NV.Templates.Backend.Web/ClientApp`
-- `npm init`
+If you generated this project with the SPA option, make sure you generate the `package.json` file at the root of the ClientApp folder, or it might result in compilation issues.
