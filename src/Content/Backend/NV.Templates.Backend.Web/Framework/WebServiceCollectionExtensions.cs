@@ -3,7 +3,6 @@ using AspNetCoreRequestTracing;
 using HelpDeskId;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
-using NV.Templates.Backend.Web.Framework.Telemetry;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

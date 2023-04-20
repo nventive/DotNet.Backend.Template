@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using NV.Templates.Backend.Core.General;
 
 namespace NV.Templates.Backend.Web.RestApi.General
 {

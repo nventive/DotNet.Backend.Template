@@ -20,7 +20,7 @@ Generated projects can:
 
 - Install the templates locally
 ```shell
-dotnet new install NV.Templates
+dotnet new -i NV.Templates
 ```
 
 ### Generate a Backend project

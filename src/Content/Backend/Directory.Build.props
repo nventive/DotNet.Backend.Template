@@ -4,7 +4,7 @@
     <Authors>CompanyName</Authors>
     <Copyright>Copyright (c) 2020, CompanyName</Copyright>
     <Product>NV.Templates.Backend</Product>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>11.0</LangVersion>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />

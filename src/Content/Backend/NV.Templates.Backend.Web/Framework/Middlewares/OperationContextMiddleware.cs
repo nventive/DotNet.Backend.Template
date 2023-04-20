@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using NV.Templates.Backend.Core.General;
 
 namespace NV.Templates.Backend.Web.Framework.Middlewares
 {

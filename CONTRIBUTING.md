@@ -80,6 +80,26 @@ use GitHub pull requests for this purpose. Consult [GitHub
 Help](https://help.github.com/articles/about-pull-requests/) for more
 information on using pull requests.
 
+## Releasing a new version of the NV.Templates NuGet Package
+
+To release a new version of the NV.Templates NuGet Package, the developer needs to create a tag on a commit.
+The publish workflow pipeline will automatically kick in.
+
+To do that :
+- Go to the [releases page](https://github.com/nventive/DotNet.Backend.Template/releases/new)
+- In **Choose a tag**, type in the tag name, starting with a **v** (ex: v2.5.3), and **Create new tag: v2.5.3**
+- Choose your target branch (typically master)
+- Type in the **Release Title** (same as the tag name)
+- A quick description of the release, if necessary
+- Choose options (pre-release or latest release)
+- Click **Publish release**
+
+After, you can check the [actions](https://github.com/nventive/DotNet.Backend.Template/actions) to see that the publish pipeline is executing properly.
+
+When the pipeline completes, it can take a few minutes for the package to be available on NuGet.
+
+To make the package available locally, you will need to reinstall the packages with DotNetCLI.
+
 ## Community Guidelines
 
 This project follows [Google's Open Source Community

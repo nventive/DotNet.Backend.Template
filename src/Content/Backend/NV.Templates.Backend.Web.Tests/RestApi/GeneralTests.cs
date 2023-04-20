@@ -4,7 +4,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
-using NV.Templates.Backend.Web.RestApi.General;
 using Refit;
 using Xunit;
 using Xunit.Abstractions;

@@ -4,8 +4,6 @@ using NJsonSchema;
 using NSwag;
 using NSwag.Generation.Processors;
 using NSwag.Generation.Processors.Contexts;
-using NV.Templates.Backend.Web.Framework.Middlewares;
-using NV.Templates.Backend.Web.Framework.Telemetry;
 
 namespace NV.Templates.Backend.Web.Framework.OpenApi
 {
