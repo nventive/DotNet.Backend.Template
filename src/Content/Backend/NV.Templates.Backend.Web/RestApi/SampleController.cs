@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using NV.Templates.Backend.Core.Framework.Continuation;
-using NV.Templates.Backend.Web.Framework.Models;
 
 namespace NV.Templates.Backend.Web.RestApi
 {

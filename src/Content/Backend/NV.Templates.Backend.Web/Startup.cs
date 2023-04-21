@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NV.Templates.Backend.Web.Framework.Middlewares;
-using NV.Templates.Backend.Web.RestApi;
 
 [assembly: ApiController]
 [assembly: ApiConventionType(typeof(RestApiConventions))]

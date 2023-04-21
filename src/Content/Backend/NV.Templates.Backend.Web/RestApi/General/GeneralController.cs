@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NV.Templates.Backend.Core.General;
 
 namespace NV.Templates.Backend.Web.RestApi.General
 {

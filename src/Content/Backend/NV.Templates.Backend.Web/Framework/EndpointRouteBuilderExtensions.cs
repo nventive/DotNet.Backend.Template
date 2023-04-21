@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using NV.Templates.Backend.Core.Configuration;
-using NV.Templates.Backend.Web.Framework.Middlewares;
 
 namespace Microsoft.AspNetCore.Routing
 {

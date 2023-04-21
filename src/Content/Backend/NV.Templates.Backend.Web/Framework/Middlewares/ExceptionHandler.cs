@@ -15,8 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using NV.Templates.Backend.Core.Framework.Exceptions;
-using NV.Templates.Backend.Core.General;
 
 namespace NV.Templates.Backend.Web.Framework.Middlewares
 {

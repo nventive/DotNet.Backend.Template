@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Security.Principal;
 using Microsoft.Extensions.DependencyInjection;
-using NV.Templates.Backend.Core.Framework.DependencyInjection;
 
 namespace NV.Templates.Backend.Core.General
 {

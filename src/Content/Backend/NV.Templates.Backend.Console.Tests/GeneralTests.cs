@@ -3,8 +3,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using NV.Templates.Backend.Console.General;
-using NV.Templates.Backend.Core.General;
 using Xunit;
 
 namespace NV.Templates.Backend.Console.Tests

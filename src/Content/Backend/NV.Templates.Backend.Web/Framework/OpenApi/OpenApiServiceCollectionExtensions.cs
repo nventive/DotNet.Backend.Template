@@ -4,9 +4,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
-using NV.Templates.Backend.Core.General;
-using NV.Templates.Backend.Web.Framework.Middlewares;
-using NV.Templates.Backend.Web.Framework.OpenApi;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

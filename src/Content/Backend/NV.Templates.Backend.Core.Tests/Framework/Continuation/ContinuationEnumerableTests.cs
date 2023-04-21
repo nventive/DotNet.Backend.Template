@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Bogus;
 using FluentAssertions;
-using NV.Templates.Backend.Core.Framework.Continuation;
 using Xunit;
 
 namespace NV.Templates.Backend.Core.Tests.Framework.Continuation

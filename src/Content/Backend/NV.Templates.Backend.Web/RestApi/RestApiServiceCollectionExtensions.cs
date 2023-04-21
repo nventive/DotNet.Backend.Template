@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 #if Auth
 using Microsoft.AspNetCore.Mvc.Authorization;
 #endif
-using NV.Templates.Backend.Core.Framework.Json;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
