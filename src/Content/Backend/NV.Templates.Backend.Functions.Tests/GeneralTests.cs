@@ -1,10 +1,8 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Worker.Http;
 using Moq;
-using NV.Templates.Backend.Core.General;
 using Xunit;
 
 namespace NV.Templates.Backend.Functions.Tests
@@ -14,11 +12,9 @@ namespace NV.Templates.Backend.Functions.Tests
         [Fact]
         public async Task ItShouldGetInfo()
         {
-            var function = new GeneralFunctions(
-                Mock.Of<IApplicationInfo>(),
-                Mock.Of<IOperationContext>());
+            var function = new GeneralFunctions(Mock.Of<IApplicationInfo>());
 
-            var result = await function.GetInfo(Mock.Of<HttpRequest>(), new ExecutionContext());
+            var result = await function.GetInfo(Mock.Of<HttpRequestData>());
 
             result.Should().BeOfType<JsonResult>();
         }
