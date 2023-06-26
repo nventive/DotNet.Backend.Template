@@ -858,7 +858,7 @@
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')), '2020-02-02').InstrumentationKey]",
             "FUNCTIONS_EXTENSION_VERSION": "~4",
-            "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+            "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
             "AzureWebJobsStorage": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2021-04-01').keys[0].value,';')]",
             "KeyVault": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2021-04-01-preview').vaultUri]"
           }
@@ -963,7 +963,7 @@
             "ASPNETCORE_ENVIRONMENT": "[parameters('environment')]",
             "APPINSIGHTS_INSTRUMENTATIONKEY": "[reference(resourceId('Microsoft.Insights/components', variables('appInsightsName')),'2020-02-02').InstrumentationKey]",
             "FUNCTIONS_EXTENSION_VERSION": "~4",
-            "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+            "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
             "AzureWebJobsStorage": "[if(equals(parameters('useStagingSlots'), 'true' ),concat('DefaultEndpointsProtocol=https;AccountName=',variables('slotsStorageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('slotsStorageAccountName')), '2021-04-01').keys[0].value,';'),'not evaluated when no slots use')]",
             "KeyVault": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName')), '2021-04-01-preview').vaultUri]"
           }
