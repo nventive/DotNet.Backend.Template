@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		azure.azrm.json = azure.azrm.json
 		Directory.Build.props = Directory.Build.props
 		Download-NuGetLicenses.ps1 = Download-NuGetLicenses.ps1
+		global.json = global.json
 		GlobalSuppressions.cs = GlobalSuppressions.cs
 		LocalSettings.Development.json = LocalSettings.Development.json
 		LocalSettings.Test.json = LocalSettings.Test.json
