@@ -6,11 +6,10 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9264D698-350F-4666-9748-8F87DAE76EF8}"
 	ProjectSection(SolutionItems) = preProject
 		ATTRIBUTIONS.txt = ATTRIBUTIONS.txt
-		//#if (Azure)
 		azure.azrm.json = azure.azrm.json
-		//#endif
 		Directory.Build.props = Directory.Build.props
 		Download-NuGetLicenses.ps1 = Download-NuGetLicenses.ps1
+		global.json = global.json
 		GlobalSuppressions.cs = GlobalSuppressions.cs
 		LocalSettings.Development.json = LocalSettings.Development.json
 		LocalSettings.Test.json = LocalSettings.Test.json
@@ -23,24 +22,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Core",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Core.Tests", "NV.Templates.Backend.Core.Tests\NV.Templates.Backend.Core.Tests.csproj", "{B39E4F15-348E-465A-AAE6-9BD7E02390B6}"
 EndProject
-//#if (Web)
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Web", "NV.Templates.Backend.Web\NV.Templates.Backend.Web.csproj", "{77F4A398-28A7-441C-8291-236165247546}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Web.Tests", "NV.Templates.Backend.Web.Tests\NV.Templates.Backend.Web.Tests.csproj", "{4D41B093-40A5-41AA-BBE7-CC3F10C12D6D}"
 EndProject
-//#endif
-//#if (Functions)
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Functions", "NV.Templates.Backend.Functions\NV.Templates.Backend.Functions.csproj", "{6DD30259-57CD-4AC7-B7E8-CD5DF77EE3BB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Functions.Tests", "NV.Templates.Backend.Functions.Tests\NV.Templates.Backend.Functions.Tests.csproj", "{29D08283-947D-4E35-96E9-243BC3F31028}"
 EndProject
-//#endif
-//#if (Console)
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Console", "NV.Templates.Backend.Console\NV.Templates.Backend.Console.csproj", "{DFDE329D-32A8-4F49-8ED5-874F7B3D2796}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Console.Tests", "NV.Templates.Backend.Console.Tests\NV.Templates.Backend.Console.Tests.csproj", "{F71E83E8-6DEB-4EBE-9A7C-89AFB240E79C}"
 EndProject
-//#endif
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
