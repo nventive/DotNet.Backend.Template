@@ -34,7 +34,7 @@ namespace NV.Templates.Backend.Web.Framework.Middlewares
             operationContext.Timestamp = DateTimeOffset.UtcNow;
             operationContext.User = context.User;
 
-            context.Response.Headers.Add(OperationIdHeader, operationContext.Id);
+            context.Response.Headers.Append(OperationIdHeader, operationContext.Id);
             return _next(context);
         }
     }
