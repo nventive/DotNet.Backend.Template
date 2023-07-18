@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Core",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Core.Tests", "NV.Templates.Backend.Core.Tests\NV.Templates.Backend.Core.Tests.csproj", "{B39E4F15-348E-465A-AAE6-9BD7E02390B6}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "NV.Templates.Resources", "NV.Templates.Resources\NV.Templates.Resources.shproj", "{2D1EC19A-F716-4FD7-ADC5-BF56173749DC}"
+EndProject
 //#if (Web)
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NV.Templates.Backend.Web", "NV.Templates.Backend.Web\NV.Templates.Backend.Web.csproj", "{77F4A398-28A7-441C-8291-236165247546}"
 EndProject
