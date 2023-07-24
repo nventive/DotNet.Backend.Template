@@ -58,20 +58,21 @@ namespace NV.Templates.Backend.Web
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseHsts()
-                .UseHttpsRedirection()
-                .UseRouting()
-                .UseCors(opt =>
-                {
-                    opt.AllowAnyOrigin();
-                });
+               .UseHttpsRedirection()
+               .UseRouting()
+               .UseCors(opt =>
+               {
+                   opt.AllowAnyOrigin();
+               });
 
             app.UseInternationalization();
 
             app.UseRequestTracing()
-                .UseExceptionHandler(ExceptionHandler.ConfigureExceptionHandling)
-                .UseResponseCaching();
+               .UseExceptionHandler(ExceptionHandler.ConfigureExceptionHandling)
+               .UseResponseCaching();
 #if Auth
-            app.UseAuthentication().UseAuthorization();
+            app.UseAuthentication()
+               .UseAuthorization();
 #endif
             app.UseMiddleware<OperationContextMiddleware>();
 
@@ -80,11 +81,7 @@ namespace NV.Templates.Backend.Web
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks(
                     HealthChecksResponseWriter.HealthChecksEndpoint,
-                    new HealthCheckOptions
-                    {
-                        ResponseWriter = HealthChecksResponseWriter.WriteResponse
-                    }
-                );
+                    new HealthCheckOptions { ResponseWriter = HealthChecksResponseWriter.WriteResponse });
                 endpoints.MapAttributions();
 #if !SPA
                 endpoints.MapRootToOpenApiUi();
