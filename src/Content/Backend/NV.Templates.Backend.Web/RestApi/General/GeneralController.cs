@@ -35,7 +35,7 @@ namespace NV.Templates.Backend.Web.RestApi.General
         [Description("Allows to test localization.")]
         public ActionResult LocalizationTest(string? key = null)
         {
-            key ??= "This is a test";
+            key ??= "Hello, world!";
 
             // Just to ensure there are enough arguments for string.Format.
             var arguments = Enumerable.Range(0, 100).Select(i => $"{i}").ToArray();
