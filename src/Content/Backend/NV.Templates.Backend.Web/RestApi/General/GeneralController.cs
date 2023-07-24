@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NV.Templates.Backend.Core.Framework.Internationalization;
 
 namespace NV.Templates.Backend.Web.RestApi.General
 {

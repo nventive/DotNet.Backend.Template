@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using Microsoft.Extensions.Localization;
-using NV.Templates.Backend.Core.Framework.Internationalization;
 
 namespace NV.Templates.Backend.Core.Framework.Internationalization
 {

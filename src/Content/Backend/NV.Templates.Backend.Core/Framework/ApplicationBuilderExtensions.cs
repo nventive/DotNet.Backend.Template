@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NV.Templates.Backend.Core.Configuration;
-using NV.Templates.Backend.Core.Framework.Internationalization;
 
 namespace Microsoft.AspNetCore.Builder
 {

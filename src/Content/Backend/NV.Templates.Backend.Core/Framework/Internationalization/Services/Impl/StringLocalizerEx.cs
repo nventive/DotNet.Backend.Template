@@ -6,7 +6,6 @@ using System.Globalization;
 using System.Linq;
 using System.Resources;
 using Microsoft.Extensions.Localization;
-using NV.Templates.Backend.Core.Framework.Internationalization;
 using NV.Templates.Resources;
 
 namespace NV.Templates.Backend.Core.Framework.Internationalization.Services.Impl
