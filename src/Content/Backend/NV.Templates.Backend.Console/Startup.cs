@@ -23,6 +23,7 @@ namespace NV.Templates.Backend.Console
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddInternationalization(_configuration);
             services.AddCore(_configuration);
         }
     }

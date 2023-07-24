@@ -36,6 +36,7 @@ namespace NV.Templates.Backend.Functions
                 .AddUserSecrets<Startup>(true)
                 .Build();
 
+            builder.Services.AddInternationalization(configuration);
             builder.Services.AddSingleton<IConfiguration>(configuration);
             builder.Services.AddCore(configuration);
 
