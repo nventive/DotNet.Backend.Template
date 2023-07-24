@@ -22,8 +22,7 @@ namespace NV.Templates.Backend.Web
 
         public Startup(IConfiguration configuration)
         {
-            _configuration =
-                configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -40,22 +39,11 @@ namespace NV.Templates.Backend.Web
                 .AddOpenApi(_configuration);
 #if Auth
             services
-                .BindOptionsToConfigurationAndValidate<Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerOptions>(
-                    _configuration
-                )
-                .BindOptionsToConfigurationAndValidate<NSwag.AspNetCore.OAuth2ClientSettings>(
-                    _configuration
-                );
+                .BindOptionsToConfigurationAndValidate<Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerOptions>(_configuration)
+                .BindOptionsToConfigurationAndValidate<NSwag.AspNetCore.OAuth2ClientSettings>(_configuration);
 
             services
-                .AddAuthentication(
-                    Microsoft
-                        .AspNetCore
-                        .Authentication
-                        .JwtBearer
-                        .JwtBearerDefaults
-                        .AuthenticationScheme
-                )
+                .AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer();
 #endif
 #if SPA
