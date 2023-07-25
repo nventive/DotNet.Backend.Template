@@ -34,6 +34,7 @@ namespace NV.Templates.Backend.Web
                 .AutoRegisterServicesFromAssembly()
                 .AddCore(_configuration)
                 .AddWeb(_configuration)
+                .AddInternationalization(_configuration)
                 .AddRestApi()
                 .AddOpenApi(_configuration);
 #if Auth
@@ -63,6 +64,8 @@ namespace NV.Templates.Backend.Web
                {
                    opt.AllowAnyOrigin();
                });
+
+            app.UseInternationalization();
 
             app.UseRequestTracing()
                .UseExceptionHandler(ExceptionHandler.ConfigureExceptionHandling)
