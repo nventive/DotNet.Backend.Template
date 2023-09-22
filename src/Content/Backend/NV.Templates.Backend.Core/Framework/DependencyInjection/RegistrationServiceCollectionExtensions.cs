@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.Configuration;
-using NV.Templates.Backend.Core.Framework.DependencyInjection;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

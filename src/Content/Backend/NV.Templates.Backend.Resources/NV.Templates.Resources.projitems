@@ -6,7 +6,7 @@
     <SharedGUID>2d1ec19a-f716-4fd7-adc5-bf56173749dc</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>NV.Templates.Resources</Import_RootNamespace>
+    <Import_RootNamespace>NV.Templates.Backend.Resources</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)SharedResources.cs" />

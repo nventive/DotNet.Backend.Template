@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace NV.Templates.Resources
+namespace NV.Templates.Backend.Resources
 {
     internal class SharedResources
     {

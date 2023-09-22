@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
-using NV.Templates.Backend.Core.Framework.Internationalization.Services.Impl;
-using NV.Templates.Resources;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

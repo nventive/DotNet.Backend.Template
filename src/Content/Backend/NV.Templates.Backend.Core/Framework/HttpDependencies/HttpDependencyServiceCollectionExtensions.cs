@@ -2,8 +2,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
-using NV.Templates.Backend.Core.Framework.HttpDependencies;
-using NV.Templates.Backend.Core.Framework.Json;
 using Refit;
 
 namespace Microsoft.Extensions.DependencyInjection
