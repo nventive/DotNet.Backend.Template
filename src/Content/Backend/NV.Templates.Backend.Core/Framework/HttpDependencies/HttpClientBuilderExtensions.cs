@@ -5,7 +5,6 @@ using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NV.Templates.Backend.Core.General;
 using Polly;
 
 namespace NV.Templates.Backend.Core.Framework.HttpDependencies

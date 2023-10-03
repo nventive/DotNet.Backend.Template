@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using McMaster.Extensions.CommandLineUtils;
 using Microsoft.Extensions.Logging;
-using NV.Templates.Backend.Core.General;
 
 namespace NV.Templates.Backend.Console.General
 {

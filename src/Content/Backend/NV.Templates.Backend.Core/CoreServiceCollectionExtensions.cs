@@ -1,6 +1,5 @@
 ﻿using HttpTracing;
 using Microsoft.Extensions.Configuration;
-using NV.Templates.Backend.Core.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

@@ -35,5 +35,7 @@
     <Compile Include="InternalsVisibleTo.cs" Link="Properties\InternalsVisibleTo.cs" />
   </ItemGroup>
 
-  <Import Project="..\NV.Templates.Resources\NV.Templates.Resources.projitems" Label="Shared" Condition="Exists('..\NV.Templates.Resources\NV.Templates.Resources.projitems')" />
+  <Import Project="..\NV.Templates.Backend.Resources\NV.Templates.Backend.Resources.projitems" Label="Shared" Condition="Exists('..\NV.Templates.Backend.Resources\NV.Templates.Backend.Resources.projitems')" />
+
+  <Import Project="..\NV.Templates.Backend.Resources\NV.Templates.Resources.projitems" Label="Shared" />
 </Project>
