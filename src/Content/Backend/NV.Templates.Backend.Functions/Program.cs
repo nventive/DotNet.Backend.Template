@@ -1,21 +1,22 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
-    .ConfigureFunctionsWorkerDefaults(builder =>
+    .ConfigureFunctionsWebApplication()
+    .ConfigureServices(services =>
     {
         var rootProjectPath = Path.GetFullPath(Path.Combine("..", "..", "..", ".."));
-        var hostingEnvironment = builder.Services.BuildServiceProvider().GetService<IHostEnvironment>();
+        var hostingEnvironment = services.BuildServiceProvider().GetService<IHostEnvironment>();
         var configuration = new ConfigurationBuilder()
             .AddLocalSettings(rootProjectPath)
             .AddAzureKeyVaultWhenPresent(hostingEnvironment!)
             .AddEnvironmentVariables()
             .AddUserSecrets<Program>(true)
             .Build();
-
-        builder.Services.AddSingleton(configuration);
-        builder.Services.AddCore(configuration);
+        services.AddSingleton(configuration);
+        services.AddCore(configuration);
     })
     .Build();
 
