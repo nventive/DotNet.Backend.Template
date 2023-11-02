@@ -27,7 +27,6 @@ namespace NV.Templates.Backend.Web.RestApi.General
         {
             return Ok(new ApplicationInfoModel(_applicationInfo));
         }
-
 #if DEBUG
         [ApiVersionNeutral]
         [AllowAnonymous]

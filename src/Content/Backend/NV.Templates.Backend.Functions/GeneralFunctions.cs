@@ -1,40 +1,38 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.IO;
+using System.Net;
+using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
+using Newtonsoft.Json;
 
 namespace NV.Templates.Backend.Functions
 {
     public class GeneralFunctions
     {
         private readonly IApplicationInfo _applicationInfo;
-        private readonly IOperationContext _operationContext;
 
         public GeneralFunctions(
-            IApplicationInfo applicationInfo,
-            IOperationContext operationContext)
+            IApplicationInfo applicationInfo)
         {
             _applicationInfo = applicationInfo;
-            _operationContext = operationContext;
         }
 
         /// <summary>
         /// Get System Information.
         /// </summary>
-        [FunctionName("GetInfo")]
-        public async Task<JsonResult> GetInfo(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "info")] HttpRequest request,
-            ExecutionContext executionContext)
+        [Function("GetInfo")]
+        public async Task<IActionResult> GetInfo(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "info")] HttpRequest request, FunctionContext context)
         {
             if (request == null)
             {
                 throw new ArgumentNullException(nameof(request));
             }
 
-            _operationContext.Id = executionContext?.InvocationId.ToString() ?? $"{Guid.NewGuid()}";
-            return new JsonResult(_applicationInfo) { StatusCode = StatusCodes.Status200OK };
+            return new JsonResult(_applicationInfo);
         }
     }
 }

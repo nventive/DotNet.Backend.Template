@@ -28,7 +28,7 @@ namespace NV.Templates.Backend.Console
                     config.AddCommandLine(args);
                 }
 
-                hostBuilderContext.HostingEnvironment.ApplicationName = typeof(Program).Assembly.GetName().Name;
+                hostBuilderContext.HostingEnvironment.ApplicationName = typeof(Program).Assembly.GetName().Name !;
             })
             .ConfigureLogging((_, builder) =>
             {

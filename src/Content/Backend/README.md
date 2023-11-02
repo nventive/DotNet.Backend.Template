@@ -5,7 +5,7 @@
 ## Pre-Requisites
 
 - [Visual Studio 2022](https://visualstudio.microsoft.com/)
-- [.NET 6](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+- [.NET 7](https://dotnet.microsoft.com/en-us/download/dotnet/7.0)
 
 ## Recommended Extensions
 
